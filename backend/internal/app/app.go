@@ -49,7 +49,11 @@ func New(ctx context.Context, cfg config.Config) (*App, error) {
 	log := logger.New("info")
 	ids := idgen.New()
 	clk := clock.New()
-	pwHasher := hasher.New(12)
+	cost := cfg.BcryptCost
+	if cost == 0 {
+		cost = 12
+	}
+	pwHasher := hasher.New(cost)
 	jwt := token.New([]byte(cfg.JWTSecret))
 
 	// Repos
@@ -63,6 +67,7 @@ func New(ctx context.Context, cfg config.Config) (*App, error) {
 	notifs := sqliteadapter.NewNotificationRepo(conn, ids)
 	fcmTokens := sqliteadapter.NewFCMTokenRepo(conn, ids)
 	auditRepo := sqliteadapter.NewAuditRepo(conn, ids)
+	services := sqliteadapter.NewServiceRepo(conn, ids)
 
 	// AI (optional)
 	var aiClient usecase.AIClient
@@ -130,8 +135,8 @@ func New(ctx context.Context, cfg config.Config) (*App, error) {
 	if mailer != nil {
 		authSvc.SetMailer(mailer)
 	}
-	vendorSvc := vendor.New(vendor.Deps{Vendors: vendors, Photos: photos, Clock: clk})
-	bookingSvc := booking.New(booking.Deps{Bookings: bookings, Vendors: vendors, Clock: clk, Notifier: notifSvc})
+	vendorSvc := vendor.New(vendor.Deps{Vendors: vendors, Photos: photos, Services: services, Clock: clk})
+	bookingSvc := booking.New(booking.Deps{Bookings: bookings, Vendors: vendors, Services: services, Clock: clk, Notifier: notifSvc})
 	reviewSvc := review.New(review.Deps{Reviews: reviews, Bookings: bookings, Vendors: vendors, Clock: clk})
 	chatSvc := chat.New(chat.Deps{Vendors: vendors, AI: aiClient, Logger: log})
 	adminSvc := admin.New(admin.Deps{
@@ -156,6 +161,7 @@ func New(ctx context.Context, cfg config.Config) (*App, error) {
 		Auth:         handler.NewAuth(authSvc),
 		Me:           handler.NewMe(users),
 		Vendor:       handler.NewVendor(vendorSvc),
+		Service:      handler.NewService(vendorSvc),
 		Booking:      handler.NewBooking(bookingSvc),
 		Review:       handler.NewReview(reviewSvc),
 		Chat:         handler.NewChat(chatSvc),

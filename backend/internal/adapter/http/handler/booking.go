@@ -19,6 +19,7 @@ func NewBooking(svc *booking.Service) *Booking { return &Booking{svc: svc} }
 
 type bookingReq struct {
 	VendorID   string `json:"vendorId"`
+	ServiceID  string `json:"serviceId,omitempty"`
 	EventDate  string `json:"eventDate"`
 	GuestCount int    `json:"guestCount"`
 	Note       string `json:"note"`
@@ -35,6 +36,7 @@ func (h *Booking) Create(w http.ResponseWriter, r *http.Request) {
 	}
 	b, err := h.svc.Create(r.Context(), uid, booking.CreateInput{
 		VendorID:   req.VendorID,
+		ServiceID:  req.ServiceID,
 		EventDate:  req.EventDate,
 		GuestCount: req.GuestCount,
 		Note:       req.Note,

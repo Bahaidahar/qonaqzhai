@@ -43,6 +43,16 @@ type VendorQuery struct {
 	Limit      int
 }
 
+// ServiceRepo persists per-vendor services (menu items).
+type ServiceRepo interface {
+	Create(ctx context.Context, vendorID string, in domain.ServiceInput) (*domain.Service, error)
+	Update(ctx context.Context, id string, in domain.ServiceInput) (*domain.Service, error)
+	FindByID(ctx context.Context, id string) (*domain.Service, error)
+	ListByVendor(ctx context.Context, vendorID string, activeOnly bool) ([]*domain.Service, error)
+	Delete(ctx context.Context, id string) error
+	MinActivePrice(ctx context.Context, vendorID string) (int64, error)
+}
+
 // PhotoRepo persists vendor photos.
 type PhotoRepo interface {
 	Create(ctx context.Context, vendorID, mime string, data []byte) (*domain.Photo, error)
@@ -60,6 +70,7 @@ type BookingRepo interface {
 	ListAll(ctx context.Context) ([]*domain.Booking, error)
 	UpdateStatus(ctx context.Context, id string, status domain.BookingStatus) error
 	SetPayment(ctx context.Context, id, paymentID string) error
+	SetService(ctx context.Context, id, serviceID string) error
 }
 
 // ReviewRepo persists vendor reviews.

@@ -21,6 +21,8 @@ func NewBookingRepo(db *sql.DB, idGen usecase.IDGen) *BookingRepo {
 	return &BookingRepo{db: db, idGen: idGen}
 }
 
+const bookingCols = `id, customer_id, vendor_id, service_id, event_date, guest_count, note, status, amount, payment_id, created_at`
+
 // Create inserts a booking.
 func (r *BookingRepo) Create(ctx context.Context, b *domain.Booking) (*domain.Booking, error) {
 	if b.ID == "" {
@@ -30,9 +32,9 @@ func (r *BookingRepo) Create(ctx context.Context, b *domain.Booking) (*domain.Bo
 		b.Status = domain.BookingPending
 	}
 	if _, err := r.db.ExecContext(ctx,
-		`INSERT INTO bookings (id, customer_id, vendor_id, event_date, guest_count, note, status, amount, payment_id)
-		 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-		b.ID, b.CustomerID, b.VendorID, b.EventDate, b.GuestCount, b.Note,
+		`INSERT INTO bookings (id, customer_id, vendor_id, service_id, event_date, guest_count, note, status, amount, payment_id)
+		 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+		b.ID, b.CustomerID, b.VendorID, b.ServiceID, b.EventDate, b.GuestCount, b.Note,
 		string(b.Status), b.Amount, b.PaymentID,
 	); err != nil {
 		return nil, fmt.Errorf("insert booking: %w", err)
@@ -43,7 +45,7 @@ func (r *BookingRepo) Create(ctx context.Context, b *domain.Booking) (*domain.Bo
 // Find returns a booking by id.
 func (r *BookingRepo) Find(ctx context.Context, id string) (*domain.Booking, error) {
 	row := r.db.QueryRowContext(ctx,
-		`SELECT id, customer_id, vendor_id, event_date, guest_count, note, status, amount, payment_id, created_at FROM bookings WHERE id = ?`,
+		`SELECT `+bookingCols+` FROM bookings WHERE id = ?`,
 		id,
 	)
 	b, err := scanBooking(row)
@@ -69,7 +71,7 @@ func (r *BookingRepo) ListAll(ctx context.Context) ([]*domain.Booking, error) {
 }
 
 func (r *BookingRepo) list(ctx context.Context, where string, args ...any) ([]*domain.Booking, error) {
-	q := `SELECT id, customer_id, vendor_id, event_date, guest_count, note, status, amount, payment_id, created_at FROM bookings ` + where + ` ORDER BY created_at DESC`
+	q := `SELECT ` + bookingCols + ` FROM bookings ` + where + ` ORDER BY created_at DESC`
 	rows, err := r.db.QueryContext(ctx, q, args...)
 	if err != nil {
 		return nil, fmt.Errorf("list bookings: %w", err)
@@ -112,11 +114,24 @@ func (r *BookingRepo) SetPayment(ctx context.Context, id, paymentID string) erro
 	return nil
 }
 
+// SetService associates a service id with a booking.
+func (r *BookingRepo) SetService(ctx context.Context, id, serviceID string) error {
+	res, err := r.db.ExecContext(ctx, `UPDATE bookings SET service_id = ? WHERE id = ?`, serviceID, id)
+	if err != nil {
+		return err
+	}
+	n, _ := res.RowsAffected()
+	if n == 0 {
+		return domain.ErrNotFound
+	}
+	return nil
+}
+
 func scanBooking(s scanner) (*domain.Booking, error) {
 	var b domain.Booking
 	var status string
 	if err := s.Scan(
-		&b.ID, &b.CustomerID, &b.VendorID, &b.EventDate,
+		&b.ID, &b.CustomerID, &b.VendorID, &b.ServiceID, &b.EventDate,
 		&b.GuestCount, &b.Note, &status, &b.Amount, &b.PaymentID, &b.CreatedAt,
 	); err != nil {
 		return nil, err

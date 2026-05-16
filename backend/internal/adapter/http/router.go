@@ -18,6 +18,7 @@ type Handlers struct {
 	Auth         *handler.Auth
 	Me           *handler.Me
 	Vendor       *handler.Vendor
+	Service      *handler.Service
 	Booking      *handler.Booking
 	Review       *handler.Review
 	Chat         *handler.Chat
@@ -59,6 +60,7 @@ func NewRouter(h Handlers, cfg RouterConfig) http.Handler {
 	mux.Handle("GET /api/vendors", cfg.Auth.Optional(http.HandlerFunc(h.Vendor.List)))
 	mux.Handle("GET /api/vendors/{id}", cfg.Auth.Optional(http.HandlerFunc(h.Vendor.Detail)))
 	mux.HandleFunc("GET /api/vendors/{id}/reviews", h.Review.ListByVendor)
+	mux.Handle("GET /api/vendors/{id}/services", cfg.Auth.Optional(http.HandlerFunc(h.Service.List)))
 	mux.HandleFunc("GET /api/photos/{id}", h.Vendor.ServePhoto)
 
 	// authenticated (any role)
@@ -73,6 +75,10 @@ func NewRouter(h Handlers, cfg RouterConfig) http.Handler {
 	mux.Handle("GET /api/vendor", vendorOnly(http.HandlerFunc(h.Vendor.My)))
 	mux.Handle("POST /api/vendor/photos", vendorOnly(http.HandlerFunc(h.Vendor.UploadPhoto)))
 	mux.Handle("DELETE /api/vendor/photos/{id}", vendorOnly(http.HandlerFunc(h.Vendor.DeletePhoto)))
+	mux.Handle("GET /api/vendor/services", vendorOnly(http.HandlerFunc(h.Service.MyList)))
+	mux.Handle("POST /api/vendor/services", vendorOnly(http.HandlerFunc(h.Service.Create)))
+	mux.Handle("PATCH /api/vendor/services/{id}", vendorOnly(http.HandlerFunc(h.Service.Update)))
+	mux.Handle("DELETE /api/vendor/services/{id}", vendorOnly(http.HandlerFunc(h.Service.Delete)))
 
 	// customer
 	customerOnly := cfg.Auth.RequireRole(domain.RoleCustomer)

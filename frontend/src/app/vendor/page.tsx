@@ -14,6 +14,7 @@ import { useLabels } from "@/shared/i18n/labels";
 import { api, ApiError, photoURL, type Vendor } from "@/shared/api";
 import { formatKZT } from "@/shared/lib/utils";
 import type { DictKey } from "@/shared/i18n/dict";
+import { ServicesManager } from "@/features/services/services-manager";
 
 const CATEGORIES = [
   "Venue",
@@ -188,6 +189,7 @@ function VendorEditor() {
       </section>
 
       {vendor && <PhotosManager vendor={vendor} onReload={load} />}
+      {vendor && <ServicesManager vendorId={vendor.id} />}
     </div>
   );
 }

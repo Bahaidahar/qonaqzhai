@@ -64,6 +64,14 @@ vendor_transition() {
     -H 'content-type: application/json' -d "{\"status\":\"$status\"}" >/dev/null
 }
 
+create_service() {
+  local vtok="$1" name="$2" desc="$3" price="$4" unit="$5"
+  curl -fsS -X POST "$API/api/vendor/services" \
+    -H "authorization: Bearer $vtok" -H 'content-type: application/json' \
+    -d "$(jq -nc --arg n "$name" --arg d "$desc" --arg u "$unit" --argjson p "$price" \
+       '{name:$n,description:$d,price:$p,unit:$u}')" >/dev/null || true
+}
+
 upload_photo() {
   local vtok="$1" seed="$2"
   local tmp
@@ -156,6 +164,40 @@ for ((i=0; i<n; i++)); do
   if [ "$existing" -lt 2 ]; then
     upload_photo "$VTOK" "qz-${i}-a" || true
     upload_photo "$VTOK" "qz-${i}-b" || true
+  fi
+  # services — only if vendor has none yet
+  existing_svc=$(api -H "authorization: Bearer $VTOK" "$API/api/vendor/services" | jq -r '.items | length')
+  if [ "$existing_svc" = "0" ]; then
+    case "${VENDORS_CATS[$i]}" in
+      Venue)
+        create_service "$VTOK" "Hall rental (4 hours)" "Main hall with stage + sound" "${VENDORS_PRICES[$i]}" "fixed"
+        create_service "$VTOK" "Premium evening package" "Full day + decor + waiters" "$(( ${VENDORS_PRICES[$i]} * 2 ))" "fixed"
+        ;;
+      Catering)
+        create_service "$VTOK" "National menu (per guest)" "Plov, beshbarmak, salads, dessert" 12000 "person"
+        create_service "$VTOK" "European menu (per guest)" "Beef wellington, salmon, sides" 18000 "person"
+        ;;
+      Photo)
+        create_service "$VTOK" "Wedding day (8 hours)" "Full coverage + 200 edited photos" "${VENDORS_PRICES[$i]}" "fixed"
+        create_service "$VTOK" "Extra hour" "Additional shooting hour" 35000 "hour"
+        ;;
+      Video)
+        create_service "$VTOK" "Highlight reel (3 min)" "Cinematic edit + drone footage" "${VENDORS_PRICES[$i]}" "fixed"
+        create_service "$VTOK" "Full ceremony (60 min)" "Full ceremony recording" 250000 "fixed"
+        ;;
+      Music)
+        create_service "$VTOK" "DJ + sound (per hour)" "Live DJ + lighting" 25000 "hour"
+        create_service "$VTOK" "Full evening package" "5 hours + MC + smoke machine" 200000 "fixed"
+        ;;
+      Decor)
+        create_service "$VTOK" "Ceremony arch" "Floral arch + aisle decor" 150000 "fixed"
+        create_service "$VTOK" "Table runner (per table)" "Florals + candles" 12000 "item"
+        ;;
+      Cakes)
+        create_service "$VTOK" "Wedding cake (3 tiers)" "Fondant, custom design" "${VENDORS_PRICES[$i]}" "fixed"
+        create_service "$VTOK" "Cupcakes (per item)" "Custom flavor" 1500 "item"
+        ;;
+    esac
   fi
   VENDOR_IDS+=("$VID")
   VENDOR_TOKENS+=("$VTOK")

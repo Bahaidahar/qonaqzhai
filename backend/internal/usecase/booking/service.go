@@ -20,6 +20,7 @@ type Notifier interface {
 type Deps struct {
 	Bookings usecase.BookingRepo
 	Vendors  usecase.VendorRepo
+	Services usecase.ServiceRepo // optional — used to validate / price services on create
 	Clock    usecase.Clock
 	Notifier Notifier // optional
 }
@@ -33,6 +34,7 @@ func New(d Deps) *Service { return &Service{d: d} }
 // CreateInput captures user-supplied fields for a new booking.
 type CreateInput struct {
 	VendorID   string
+	ServiceID  string // optional — when set, amount auto-derived if not supplied
 	EventDate  string
 	GuestCount int
 	Note       string
@@ -42,6 +44,7 @@ type CreateInput struct {
 // Create validates input, verifies vendor existence and inserts a pending booking.
 func (s *Service) Create(ctx context.Context, customerID string, in CreateInput) (*domain.Booking, error) {
 	in.VendorID = strings.TrimSpace(in.VendorID)
+	in.ServiceID = strings.TrimSpace(in.ServiceID)
 	in.EventDate = strings.TrimSpace(in.EventDate)
 	if in.VendorID == "" || in.EventDate == "" {
 		return nil, fmt.Errorf("vendorId and eventDate required: %w", domain.ErrInvalidInput)
@@ -52,9 +55,23 @@ func (s *Service) Create(ctx context.Context, customerID string, in CreateInput)
 	if _, err := s.d.Vendors.FindByID(ctx, in.VendorID); err != nil {
 		return nil, err
 	}
+	// If a service is selected, validate it belongs to the same vendor + price-fill.
+	if in.ServiceID != "" && s.d.Services != nil {
+		svc, err := s.d.Services.FindByID(ctx, in.ServiceID)
+		if err != nil {
+			return nil, err
+		}
+		if svc.VendorID != in.VendorID {
+			return nil, fmt.Errorf("service does not belong to vendor: %w", domain.ErrInvalidInput)
+		}
+		if in.Amount == 0 {
+			in.Amount = svc.Price * priceMultiplier(svc.Unit, in.GuestCount)
+		}
+	}
 	b := &domain.Booking{
 		CustomerID: customerID,
 		VendorID:   in.VendorID,
+		ServiceID:  in.ServiceID,
 		EventDate:  in.EventDate,
 		GuestCount: in.GuestCount,
 		Note:       strings.TrimSpace(in.Note),
@@ -180,4 +197,16 @@ func (s *Service) ListForVendor(ctx context.Context, vendorUserID string) ([]*do
 // ListAll returns every booking (admin only).
 func (s *Service) ListAll(ctx context.Context) ([]*domain.Booking, error) {
 	return s.d.Bookings.ListAll(ctx)
+}
+
+// priceMultiplier converts a service unit + guest count into the bill multiplier.
+// Per-guest / per-item / per-hour units default to qty=1 when guest count is 0.
+func priceMultiplier(unit domain.ServiceUnit, guests int) int64 {
+	switch unit {
+	case domain.UnitPerson:
+		if guests > 0 {
+			return int64(guests)
+		}
+	}
+	return 1
 }

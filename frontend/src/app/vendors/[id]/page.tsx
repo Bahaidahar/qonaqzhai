@@ -10,9 +10,10 @@ import { Button } from "@/shared/ui/button";
 import { Input } from "@/shared/ui/input";
 import { useI18n } from "@/shared/i18n/context";
 import { useLabels } from "@/shared/i18n/labels";
-import { api, photoURL, ApiError, type Vendor, type Booking } from "@/shared/api";
+import { api, photoURL, ApiError, type Vendor, type Booking, type Service } from "@/shared/api";
 import { formatKZT } from "@/shared/lib/utils";
 import { ReviewList, Stars } from "@/features/reviews/review-list";
+import { ServicesList } from "@/features/services/services-list";
 
 interface PageProps {
   params: Promise<{ id: string }>;
@@ -137,6 +138,15 @@ function VendorDetailInner({ params }: PageProps) {
 
           <section className="mt-12">
             <h2 className="font-mono text-[10px] uppercase tracking-widest text-[var(--color-muted-foreground)]">
+              / Services
+            </h2>
+            <div className="mt-3">
+              <ServicesList vendorId={vendor.id} showFallbackEmpty />
+            </div>
+          </section>
+
+          <section className="mt-12">
+            <h2 className="font-mono text-[10px] uppercase tracking-widest text-[var(--color-muted-foreground)]">
               / Reviews
             </h2>
             <div className="mt-3">
@@ -160,18 +170,24 @@ function BookingPanel({ vendor }: { vendor: Vendor }) {
   const [booking, setBooking] = useState<Booking | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [paying, setPaying] = useState(false);
+  const [selectedService, setSelectedService] = useState<Service | null>(null);
 
   async function submit(e: React.FormEvent) {
     e.preventDefault();
     setSubmitting(true);
     setError(null);
     try {
+      const amountFromService =
+        selectedService && selectedService.unit === "person"
+          ? selectedService.price * (Number(guestCount) || 1)
+          : selectedService?.price;
       const b = await api.createBooking({
         vendorId: vendor.id,
+        serviceId: selectedService?.id,
         eventDate,
         guestCount: Number(guestCount) || 0,
         note,
-        amount: vendor.priceFrom > 0 ? vendor.priceFrom : undefined,
+        amount: amountFromService ?? (vendor.priceFrom > 0 ? vendor.priceFrom : undefined),
       });
       setBooking(b);
     } catch (err) {
@@ -252,6 +268,17 @@ function BookingPanel({ vendor }: { vendor: Vendor }) {
       </div>
       <div className="mt-1 font-display text-3xl">
         {vendor.priceFrom > 0 ? formatKZT(vendor.priceFrom) : "—"}
+      </div>
+
+      <div className="mt-5 space-y-2">
+        <div className="font-mono text-[10px] uppercase tracking-widest text-[var(--color-muted-foreground)]">
+          Pick a service
+        </div>
+        <ServicesList
+          vendorId={vendor.id}
+          selectedId={selectedService?.id}
+          onSelect={setSelectedService}
+        />
       </div>
 
       <form onSubmit={submit} className="mt-6 space-y-3">

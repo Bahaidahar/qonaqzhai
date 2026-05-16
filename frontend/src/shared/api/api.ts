@@ -7,6 +7,7 @@ import type {
 } from "@/entities/vendor/types";
 import type { Booking, BookingStatus } from "@/entities/booking/types";
 import type { Review } from "@/entities/review/types";
+import type { Service, ServiceInput } from "@/entities/service/types";
 import {
   API_BASE,
   TOKEN_KEY,
@@ -17,6 +18,7 @@ export type { Role, User as ApiUser } from "@/entities/user/types";
 export type { Vendor, Photo } from "@/entities/vendor/types";
 export type { Booking } from "@/entities/booking/types";
 export type { Review } from "@/entities/review/types";
+export type { Service, ServiceUnit, ServiceInput } from "@/entities/service/types";
 
 export interface AuthResponse {
   token: string;
@@ -288,6 +290,7 @@ export const api = {
   // bookings
   createBooking(body: {
     vendorId: string;
+    serviceId?: string;
     eventDate: string;
     guestCount: number;
     note?: string;
@@ -327,6 +330,34 @@ export const api = {
   },
   adminDeleteReview(id: string): Promise<void> {
     return request<void>(`/api/admin/reviews/${id}`, {
+      method: "DELETE",
+      auth: true,
+    });
+  },
+
+  // services
+  vendorServices(vendorId: string): Promise<{ items: Service[] | null }> {
+    return request<{ items: Service[] | null }>(`/api/vendors/${vendorId}/services`);
+  },
+  myServices(): Promise<{ items: Service[] | null }> {
+    return request<{ items: Service[] | null }>("/api/vendor/services", { auth: true });
+  },
+  createService(body: ServiceInput): Promise<Service> {
+    return request<Service>("/api/vendor/services", {
+      method: "POST",
+      body: JSON.stringify(body),
+      auth: true,
+    });
+  },
+  updateService(id: string, body: ServiceInput): Promise<Service> {
+    return request<Service>(`/api/vendor/services/${id}`, {
+      method: "PATCH",
+      body: JSON.stringify(body),
+      auth: true,
+    });
+  },
+  deleteService(id: string): Promise<void> {
+    return request<void>(`/api/vendor/services/${id}`, {
       method: "DELETE",
       auth: true,
     });

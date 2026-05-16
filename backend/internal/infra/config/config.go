@@ -38,6 +38,7 @@ type Config struct {
 	BaseURL string
 
 	RateLimitDisabled bool
+	BcryptCost        int // 0 → bcrypt.DefaultCost; set lower (4) in tests for speed
 }
 
 // Load reads configuration from environment variables, providing sensible defaults.

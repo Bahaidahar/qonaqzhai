@@ -37,6 +37,7 @@ func newEnv(t *testing.T) *env {
 		RefreshTTL:        24 * time.Hour,
 		ResetTTL:          time.Hour,
 		RateLimitDisabled: true,
+		BcryptCost:        4, // fast hashing in tests; production uses 12
 	}
 	a, err := app.New(context.Background(), cfg)
 	if err != nil {

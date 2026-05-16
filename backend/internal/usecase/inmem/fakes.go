@@ -426,6 +426,128 @@ func (r *BookingRepo) SetPayment(_ context.Context, id, paymentID string) error 
 	return nil
 }
 
+func (r *BookingRepo) SetService(_ context.Context, id, serviceID string) error {
+	r.mu.Lock()
+	defer r.mu.Unlock()
+	b, ok := r.byID[id]
+	if !ok {
+		return domain.ErrNotFound
+	}
+	b.ServiceID = serviceID
+	return nil
+}
+
+// --- Service repo ---
+
+type ServiceRepo struct {
+	mu    sync.Mutex
+	byID  map[string]*domain.Service
+	idGen func() string
+}
+
+func NewServiceRepo(idGen func() string) *ServiceRepo {
+	return &ServiceRepo{byID: map[string]*domain.Service{}, idGen: idGen}
+}
+
+func (r *ServiceRepo) Create(_ context.Context, vendorID string, in domain.ServiceInput) (*domain.Service, error) {
+	r.mu.Lock()
+	defer r.mu.Unlock()
+	active := true
+	if in.IsActive != nil {
+		active = *in.IsActive
+	}
+	now := time.Now().UTC()
+	s := &domain.Service{
+		ID:          r.idGen(),
+		VendorID:    vendorID,
+		Name:        in.Name,
+		Description: in.Description,
+		Price:       in.Price,
+		Unit:        in.Unit,
+		IsActive:    active,
+		CreatedAt:   now,
+		UpdatedAt:   now,
+	}
+	r.byID[s.ID] = s
+	cp := *s
+	return &cp, nil
+}
+
+func (r *ServiceRepo) Update(_ context.Context, id string, in domain.ServiceInput) (*domain.Service, error) {
+	r.mu.Lock()
+	defer r.mu.Unlock()
+	s, ok := r.byID[id]
+	if !ok {
+		return nil, domain.ErrNotFound
+	}
+	s.Name = in.Name
+	s.Description = in.Description
+	s.Price = in.Price
+	s.Unit = in.Unit
+	if in.IsActive != nil {
+		s.IsActive = *in.IsActive
+	}
+	s.UpdatedAt = time.Now().UTC()
+	cp := *s
+	return &cp, nil
+}
+
+func (r *ServiceRepo) FindByID(_ context.Context, id string) (*domain.Service, error) {
+	r.mu.Lock()
+	defer r.mu.Unlock()
+	s, ok := r.byID[id]
+	if !ok {
+		return nil, domain.ErrNotFound
+	}
+	cp := *s
+	return &cp, nil
+}
+
+func (r *ServiceRepo) ListByVendor(_ context.Context, vendorID string, activeOnly bool) ([]*domain.Service, error) {
+	r.mu.Lock()
+	defer r.mu.Unlock()
+	out := []*domain.Service{}
+	for _, s := range r.byID {
+		if s.VendorID != vendorID {
+			continue
+		}
+		if activeOnly && !s.IsActive {
+			continue
+		}
+		cp := *s
+		out = append(out, &cp)
+	}
+	sort.Slice(out, func(i, j int) bool { return out[i].CreatedAt.Before(out[j].CreatedAt) })
+	return out, nil
+}
+
+func (r *ServiceRepo) Delete(_ context.Context, id string) error {
+	r.mu.Lock()
+	defer r.mu.Unlock()
+	if _, ok := r.byID[id]; !ok {
+		return domain.ErrNotFound
+	}
+	delete(r.byID, id)
+	return nil
+}
+
+func (r *ServiceRepo) MinActivePrice(_ context.Context, vendorID string) (int64, error) {
+	r.mu.Lock()
+	defer r.mu.Unlock()
+	var min int64
+	found := false
+	for _, s := range r.byID {
+		if s.VendorID != vendorID || !s.IsActive {
+			continue
+		}
+		if !found || s.Price < min {
+			min = s.Price
+			found = true
+		}
+	}
+	return min, nil
+}
+
 // --- Review repo ---
 
 type ReviewRepo struct {
