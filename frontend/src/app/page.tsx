@@ -9,12 +9,7 @@ import { AuthGate } from "@/features/auth/auth-gate";
 import { RedirectIfWrongRole } from "@/features/auth/role-redirect";
 import { sendChat, userMessage } from "@/features/ai-chat/client";
 import type { ChatMessage } from "@/features/ai-chat/types";
-import {
-  loadChat,
-  newChatId,
-  notifyChatChanged,
-  saveChat,
-} from "@/features/ai-chat/history";
+import { loadChat, notifyChatChanged } from "@/features/ai-chat/history";
 import { useI18n } from "@/shared/i18n/context";
 import {
   Calendar,
@@ -69,41 +64,37 @@ function ChatApp() {
       return;
     }
     if (loadedRef.current === chatIdFromUrl) return;
-    const session = loadChat(chatIdFromUrl);
-    setChatId(chatIdFromUrl);
-    setMessages(session?.messages ?? []);
     loadedRef.current = chatIdFromUrl;
+    setChatId(chatIdFromUrl);
+    void loadChat(chatIdFromUrl).then((res) => {
+      if (!res) return;
+      // Only apply if URL still matches (user may have switched chats mid-load).
+      if (loadedRef.current === chatIdFromUrl) {
+        setMessages(res.messages);
+      }
+    });
   }, [chatIdFromUrl]);
 
   const send = useCallback(
     async (text: string) => {
-      let id = chatId;
-      if (!id) {
-        id = newChatId();
-        setChatId(id);
-        loadedRef.current = id;
-        router.replace(`/?c=${id}`);
-      }
-      setMessages((prev) => {
-        const next = [...prev, userMessage(text)];
-        saveChat(id!, next);
-        notifyChatChanged();
-        return next;
-      });
+      const currentId = chatId;
+      // Append the user message optimistically.
+      setMessages((prev) => [...prev, userMessage(text)]);
       setThinking(true);
       try {
-        const reply = await sendChat(text);
-        setMessages((prev) => {
-          const next = [...prev, { ...reply, streaming: true }];
-          saveChat(id!, next); // saveChat strips `streaming` before persist
-          notifyChatChanged();
-          return next;
-        });
+        const { chatId: resolvedId, message } = await sendChat(text, currentId ?? undefined);
+        if (resolvedId && resolvedId !== currentId) {
+          setChatId(resolvedId);
+          loadedRef.current = resolvedId;
+          router.replace(`/?c=${resolvedId}`);
+        }
+        setMessages((prev) => [...prev, { ...message, streaming: true }]);
+        notifyChatChanged();
       } finally {
         setThinking(false);
       }
     },
-    [chatId, router]
+    [chatId, router],
   );
 
   const isEmpty = messages.length === 0;

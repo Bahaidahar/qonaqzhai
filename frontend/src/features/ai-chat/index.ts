@@ -3,11 +3,10 @@ export { ChatMessageView } from "./chat-message";
 export { BlockRenderer } from "./block-renderer";
 export { sendChat, userMessage } from "./client";
 export {
-  newChatId,
   listChats,
   loadChat,
-  saveChat,
   deleteChat,
+  renameChat,
   useChatHistory,
   notifyChatChanged,
 } from "./history";

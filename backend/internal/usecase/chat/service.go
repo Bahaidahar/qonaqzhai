@@ -1,8 +1,9 @@
-// Package chat implements the AI chat use case with fallback behavior.
+// Package chat implements the AI chat use case with fallback behavior + history persistence.
 package chat
 
 import (
 	"context"
+	"encoding/json"
 	"errors"
 	"log/slog"
 	"strings"
@@ -14,6 +15,7 @@ import (
 // Deps bundles chat service collaborators.
 type Deps struct {
 	Vendors usecase.VendorRepo
+	Chats   usecase.ChatRepo // optional — when nil, history is not persisted
 	AI      usecase.AIClient // optional — nil disables Gemini, fallback only
 	Logger  *slog.Logger
 }
@@ -36,23 +38,162 @@ type Reply struct {
 	Blocks []usecase.ChatBlock
 }
 
-// Generate produces a Reply for the user message.
+// SendOutcome is the result of sending a message:
+// the AI reply plus the chat id (newly created or reused).
+type SendOutcome struct {
+	ChatID string
+	Reply  string
+	Blocks []usecase.ChatBlock
+}
+
+// Generate produces a Reply for the user message without touching history.
+// Used by stateless callers (e.g. tests).
 func (s *Service) Generate(ctx context.Context, message string) (*Reply, error) {
 	message = strings.TrimSpace(message)
 	if message == "" {
 		return nil, domain.ErrInvalidInput
 	}
+	r := s.generate(ctx, message)
+	return &Reply{Reply: r.Reply, Blocks: r.Blocks}, nil
+}
+
+// Send persists the user message + AI reply against a chat owned by userID.
+// When chatID is empty, a fresh chat is created and its id is returned.
+func (s *Service) Send(ctx context.Context, userID, chatID, message string) (*SendOutcome, error) {
+	message = strings.TrimSpace(message)
+	if message == "" {
+		return nil, domain.ErrInvalidInput
+	}
+	if s.d.Chats == nil {
+		// History disabled — fall back to stateless behavior.
+		r := s.generate(ctx, message)
+		return &SendOutcome{ChatID: "", Reply: r.Reply, Blocks: r.Blocks}, nil
+	}
+
+	// Resolve / create chat.
+	var chat *domain.Chat
+	if chatID != "" {
+		c, err := s.d.Chats.FindByID(ctx, chatID)
+		if err != nil {
+			return nil, err
+		}
+		if c.UserID != userID {
+			return nil, domain.ErrForbidden
+		}
+		chat = c
+	} else {
+		c, err := s.d.Chats.Create(ctx, userID, deriveTitle(message))
+		if err != nil {
+			return nil, err
+		}
+		chat = c
+	}
+
+	// Persist user message.
+	if _, err := s.d.Chats.AddMessage(ctx, &domain.ChatMessage{
+		ChatID: chat.ID, Role: domain.ChatRoleUser, Text: message,
+	}); err != nil {
+		return nil, err
+	}
+
+	// Generate + persist AI reply.
+	r := s.generate(ctx, message)
+	var blocksJSON string
+	if len(r.Blocks) > 0 {
+		raw, err := json.Marshal(r.Blocks)
+		if err == nil {
+			blocksJSON = string(raw)
+		}
+	}
+	if _, err := s.d.Chats.AddMessage(ctx, &domain.ChatMessage{
+		ChatID:     chat.ID,
+		Role:       domain.ChatRoleAI,
+		Text:       r.Reply,
+		BlocksJSON: blocksJSON,
+	}); err != nil {
+		return nil, err
+	}
+
+	// Bump updatedAt + title if the chat title was empty.
+	if chat.Title == "" {
+		_ = s.d.Chats.UpdateTitle(ctx, chat.ID, deriveTitle(message))
+	} else {
+		_ = s.d.Chats.Touch(ctx, chat.ID)
+	}
+
+	return &SendOutcome{ChatID: chat.ID, Reply: r.Reply, Blocks: r.Blocks}, nil
+}
+
+// ListChats returns the user's chats, newest first.
+func (s *Service) ListChats(ctx context.Context, userID string) ([]*domain.Chat, error) {
+	if s.d.Chats == nil {
+		return []*domain.Chat{}, nil
+	}
+	return s.d.Chats.ListForUser(ctx, userID, 100)
+}
+
+// GetChat returns a chat + its messages, enforcing ownership.
+func (s *Service) GetChat(ctx context.Context, userID, chatID string) (*domain.Chat, []*domain.ChatMessage, error) {
+	if s.d.Chats == nil {
+		return nil, nil, domain.ErrNotFound
+	}
+	c, err := s.d.Chats.FindByID(ctx, chatID)
+	if err != nil {
+		return nil, nil, err
+	}
+	if c.UserID != userID {
+		return nil, nil, domain.ErrForbidden
+	}
+	msgs, err := s.d.Chats.ListMessages(ctx, chatID)
+	if err != nil {
+		return nil, nil, err
+	}
+	return c, msgs, nil
+}
+
+// DeleteChat removes a chat owned by userID (cascades to messages).
+func (s *Service) DeleteChat(ctx context.Context, userID, chatID string) error {
+	if s.d.Chats == nil {
+		return domain.ErrNotFound
+	}
+	c, err := s.d.Chats.FindByID(ctx, chatID)
+	if err != nil {
+		return err
+	}
+	if c.UserID != userID {
+		return domain.ErrForbidden
+	}
+	return s.d.Chats.Delete(ctx, chatID)
+}
+
+// RenameChat updates a chat's title.
+func (s *Service) RenameChat(ctx context.Context, userID, chatID, title string) error {
+	if s.d.Chats == nil {
+		return domain.ErrNotFound
+	}
+	c, err := s.d.Chats.FindByID(ctx, chatID)
+	if err != nil {
+		return err
+	}
+	if c.UserID != userID {
+		return domain.ErrForbidden
+	}
+	return s.d.Chats.UpdateTitle(ctx, chatID, strings.TrimSpace(title))
+}
+
+// generate is the LLM call with fallback. Internal use only.
+func (s *Service) generate(ctx context.Context, message string) Reply {
 	if s.d.AI != nil {
 		refs, err := s.approvedRefs(ctx)
 		if err == nil {
 			res, err := s.d.AI.Generate(ctx, message, refs)
 			if err == nil && res != nil {
-				return &Reply{Reply: res.Reply, Blocks: res.Blocks}, nil
+				return Reply{Reply: res.Reply, Blocks: res.Blocks}
 			}
 			s.d.Logger.Warn("ai generate failed, falling back", slog.String("err", errString(err)))
 		}
 	}
-	return s.fallback(ctx, message), nil
+	return s.fallback(ctx, message)
 }
 
 func (s *Service) approvedRefs(ctx context.Context) ([]usecase.VendorRef, error) {
@@ -73,11 +214,11 @@ func (s *Service) approvedRefs(ctx context.Context) ([]usecase.VendorRef, error)
 	return refs, nil
 }
 
-func (s *Service) fallback(ctx context.Context, message string) *Reply {
+func (s *Service) fallback(ctx context.Context, message string) Reply {
 	low := strings.ToLower(message)
 	switch {
 	case containsAny(low, "budget", "бюджет"):
-		return &Reply{
+		return Reply{
 			Reply: "Here's a typical KZ split for your event.",
 			Blocks: []usecase.ChatBlock{{
 				Type: "budget",
@@ -107,7 +248,7 @@ func (s *Service) fallback(ctx context.Context, message string) *Reply {
 				"rating":    v.RatingAvg,
 			})
 		}
-		return &Reply{
+		return Reply{
 			Reply: "Top picks from our verified vendors.",
 			Blocks: []usecase.ChatBlock{{
 				Type: "vendors",
@@ -115,7 +256,7 @@ func (s *Service) fallback(ctx context.Context, message string) *Reply {
 			}},
 		}
 	default:
-		return &Reply{
+		return Reply{
 			Reply: "Drafted your plan. Ask for budget, vendors, or timeline next.",
 			Blocks: []usecase.ChatBlock{{
 				Type: "plan",
@@ -149,4 +290,13 @@ func errString(err error) string {
 		return "canceled"
 	}
 	return err.Error()
+}
+
+// deriveTitle creates a short title from the first user message.
+func deriveTitle(message string) string {
+	t := strings.Join(strings.Fields(message), " ")
+	if len(t) > 60 {
+		t = t[:60] + "…"
+	}
+	return t
 }

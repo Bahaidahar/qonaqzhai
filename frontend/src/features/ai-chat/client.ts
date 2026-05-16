@@ -1,4 +1,5 @@
-import { api, type ChatBlockRaw } from "@/shared/api";
+import { getToken } from "@/shared/api";
+import { API_BASE } from "@/shared/config/env";
 import type { Block, ChatMessage } from "./types";
 
 let counter = 1;
@@ -6,6 +7,17 @@ const id = () => `m_${Date.now()}_${counter++}`;
 
 export function userMessage(text: string): ChatMessage {
   return { id: id(), role: "user", text };
+}
+
+interface ChatBlockRaw {
+  type: string;
+  data: Record<string, unknown>;
+}
+
+interface ChatReplyResponse {
+  chatId?: string;
+  reply: string;
+  blocks?: ChatBlockRaw[];
 }
 
 function adaptBlock(b: ChatBlockRaw): Block | null {
@@ -42,15 +54,42 @@ function adaptBlock(b: ChatBlockRaw): Block | null {
   }
 }
 
-export async function sendChat(text: string): Promise<ChatMessage> {
-  const res = await api.chat(text);
-  const blocks = (res.blocks ?? [])
+export interface SendResult {
+  chatId: string;
+  message: ChatMessage;
+}
+
+/**
+ * Send a chat message. Server persists user message + AI reply, returns chatId.
+ * On first message of a brand-new chat, chatId may be empty; server creates one and echoes it back.
+ */
+export async function sendChat(text: string, chatId?: string): Promise<SendResult> {
+  const token = getToken();
+  const res = await fetch(`${API_BASE}/api/chat`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
+    },
+    body: JSON.stringify({ message: text, chatId: chatId ?? "" }),
+  });
+  const body: ChatReplyResponse | { error?: string } = await res.json().catch(() => ({}) as never);
+  if (!res.ok) {
+    const message =
+      "error" in body && typeof body.error === "string" ? body.error : `chat failed: ${res.status}`;
+    throw new Error(message);
+  }
+  const data = body as ChatReplyResponse;
+  const blocks = (data.blocks ?? [])
     .map(adaptBlock)
     .filter((b): b is Block => b !== null);
   return {
-    id: id(),
-    role: "ai",
-    text: res.reply,
-    blocks: blocks.length ? blocks : undefined,
+    chatId: data.chatId ?? chatId ?? "",
+    message: {
+      id: id(),
+      role: "ai",
+      text: data.reply,
+      blocks: blocks.length ? blocks : undefined,
+    },
   };
 }

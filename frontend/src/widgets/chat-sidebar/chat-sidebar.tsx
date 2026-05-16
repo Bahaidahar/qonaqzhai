@@ -22,12 +22,7 @@ import { useI18n } from "@/shared/i18n/context";
 import { useSidebar } from "./sidebar-context";
 import { useAuth } from "@/features/auth/context";
 import type { DictKey } from "@/shared/i18n/dict";
-import {
-  deleteChat,
-  newChatId,
-  notifyChatChanged,
-  useChatHistory,
-} from "@/features/ai-chat/history";
+import { deleteChat, useChatHistory } from "@/features/ai-chat/history";
 
 interface NavItem {
   href: string;
@@ -88,13 +83,17 @@ export function ChatSidebar() {
   const showHistory = user?.role === "customer";
 
   function startNewChat() {
-    router.push(`/?c=${newChatId()}`);
+    // Drop the chat query param — first message creates a chat on the server.
+    router.push("/");
   }
 
-  function removeChat(id: string) {
-    deleteChat(id);
-    notifyChatChanged();
-    refresh();
+  async function removeChat(id: string) {
+    try {
+      await deleteChat(id);
+    } catch {
+      // ignore; refresh below will reconcile
+    }
+    await refresh();
     if (id === currentChatId) {
       router.push("/");
     }

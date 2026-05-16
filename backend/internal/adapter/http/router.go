@@ -66,6 +66,10 @@ func NewRouter(h Handlers, cfg RouterConfig) http.Handler {
 	// authenticated (any role)
 	mux.Handle("GET /api/me", cfg.Auth.Required(http.HandlerFunc(h.Me.Get)))
 	mux.Handle("POST /api/chat", cfg.Auth.Required(chatLimit(http.HandlerFunc(h.Chat.Generate))))
+	mux.Handle("GET /api/chats", cfg.Auth.Required(http.HandlerFunc(h.Chat.ListChats)))
+	mux.Handle("GET /api/chats/{id}", cfg.Auth.Required(http.HandlerFunc(h.Chat.GetChat)))
+	mux.Handle("PATCH /api/chats/{id}", cfg.Auth.Required(http.HandlerFunc(h.Chat.RenameChat)))
+	mux.Handle("DELETE /api/chats/{id}", cfg.Auth.Required(http.HandlerFunc(h.Chat.DeleteChat)))
 	mux.Handle("GET /api/bookings", cfg.Auth.Required(http.HandlerFunc(h.Booking.List)))
 	mux.Handle("PATCH /api/bookings/{id}", cfg.Auth.Required(http.HandlerFunc(h.Booking.Update)))
 

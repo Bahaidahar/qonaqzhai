@@ -92,6 +92,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setUser(null);
   }
 
+  // Persist current user id in localStorage so feature modules (e.g. chat history)
+  // can scope their storage to the active account without a hard dependency on this context.
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    if (user) {
+      window.localStorage.setItem("qonaqzhai_current_user", user.id);
+    } else {
+      window.localStorage.removeItem("qonaqzhai_current_user");
+    }
+    window.dispatchEvent(new CustomEvent("qonaqzhai:user-changed"));
+  }, [user]);
+
   return (
     <AuthContext.Provider
       value={{ user, loading, signup, login, logout, refresh }}

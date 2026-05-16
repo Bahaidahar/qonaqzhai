@@ -107,6 +107,19 @@ type AuditRepo interface {
 	List(ctx context.Context, limit int) ([]*domain.AuditEntry, error)
 }
 
+// ChatRepo persists chats + messages per user.
+type ChatRepo interface {
+	Create(ctx context.Context, userID, title string) (*domain.Chat, error)
+	FindByID(ctx context.Context, id string) (*domain.Chat, error)
+	ListForUser(ctx context.Context, userID string, limit int) ([]*domain.Chat, error)
+	UpdateTitle(ctx context.Context, id, title string) error
+	Touch(ctx context.Context, id string) error
+	Delete(ctx context.Context, id string) error
+
+	AddMessage(ctx context.Context, m *domain.ChatMessage) (*domain.ChatMessage, error)
+	ListMessages(ctx context.Context, chatID string) ([]*domain.ChatMessage, error)
+}
+
 // NotificationRepo persists in-app notifications and delivery records.
 type NotificationRepo interface {
 	Create(ctx context.Context, n *domain.Notification) (*domain.Notification, error)

@@ -68,6 +68,7 @@ func New(ctx context.Context, cfg config.Config) (*App, error) {
 	fcmTokens := sqliteadapter.NewFCMTokenRepo(conn, ids)
 	auditRepo := sqliteadapter.NewAuditRepo(conn, ids)
 	services := sqliteadapter.NewServiceRepo(conn, ids)
+	chats := sqliteadapter.NewChatRepo(conn, ids)
 
 	// AI (optional)
 	var aiClient usecase.AIClient
@@ -138,7 +139,7 @@ func New(ctx context.Context, cfg config.Config) (*App, error) {
 	vendorSvc := vendor.New(vendor.Deps{Vendors: vendors, Photos: photos, Services: services, Clock: clk})
 	bookingSvc := booking.New(booking.Deps{Bookings: bookings, Vendors: vendors, Services: services, Clock: clk, Notifier: notifSvc})
 	reviewSvc := review.New(review.Deps{Reviews: reviews, Bookings: bookings, Vendors: vendors, Clock: clk})
-	chatSvc := chat.New(chat.Deps{Vendors: vendors, AI: aiClient, Logger: log})
+	chatSvc := chat.New(chat.Deps{Vendors: vendors, Chats: chats, AI: aiClient, Logger: log})
 	adminSvc := admin.New(admin.Deps{
 		Users: users, Vendors: vendors, Bookings: bookings, Reviews: reviews,
 		Audit: auditRepo, Notifier: notifSvc,
