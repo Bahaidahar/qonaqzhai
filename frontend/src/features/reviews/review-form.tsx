@@ -4,6 +4,7 @@ import { useState } from "react";
 import { Star, Send } from "lucide-react";
 import { Button } from "@/shared/ui/button";
 import { api, ApiError } from "@/shared/api";
+import { useI18n } from "@/shared/i18n/context";
 
 interface Props {
   bookingId: string;
@@ -11,6 +12,7 @@ interface Props {
 }
 
 export function ReviewForm({ bookingId, onSubmitted }: Props) {
+  const { t } = useI18n();
   const [rating, setRating] = useState(5);
   const [text, setText] = useState("");
   const [submitting, setSubmitting] = useState(false);
@@ -20,7 +22,7 @@ export function ReviewForm({ bookingId, onSubmitted }: Props) {
   if (done) {
     return (
       <div className="rounded-xl border bg-[var(--color-card)] p-4 text-sm">
-        Thanks for the review!
+        {t("reviews_thanks")}
       </div>
     );
   }
@@ -35,7 +37,7 @@ export function ReviewForm({ bookingId, onSubmitted }: Props) {
       onSubmitted?.();
     } catch (err) {
       if (err instanceof ApiError) setError(err.message);
-      else setError("Network error");
+      else setError(t("auth_network_error"));
     } finally {
       setSubmitting(false);
     }
@@ -68,7 +70,7 @@ export function ReviewForm({ bookingId, onSubmitted }: Props) {
         value={text}
         onChange={(e) => setText(e.target.value)}
         rows={3}
-        placeholder="Share your experience…"
+        placeholder={t("reviews_share_ph")}
         className="mt-3 w-full resize-none rounded-lg border bg-[var(--color-input)]/60 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-ring)]"
       />
       {error && (
@@ -76,7 +78,7 @@ export function ReviewForm({ bookingId, onSubmitted }: Props) {
       )}
       <Button type="submit" size="sm" className="mt-3" disabled={submitting}>
         <Send className="h-3.5 w-3.5" />
-        {submitting ? "..." : "Submit review"}
+        {submitting ? "..." : t("reviews_submit")}
       </Button>
     </form>
   );

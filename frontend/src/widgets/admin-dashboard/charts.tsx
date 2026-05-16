@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { API_BASE } from "@/shared/config/env";
 import { getToken } from "@/shared/api";
+import { useI18n } from "@/shared/i18n/context";
 
 interface TimePoint {
   date: string;
@@ -26,6 +27,7 @@ async function fetchAuthed<T>(path: string): Promise<T> {
 }
 
 export function AdminCharts() {
+  const { t } = useI18n();
   const [series, setSeries] = useState<TimePoint[]>([]);
   const [categories, setCategories] = useState<CategoryCount[]>([]);
   const [funnel, setFunnel] = useState<FunnelStage[]>([]);
@@ -45,15 +47,15 @@ export function AdminCharts() {
 
   return (
     <div className="mt-8 grid gap-4 lg:grid-cols-3">
-      <Card title="Bookings per day">
+      <Card title={t("charts_bookings_per_day")}>
         <BarChart points={series.slice(-30).map((p) => ({ label: p.date.slice(5), value: Number(p.value) }))} />
       </Card>
-      <Card title="Top categories">
+      <Card title={t("charts_top_categories")}>
         <BarChart
           points={categories.slice(0, 6).map((c) => ({ label: c.category, value: c.count }))}
         />
       </Card>
-      <Card title="Vendor approval funnel">
+      <Card title={t("charts_funnel")}>
         <FunnelChart stages={funnel} />
       </Card>
     </div>
@@ -72,10 +74,11 @@ function Card({ title, children }: { title: string; children: React.ReactNode })
 }
 
 function BarChart({ points }: { points: { label: string; value: number }[] }) {
+  const { t } = useI18n();
   if (points.length === 0) {
     return (
       <div className="py-8 text-center text-xs text-[var(--color-muted-foreground)]">
-        No data yet
+        {t("charts_no_data")}
       </div>
     );
   }
@@ -101,10 +104,11 @@ function BarChart({ points }: { points: { label: string; value: number }[] }) {
 }
 
 function FunnelChart({ stages }: { stages: FunnelStage[] }) {
+  const { t } = useI18n();
   if (stages.length === 0) {
     return (
       <div className="py-8 text-center text-xs text-[var(--color-muted-foreground)]">
-        No data yet
+        {t("charts_no_data")}
       </div>
     );
   }

@@ -8,6 +8,7 @@ import { Button } from "@/shared/ui/button";
 import { Input } from "@/shared/ui/input";
 import { api, ApiError } from "@/shared/api";
 import { Wordmark } from "@/widgets/header/brand";
+import { useI18n } from "@/shared/i18n/context";
 
 export default function ResetPasswordPage() {
   return (
@@ -18,6 +19,7 @@ export default function ResetPasswordPage() {
 }
 
 function ResetInner() {
+  const { t } = useI18n();
   const router = useRouter();
   const params = useSearchParams();
   const [token, setToken] = useState("");
@@ -27,8 +29,8 @@ function ResetInner() {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    const t = params.get("token");
-    if (t) setToken(t);
+    const tk = params.get("token");
+    if (tk) setToken(tk);
   }, [params]);
 
   async function submit(e: React.FormEvent) {
@@ -40,7 +42,7 @@ function ResetInner() {
       setDone(true);
       window.setTimeout(() => router.replace("/"), 1500);
     } catch (err) {
-      setError(err instanceof ApiError ? err.message : "Network error");
+      setError(err instanceof ApiError ? err.message : t("auth_network_error"));
     } finally {
       setBusy(false);
     }
@@ -56,30 +58,30 @@ function ResetInner() {
       <div className="w-full max-w-md">
         <Wordmark className="mb-6 block text-center" />
         <h1 className="text-center font-display text-3xl tracking-[-0.045em]">
-          Reset password
+          {t("auth_reset_title")}
         </h1>
 
         {done ? (
           <div className="mt-8 rounded-xl border bg-[var(--color-card)] p-6 text-center">
             <CheckCircle2 className="mx-auto h-10 w-10 text-[oklch(0.58_0.14_145)]" />
-            <h2 className="mt-3 font-display text-xl">Password updated</h2>
+            <h2 className="mt-3 font-display text-xl">{t("auth_reset_done_title")}</h2>
             <p className="mt-2 text-xs text-[var(--color-muted-foreground)]">
-              Redirecting to sign in…
+              {t("auth_reset_done_hint")}
             </p>
           </div>
         ) : (
           <form onSubmit={submit} className="mt-8 space-y-4">
             <div className="space-y-1.5">
-              <label className="text-sm font-medium">Reset token</label>
+              <label className="text-sm font-medium">{t("auth_reset_token")}</label>
               <Input
                 value={token}
                 onChange={(e) => setToken(e.target.value)}
-                placeholder="Paste from email"
+                placeholder={t("auth_reset_token_ph")}
                 required
               />
             </div>
             <div className="space-y-1.5">
-              <label className="text-sm font-medium">New password</label>
+              <label className="text-sm font-medium">{t("auth_reset_new_password")}</label>
               <Input
                 type="password"
                 value={pw}
@@ -95,13 +97,13 @@ function ResetInner() {
               </div>
             )}
             <Button type="submit" className="w-full" size="lg" disabled={busy}>
-              {busy ? "..." : "Reset password"}
+              {busy ? "..." : t("auth_reset_btn")}
             </Button>
             <Link
               href="/"
               className="link-underline mx-auto block w-fit text-xs text-[var(--color-muted-foreground)]"
             >
-              Back to sign in
+              {t("auth_forgot_back")}
             </Link>
           </form>
         )}

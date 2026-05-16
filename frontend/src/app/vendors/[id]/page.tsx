@@ -138,7 +138,7 @@ function VendorDetailInner({ params }: PageProps) {
 
           <section className="mt-12">
             <h2 className="font-mono text-[10px] uppercase tracking-widest text-[var(--color-muted-foreground)]">
-              / Services
+              / {t("services_title")}
             </h2>
             <div className="mt-3">
               <ServicesList vendorId={vendor.id} showFallbackEmpty />
@@ -147,7 +147,7 @@ function VendorDetailInner({ params }: PageProps) {
 
           <section className="mt-12">
             <h2 className="font-mono text-[10px] uppercase tracking-widest text-[var(--color-muted-foreground)]">
-              / Reviews
+              / {t("reviews_title")}
             </h2>
             <div className="mt-3">
               <ReviewList vendorId={vendor.id} />
@@ -244,7 +244,7 @@ function BookingPanel({ vendor }: { vendor: Vendor }) {
             variant="primary"
           >
             <CreditCard className="h-4 w-4" />
-            {paying ? "..." : `Pay ${formatKZT(booking.amount)}`}
+            {paying ? "..." : `${t("booking_pay")} ${formatKZT(booking.amount)}`}
           </Button>
         )}
         {error && (
@@ -272,7 +272,7 @@ function BookingPanel({ vendor }: { vendor: Vendor }) {
 
       <div className="mt-5 space-y-2">
         <div className="font-mono text-[10px] uppercase tracking-widest text-[var(--color-muted-foreground)]">
-          Pick a service
+          {t("services_pick")}
         </div>
         <ServicesList
           vendorId={vendor.id}

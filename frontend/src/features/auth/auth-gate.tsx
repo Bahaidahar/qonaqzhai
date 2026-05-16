@@ -206,7 +206,7 @@ function AuthScreen() {
               href="/auth/forgot"
               className="link-underline block text-center text-xs text-[var(--color-muted-foreground)]"
             >
-              Forgot password?
+              {t("auth_forgot_link")}
             </Link>
           )}
         </form>

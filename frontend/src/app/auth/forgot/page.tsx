@@ -24,7 +24,7 @@ export default function ForgotPasswordPage() {
       await api.forgotPassword(email.trim());
       setDone(true);
     } catch (err) {
-      setError(err instanceof ApiError ? err.message : "Network error");
+      setError(err instanceof ApiError ? err.message : t("auth_network_error"));
     } finally {
       setBusy(false);
     }
@@ -40,24 +40,22 @@ export default function ForgotPasswordPage() {
       <div className="w-full max-w-md">
         <Wordmark className="mb-6 block text-center" />
         <h1 className="text-center font-display text-3xl tracking-[-0.045em]">
-          Forgot password
+          {t("auth_forgot_title")}
         </h1>
         <p className="mt-2 text-center text-sm text-[var(--color-muted-foreground)]">
-          We&apos;ll email you a reset link.
+          {t("auth_forgot_hint")}
         </p>
 
         {done ? (
           <div className="mt-8 rounded-xl border bg-[var(--color-card)] p-6 text-center">
             <Mail className="mx-auto h-8 w-8 text-[var(--color-primary)]" />
-            <h2 className="mt-3 font-display text-xl">Check your inbox</h2>
+            <h2 className="mt-3 font-display text-xl">{t("auth_forgot_done_title")}</h2>
             <p className="mt-2 text-xs text-[var(--color-muted-foreground)]">
-              If an account exists for <b>{email}</b>, a password reset link has
-              been sent. Open the email and follow the instructions, or paste
-              the token manually below.
+              {t("auth_forgot_done_hint")}
             </p>
             <Link href="/auth/reset">
               <Button className="mt-4 w-full" size="sm">
-                Enter reset token →
+                {t("auth_forgot_enter_token")}
               </Button>
             </Link>
             <Link
@@ -65,7 +63,7 @@ export default function ForgotPasswordPage() {
               className="link-underline mt-4 inline-flex items-center gap-1.5 text-xs text-[var(--color-muted-foreground)]"
             >
               <ArrowLeft className="h-3 w-3" />
-              Back to sign in
+              {t("auth_forgot_back")}
             </Link>
           </div>
         ) : (
@@ -86,13 +84,13 @@ export default function ForgotPasswordPage() {
               </div>
             )}
             <Button type="submit" className="w-full" size="lg" disabled={busy}>
-              {busy ? "..." : "Send reset link"}
+              {busy ? "..." : t("auth_forgot_btn_send")}
             </Button>
             <Link
               href="/"
               className="link-underline mx-auto block w-fit text-xs text-[var(--color-muted-foreground)]"
             >
-              Back to sign in
+              {t("auth_forgot_back")}
             </Link>
           </form>
         )}

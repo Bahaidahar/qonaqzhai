@@ -3,8 +3,10 @@
 import { useEffect, useState } from "react";
 import { Star } from "lucide-react";
 import { api, type Review } from "@/shared/api";
+import { useI18n } from "@/shared/i18n/context";
 
 export function ReviewList({ vendorId }: { vendorId: string }) {
+  const { t } = useI18n();
   const [items, setItems] = useState<Review[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -18,14 +20,14 @@ export function ReviewList({ vendorId }: { vendorId: string }) {
   if (loading) {
     return (
       <div className="text-sm text-[var(--color-muted-foreground)]">
-        Loading reviews…
+        {t("reviews_loading")}
       </div>
     );
   }
   if (items.length === 0) {
     return (
       <div className="rounded-xl border border-dashed py-10 text-center text-sm text-[var(--color-muted-foreground)]">
-        No reviews yet.
+        {t("reviews_empty")}
       </div>
     );
   }

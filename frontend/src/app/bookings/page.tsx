@@ -127,7 +127,7 @@ function BookingsList() {
                       }
                     >
                       <Star className="h-4 w-4" />
-                      {reviewingId === b.id ? "Cancel" : "Review"}
+                      {reviewingId === b.id ? t("common_cancel") : t("reviews_title")}
                     </Button>
                   )}
                 </div>

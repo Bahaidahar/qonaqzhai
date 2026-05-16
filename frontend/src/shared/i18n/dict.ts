@@ -203,6 +203,75 @@ type Dict = {
   role_admin: string;
   user_status_active: string;
   user_status_suspended: string;
+  // services
+  services_title: string;
+  services_hint: string;
+  services_btn_new: string;
+  services_empty: string;
+  services_inactive: string;
+  services_disable: string;
+  services_enable: string;
+  services_confirm_delete: string;
+  services_dialog_new: string;
+  services_dialog_edit: string;
+  services_field_name: string;
+  services_field_name_ph: string;
+  services_field_description: string;
+  services_field_price: string;
+  services_field_unit: string;
+  services_unit_fixed: string;
+  services_unit_hour: string;
+  services_unit_item: string;
+  services_unit_person: string;
+  services_unit_day: string;
+  services_save_failed: string;
+  services_load_failed: string;
+  services_loading: string;
+  services_empty_public: string;
+  services_pick: string;
+  services_per_hour: string;
+  services_per_item: string;
+  services_per_person: string;
+  services_per_day: string;
+  // reviews
+  reviews_title: string;
+  reviews_loading: string;
+  reviews_empty: string;
+  reviews_submit: string;
+  reviews_share_ph: string;
+  reviews_thanks: string;
+  // notifications page
+  notifications_title: string;
+  notifications_hint: string;
+  notifications_empty: string;
+  // admin analytics
+  charts_bookings_per_day: string;
+  charts_top_categories: string;
+  charts_funnel: string;
+  charts_no_data: string;
+  // auth forgot/reset
+  auth_forgot_title: string;
+  auth_forgot_hint: string;
+  auth_forgot_btn_send: string;
+  auth_forgot_done_title: string;
+  auth_forgot_done_hint: string;
+  auth_forgot_enter_token: string;
+  auth_forgot_back: string;
+  auth_forgot_link: string;
+  auth_reset_title: string;
+  auth_reset_token: string;
+  auth_reset_token_ph: string;
+  auth_reset_new_password: string;
+  auth_reset_btn: string;
+  auth_reset_done_title: string;
+  auth_reset_done_hint: string;
+  auth_network_error: string;
+  // chat header
+  chat_header_label: string;
+  // booking pay button
+  booking_pay: string;
+  // vendor detail action labels
+  vendor_detail_book_now: string;
 };
 
 export type DictKey = keyof Dict;
@@ -385,6 +454,67 @@ export const DICT: Record<Locale, Dict> = {
     role_admin: "admin",
     user_status_active: "active",
     user_status_suspended: "suspended",
+    services_title: "Services",
+    services_hint: "Offerings shown to customers — they pick one when booking.",
+    services_btn_new: "New service",
+    services_empty: "No services yet — add your first one.",
+    services_inactive: "inactive",
+    services_disable: "Disable",
+    services_enable: "Enable",
+    services_confirm_delete: "Delete this service?",
+    services_dialog_new: "New service",
+    services_dialog_edit: "Edit service",
+    services_field_name: "Name",
+    services_field_name_ph: "Wedding photography",
+    services_field_description: "Description",
+    services_field_price: "Price (₸)",
+    services_field_unit: "Unit",
+    services_unit_fixed: "Fixed",
+    services_unit_hour: "Per hour",
+    services_unit_item: "Per item",
+    services_unit_person: "Per person",
+    services_unit_day: "Per day",
+    services_save_failed: "Save failed",
+    services_load_failed: "Load failed",
+    services_loading: "Loading services…",
+    services_empty_public: "Vendor has not published any services.",
+    services_pick: "Pick a service",
+    services_per_hour: " / hr",
+    services_per_item: " / item",
+    services_per_person: " / person",
+    services_per_day: " / day",
+    reviews_title: "Reviews",
+    reviews_loading: "Loading reviews…",
+    reviews_empty: "No reviews yet.",
+    reviews_submit: "Submit review",
+    reviews_share_ph: "Share your experience…",
+    reviews_thanks: "Thanks for the review!",
+    notifications_title: "Notifications",
+    notifications_hint: "Booking updates, vendor approvals, payment receipts.",
+    notifications_empty: "No notifications yet.",
+    charts_bookings_per_day: "Bookings per day",
+    charts_top_categories: "Top categories",
+    charts_funnel: "Vendor approval funnel",
+    charts_no_data: "No data yet",
+    auth_forgot_title: "Forgot password",
+    auth_forgot_hint: "We'll email you a reset link.",
+    auth_forgot_btn_send: "Send reset link",
+    auth_forgot_done_title: "Check your inbox",
+    auth_forgot_done_hint: "If an account exists, a password reset link has been sent. Follow the email, or paste the token below.",
+    auth_forgot_enter_token: "Enter reset token →",
+    auth_forgot_back: "Back to sign in",
+    auth_forgot_link: "Forgot password?",
+    auth_reset_title: "Reset password",
+    auth_reset_token: "Reset token",
+    auth_reset_token_ph: "Paste from email",
+    auth_reset_new_password: "New password",
+    auth_reset_btn: "Reset password",
+    auth_reset_done_title: "Password updated",
+    auth_reset_done_hint: "Redirecting to sign in…",
+    auth_network_error: "Network error",
+    chat_header_label: "Chat",
+    booking_pay: "Pay",
+    vendor_detail_book_now: "Book now",
   },
   ru: {
     status_online: "Онлайн · Gemini 2.5 Flash",
@@ -563,6 +693,67 @@ export const DICT: Record<Locale, Dict> = {
     role_admin: "админ",
     user_status_active: "активен",
     user_status_suspended: "заблокирован",
+    services_title: "Услуги",
+    services_hint: "Услуги, которые видит заказчик и выбирает при бронировании.",
+    services_btn_new: "Новая услуга",
+    services_empty: "Услуг пока нет — добавь первую.",
+    services_inactive: "скрыта",
+    services_disable: "Скрыть",
+    services_enable: "Показать",
+    services_confirm_delete: "Удалить эту услугу?",
+    services_dialog_new: "Новая услуга",
+    services_dialog_edit: "Редактировать услугу",
+    services_field_name: "Название",
+    services_field_name_ph: "Свадебная фотосъёмка",
+    services_field_description: "Описание",
+    services_field_price: "Цена (₸)",
+    services_field_unit: "Единица",
+    services_unit_fixed: "Фикс",
+    services_unit_hour: "За час",
+    services_unit_item: "За штуку",
+    services_unit_person: "За гостя",
+    services_unit_day: "За день",
+    services_save_failed: "Не удалось сохранить",
+    services_load_failed: "Не удалось загрузить",
+    services_loading: "Загрузка услуг…",
+    services_empty_public: "У подрядчика пока нет опубликованных услуг.",
+    services_pick: "Выбери услугу",
+    services_per_hour: " / час",
+    services_per_item: " / шт",
+    services_per_person: " / гость",
+    services_per_day: " / день",
+    reviews_title: "Отзывы",
+    reviews_loading: "Загрузка отзывов…",
+    reviews_empty: "Пока нет отзывов.",
+    reviews_submit: "Отправить отзыв",
+    reviews_share_ph: "Поделись впечатлениями…",
+    reviews_thanks: "Спасибо за отзыв!",
+    notifications_title: "Уведомления",
+    notifications_hint: "Обновления бронирований, модерации и платежей.",
+    notifications_empty: "Уведомлений пока нет.",
+    charts_bookings_per_day: "Брони по дням",
+    charts_top_categories: "Топ категорий",
+    charts_funnel: "Воронка одобрения подрядчиков",
+    charts_no_data: "Пока нет данных",
+    auth_forgot_title: "Сброс пароля",
+    auth_forgot_hint: "Отправим письмо со ссылкой для сброса.",
+    auth_forgot_btn_send: "Отправить ссылку",
+    auth_forgot_done_title: "Проверь почту",
+    auth_forgot_done_hint: "Если аккаунт существует — отправили ссылку. Следуй ей или вставь токен ниже.",
+    auth_forgot_enter_token: "Ввести токен →",
+    auth_forgot_back: "Назад ко входу",
+    auth_forgot_link: "Забыли пароль?",
+    auth_reset_title: "Новый пароль",
+    auth_reset_token: "Токен сброса",
+    auth_reset_token_ph: "Вставь из письма",
+    auth_reset_new_password: "Новый пароль",
+    auth_reset_btn: "Сменить пароль",
+    auth_reset_done_title: "Пароль обновлён",
+    auth_reset_done_hint: "Перенаправляем на вход…",
+    auth_network_error: "Сетевая ошибка",
+    chat_header_label: "Чат",
+    booking_pay: "Оплатить",
+    vendor_detail_book_now: "Забронировать",
   },
   kz: {
     status_online: "Онлайн · Gemini 2.5 Flash",
@@ -741,5 +932,66 @@ export const DICT: Record<Locale, Dict> = {
     role_admin: "әкімші",
     user_status_active: "белсенді",
     user_status_suspended: "бұғатталған",
+    services_title: "Қызметтер",
+    services_hint: "Тапсырыс берушілерге көрсетілетін қызметтер — олар бронь кезінде біреуін таңдайды.",
+    services_btn_new: "Жаңа қызмет",
+    services_empty: "Қызметтер әлі жоқ — бірінші қызметті қос.",
+    services_inactive: "жасырын",
+    services_disable: "Жасыру",
+    services_enable: "Көрсету",
+    services_confirm_delete: "Бұл қызметті жоюды растайсыз ба?",
+    services_dialog_new: "Жаңа қызмет",
+    services_dialog_edit: "Қызметті өзгерту",
+    services_field_name: "Атауы",
+    services_field_name_ph: "Үйленуге фотосессия",
+    services_field_description: "Сипаттама",
+    services_field_price: "Баға (₸)",
+    services_field_unit: "Өлшем",
+    services_unit_fixed: "Бекітілген",
+    services_unit_hour: "Сағатына",
+    services_unit_item: "Дана үшін",
+    services_unit_person: "Қонаққа",
+    services_unit_day: "Күніне",
+    services_save_failed: "Сақтау сәтсіз",
+    services_load_failed: "Жүктеу сәтсіз",
+    services_loading: "Қызметтер жүктелуде…",
+    services_empty_public: "Мердігер әлі қызмет жарияламаған.",
+    services_pick: "Қызметті таңда",
+    services_per_hour: " / сағ",
+    services_per_item: " / дана",
+    services_per_person: " / қонақ",
+    services_per_day: " / күн",
+    reviews_title: "Пікірлер",
+    reviews_loading: "Пікірлер жүктелуде…",
+    reviews_empty: "Әзірге пікір жоқ.",
+    reviews_submit: "Пікір қалдыру",
+    reviews_share_ph: "Әсеріңізбен бөлісіңіз…",
+    reviews_thanks: "Пікіріңіз үшін рахмет!",
+    notifications_title: "Хабарландырулар",
+    notifications_hint: "Бронь, мердігер модерациясы мен төлемдер бойынша жаңарулар.",
+    notifications_empty: "Хабарландырулар әлі жоқ.",
+    charts_bookings_per_day: "Күнделікті брондар",
+    charts_top_categories: "Топ санаттар",
+    charts_funnel: "Мердігер мақұлдау воронкасы",
+    charts_no_data: "Деректер әлі жоқ",
+    auth_forgot_title: "Құпиясөзді ұмыттыңыз ба",
+    auth_forgot_hint: "Сізге қалпына келтіру сілтемесін жібереміз.",
+    auth_forgot_btn_send: "Сілтеме жіберу",
+    auth_forgot_done_title: "Пошта жәшігіңізді тексеріңіз",
+    auth_forgot_done_hint: "Аккаунт бар болса — сілтеме жіберілді. Хатпен жалғастырыңыз немесе төменге токенді қойыңыз.",
+    auth_forgot_enter_token: "Токенді енгізу →",
+    auth_forgot_back: "Кіруге оралу",
+    auth_forgot_link: "Құпиясөзді ұмыттыңыз ба?",
+    auth_reset_title: "Жаңа құпиясөз",
+    auth_reset_token: "Қалпына келтіру токені",
+    auth_reset_token_ph: "Хаттан көшіріп қой",
+    auth_reset_new_password: "Жаңа құпиясөз",
+    auth_reset_btn: "Құпиясөзді ауыстыру",
+    auth_reset_done_title: "Құпиясөз жаңартылды",
+    auth_reset_done_hint: "Кіру бетіне бағыттаудамыз…",
+    auth_network_error: "Желі қатесі",
+    chat_header_label: "Чат",
+    booking_pay: "Төлеу",
+    vendor_detail_book_now: "Бронь",
   },
 };

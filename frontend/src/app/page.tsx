@@ -124,10 +124,11 @@ function ChatApp() {
 }
 
 function ChatHeader({ chatId }: { chatId: string }) {
+  const { t } = useI18n();
   return (
     <header className="flex h-12 shrink-0 items-center gap-3 border-b bg-[var(--color-card)] px-5">
       <MessageSquare className="h-4 w-4 text-[var(--color-primary)]" />
-      <span className="text-sm font-medium">Chat</span>
+      <span className="text-sm font-medium">{t("chat_header_label")}</span>
       <span className="font-mono text-[10px] uppercase tracking-widest text-[var(--color-muted-foreground)]">
         {chatId}
       </span>
