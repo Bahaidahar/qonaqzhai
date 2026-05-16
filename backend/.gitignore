@@ -1,0 +1,16 @@
+# env (real secrets)
+.env
+.env.local
+.env.*.local
+
+# sqlite db files (WAL + SHM)
+*.db
+*.db-wal
+*.db-shm
+
+# go build artifacts
+/qonaqzhai-backend
+/backend
+
+# editor/OS
+.DS_Store

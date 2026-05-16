@@ -1,0 +1,13 @@
+DROP TRIGGER IF EXISTS vendors_au;
+DROP TRIGGER IF EXISTS vendors_ad;
+DROP TRIGGER IF EXISTS vendors_ai;
+DROP TABLE IF EXISTS vendors_fts;
+DROP TABLE IF EXISTS fcm_tokens;
+DROP TABLE IF EXISTS notifications;
+DROP TABLE IF EXISTS password_reset_tokens;
+DROP TABLE IF EXISTS refresh_tokens;
+DROP TABLE IF EXISTS reviews;
+DROP TABLE IF EXISTS bookings;
+DROP TABLE IF EXISTS photos;
+DROP TABLE IF EXISTS vendors;
+DROP TABLE IF EXISTS users;
