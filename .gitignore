@@ -1,3 +1,12 @@
+# ---- Internal / diploma docs (kept local) ----
+.github/
+deploy/
+ACCOUNTS.md
+DIPLOMA_BRIEF.md
+DIPLOMA_BRIEF_EN.md
+DIPLOMA_DOC.md
+PLAN.md
+
 # ---- Secrets ----
 .env
 .env.*
