@@ -30,7 +30,7 @@ func (r *NotificationRepo) Create(ctx context.Context, n *domain.Notification) (
 		n.Status = "queued"
 	}
 	if _, err := r.db.ExecContext(ctx,
-		`INSERT INTO notifications (id, user_id, type, channel, title, body, status) VALUES (?, ?, ?, ?, ?, ?, ?)`,
+		`INSERT INTO notifications (id, user_id, type, channel, title, body, status) VALUES ($1, $2, $3, $4, $5, $6, $7)`,
 		n.ID, n.UserID, string(n.Type), string(n.Channel), n.Title, n.Body, n.Status,
 	); err != nil {
 		return nil, fmt.Errorf("insert notification: %w", err)
@@ -45,7 +45,7 @@ func (r *NotificationRepo) ListForUser(ctx context.Context, userID string, limit
 	}
 	rows, err := r.db.QueryContext(ctx,
 		`SELECT id, user_id, type, channel, title, body, status, created_at FROM notifications
-		 WHERE user_id = ? ORDER BY created_at DESC LIMIT ?`,
+		 WHERE user_id = $1 ORDER BY created_at DESC LIMIT $2`,
 		userID, limit,
 	)
 	if err != nil {
@@ -74,7 +74,7 @@ func (r *NotificationRepo) MarkFailed(ctx context.Context, id string) error {
 }
 
 func (r *NotificationRepo) setStatus(ctx context.Context, id, status string) error {
-	res, err := r.db.ExecContext(ctx, `UPDATE notifications SET status = ? WHERE id = ?`, status, id)
+	res, err := r.db.ExecContext(ctx, `UPDATE notifications SET status = $1 WHERE id = $2`, status, id)
 	if err != nil {
 		return err
 	}
@@ -87,7 +87,7 @@ func (r *NotificationRepo) setStatus(ctx context.Context, id, status string) err
 
 func (r *NotificationRepo) findByID(ctx context.Context, id string) (*domain.Notification, error) {
 	row := r.db.QueryRowContext(ctx,
-		`SELECT id, user_id, type, channel, title, body, status, created_at FROM notifications WHERE id = ?`,
+		`SELECT id, user_id, type, channel, title, body, status, created_at FROM notifications WHERE id = $1`,
 		id,
 	)
 	n, err := scanNotification(row)

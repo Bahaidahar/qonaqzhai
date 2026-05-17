@@ -13,7 +13,7 @@ import (
 // Config is the resolved runtime configuration.
 type Config struct {
 	Addr         string
-	DBPath       string
+	DatabaseURL  string
 	CORSOrigin   string
 	JWTSecret    string
 	AccessTTL    time.Duration
@@ -46,7 +46,7 @@ type Config struct {
 func Load() (Config, error) {
 	c := Config{
 		Addr:         envOr("ADDR", ":8080"),
-		DBPath:       envOr("DB_PATH", "qonaqzhai.db"),
+		DatabaseURL:  envOr("DATABASE_URL", "postgres://qonaqzhai:qonaqzhai@localhost:5433/qonaqzhai?sslmode=disable"),
 		CORSOrigin:   envOr("CORS_ORIGIN", "http://localhost:3000"),
 		JWTSecret:    os.Getenv("JWT_SECRET"),
 		AccessTTL:    durOr("JWT_ACCESS_TTL", 15*time.Minute),

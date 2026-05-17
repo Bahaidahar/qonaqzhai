@@ -1,1 +1,1 @@
-export type { BookingThread, ThreadMessage } from "./types";
+export type { BookingThread, ThreadMessage, ThreadSummary } from "./types";

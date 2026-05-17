@@ -137,39 +137,58 @@ export async function renameChat(id: string, title: string): Promise<void> {
   notifyChatChanged();
 }
 
+// Process-lifetime cache for the sidebar list. Survives route navigations so
+// switching tabs doesn't re-trigger a loading spinner each time — we hydrate
+// instantly from cache and revalidate in the background.
+let cachedChats: ChatSession[] | null = null;
+type Subscriber = (next: ChatSession[]) => void;
+const subscribers = new Set<Subscriber>();
+
+function setCache(next: ChatSession[]): void {
+  cachedChats = next;
+  for (const s of subscribers) s(next);
+}
+
+async function revalidate(): Promise<void> {
+  if (!getToken()) {
+    setCache([]);
+    return;
+  }
+  try {
+    const list = await listChats();
+    setCache(list);
+  } catch {
+    // keep prior cache on transient error
+  }
+}
+
 /** React hook: reactive list of chat sessions owned by current user. */
 export function useChatHistory() {
-  const [items, setItems] = useState<ChatSession[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [items, setItems] = useState<ChatSession[]>(cachedChats ?? []);
+  const [loading, setLoading] = useState(cachedChats === null);
 
   const refresh = useCallback(async () => {
-    if (!getToken()) {
-      setItems([]);
-      setLoading(false);
-      return;
-    }
-    try {
-      const list = await listChats();
-      setItems(list);
-    } catch {
-      setItems([]);
-    } finally {
-      setLoading(false);
-    }
+    await revalidate();
+    setLoading(false);
   }, []);
 
   useEffect(() => {
-    void refresh();
+    const sub: Subscriber = (next) => setItems(next);
+    subscribers.add(sub);
+    // First mount: kick off a fetch. Subsequent mounts read cache, then refresh
+    // silently — no UI loading flicker between tabs.
+    void revalidate().then(() => setLoading(false));
     function onCustom() {
-      void refresh();
+      void revalidate();
     }
     window.addEventListener(HISTORY_EVENT, onCustom);
     window.addEventListener("qonaqzhai:user-changed", onCustom);
     return () => {
+      subscribers.delete(sub);
       window.removeEventListener(HISTORY_EVENT, onCustom);
       window.removeEventListener("qonaqzhai:user-changed", onCustom);
     };
-  }, [refresh]);
+  }, []);
 
   return { items, loading, refresh };
 }

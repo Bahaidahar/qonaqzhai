@@ -2,7 +2,7 @@ class ApiEndpoints {
   ApiEndpoints._();
 
   static const String baseUrl =
-      String.fromEnvironment('API_BASE_URL', defaultValue: 'http://localhost:8080');
+      String.fromEnvironment('API_BASE_URL', defaultValue: 'http://localhost:18080');
 
   static const String signup = '/api/signup';
   static const String login = '/api/login';

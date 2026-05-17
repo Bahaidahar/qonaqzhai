@@ -28,7 +28,7 @@ func (r *RefreshTokenRepo) Create(ctx context.Context, t *domain.RefreshToken) e
 		t.ID = r.idGen.New()
 	}
 	_, err := r.db.ExecContext(ctx,
-		`INSERT INTO refresh_tokens (id, user_id, token_hash, expires_at) VALUES (?, ?, ?, ?)`,
+		`INSERT INTO refresh_tokens (id, user_id, token_hash, expires_at) VALUES ($1, $2, $3, $4)`,
 		t.ID, t.UserID, t.TokenHash, t.ExpiresAt,
 	)
 	if err != nil {
@@ -42,7 +42,7 @@ func (r *RefreshTokenRepo) FindActiveByHash(ctx context.Context, hash string, no
 	row := r.db.QueryRowContext(ctx,
 		`SELECT id, user_id, token_hash, expires_at, revoked_at, created_at
 		 FROM refresh_tokens
-		 WHERE token_hash = ? AND revoked_at IS NULL AND expires_at > ?`,
+		 WHERE token_hash = $1 AND revoked_at IS NULL AND expires_at > $2`,
 		hash, now,
 	)
 	var t domain.RefreshToken
@@ -61,14 +61,14 @@ func (r *RefreshTokenRepo) FindActiveByHash(ctx context.Context, hash string, no
 
 // Revoke marks a single refresh token as revoked.
 func (r *RefreshTokenRepo) Revoke(ctx context.Context, id string, at time.Time) error {
-	_, err := r.db.ExecContext(ctx, `UPDATE refresh_tokens SET revoked_at = ? WHERE id = ?`, at, id)
+	_, err := r.db.ExecContext(ctx, `UPDATE refresh_tokens SET revoked_at = $1 WHERE id = $2`, at, id)
 	return err
 }
 
 // RevokeAllForUser revokes every active refresh token belonging to user.
 func (r *RefreshTokenRepo) RevokeAllForUser(ctx context.Context, userID string, at time.Time) error {
 	_, err := r.db.ExecContext(ctx,
-		`UPDATE refresh_tokens SET revoked_at = ? WHERE user_id = ? AND revoked_at IS NULL`,
+		`UPDATE refresh_tokens SET revoked_at = $1 WHERE user_id = $2 AND revoked_at IS NULL`,
 		at, userID,
 	)
 	return err

@@ -26,7 +26,8 @@ type Handlers struct {
 	Payment      *handler.Payment      // optional — nil disables routes
 	Notification *handler.Notification // optional — nil disables routes
 	Thread       *handler.Thread
-	WS           *handler.WS // optional — realtime socket upgrade
+	WS           *handler.WS   // optional — realtime socket upgrade
+	Card         *handler.Card // optional — saved cards / mock checkout
 }
 
 // RouterConfig bundles router-level dependencies.
@@ -96,7 +97,16 @@ func NewRouter(h Handlers, cfg RouterConfig) http.Handler {
 	// customer
 	customerOnly := cfg.Auth.RequireRole(domain.RoleCustomer)
 	mux.Handle("POST /api/bookings", customerOnly(http.HandlerFunc(h.Booking.Create)))
+	mux.Handle("POST /api/bookings/{id}/pay/mock", customerOnly(http.HandlerFunc(h.Booking.PayMock)))
 	mux.Handle("POST /api/reviews", customerOnly(http.HandlerFunc(h.Review.Submit)))
+
+	// cards (mock payment instruments)
+	if h.Card != nil {
+		mux.Handle("GET /api/cards", cfg.Auth.Required(http.HandlerFunc(h.Card.List)))
+		mux.Handle("POST /api/cards", cfg.Auth.Required(http.HandlerFunc(h.Card.Create)))
+		mux.Handle("DELETE /api/cards/{id}", cfg.Auth.Required(http.HandlerFunc(h.Card.Delete)))
+		mux.Handle("POST /api/cards/{id}/default", cfg.Auth.Required(http.HandlerFunc(h.Card.SetDefault)))
+	}
 
 	// admin
 	adminOnly := cfg.Auth.RequireRole(domain.RoleAdmin)

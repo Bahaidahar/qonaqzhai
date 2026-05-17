@@ -4,6 +4,15 @@ import { useEffect, useState } from "react";
 import { API_BASE } from "@/shared/config/env";
 import { getToken } from "@/shared/api";
 import { useI18n } from "@/shared/i18n/context";
+import { useLabels } from "@/shared/i18n/labels";
+import type { DictKey } from "@/shared/i18n/dict";
+
+const FUNNEL_STAGE_KEYS: Record<string, DictKey> = {
+  submitted: "funnel_submitted",
+  pending: "funnel_pending",
+  approved: "funnel_approved",
+  rejected: "funnel_rejected",
+};
 
 interface TimePoint {
   date: string;
@@ -28,6 +37,7 @@ async function fetchAuthed<T>(path: string): Promise<T> {
 
 export function AdminCharts() {
   const { t } = useI18n();
+  const labels = useLabels();
   const [series, setSeries] = useState<TimePoint[]>([]);
   const [categories, setCategories] = useState<CategoryCount[]>([]);
   const [funnel, setFunnel] = useState<FunnelStage[]>([]);
@@ -52,11 +62,19 @@ export function AdminCharts() {
       </Card>
       <Card title={t("charts_top_categories")}>
         <BarChart
-          points={categories.slice(0, 6).map((c) => ({ label: c.category, value: c.count }))}
+          points={categories.slice(0, 6).map((c) => ({
+            label: labels.category(c.category),
+            value: c.count,
+          }))}
         />
       </Card>
       <Card title={t("charts_funnel")}>
-        <FunnelChart stages={funnel} />
+        <FunnelChart
+          stages={funnel.map((s) => ({
+            stage: FUNNEL_STAGE_KEYS[s.stage] ? t(FUNNEL_STAGE_KEYS[s.stage]) : s.stage,
+            count: s.count,
+          }))}
+        />
       </Card>
     </div>
   );

@@ -1,16 +1,16 @@
 package db_test
 
 import (
-	"path/filepath"
 	"testing"
 
 	"qonaqzhai-backend/internal/infra/db"
+	"qonaqzhai-backend/internal/infra/db/testpg"
 )
 
 func TestOpenAppliesAllMigrations(t *testing.T) {
 	t.Parallel()
-	dir := t.TempDir()
-	conn, err := db.Open(filepath.Join(dir, "test.db"))
+	dsn := testpg.Start(t)
+	conn, err := db.Open(dsn)
 	if err != nil {
 		t.Fatalf("open: %v", err)
 	}
@@ -19,11 +19,14 @@ func TestOpenAppliesAllMigrations(t *testing.T) {
 	tables := []string{
 		"users", "vendors", "photos", "bookings", "reviews",
 		"refresh_tokens", "password_reset_tokens", "notifications",
-		"fcm_tokens", "vendors_fts", "schema_migrations",
+		"fcm_tokens", "schema_migrations",
+		"services", "chats", "chat_messages",
+		"booking_threads", "thread_messages", "payment_cards",
+		"audit_log",
 	}
 	for _, tbl := range tables {
 		var n int
-		if err := conn.QueryRow("SELECT COUNT(*) FROM "+tbl).Scan(&n); err != nil {
+		if err := conn.QueryRow("SELECT COUNT(*) FROM " + tbl).Scan(&n); err != nil {
 			t.Errorf("table %q missing or unreadable: %v", tbl, err)
 		}
 	}
@@ -31,14 +34,13 @@ func TestOpenAppliesAllMigrations(t *testing.T) {
 
 func TestMigrationsAreIdempotent(t *testing.T) {
 	t.Parallel()
-	dir := t.TempDir()
-	path := filepath.Join(dir, "test.db")
-	c1, err := db.Open(path)
+	dsn := testpg.Start(t)
+	c1, err := db.Open(dsn)
 	if err != nil {
 		t.Fatal(err)
 	}
 	_ = c1.Close()
-	c2, err := db.Open(path) // should not re-apply or error
+	c2, err := db.Open(dsn) // should not re-apply or error
 	if err != nil {
 		t.Fatalf("re-open: %v", err)
 	}
@@ -50,8 +52,7 @@ func TestMigrationsAreIdempotent(t *testing.T) {
 	if n < 1 {
 		t.Errorf("expected at least 1 migration row, got %d", n)
 	}
-	// Reopen again and assert count is stable (no duplicate inserts).
-	c3, err := db.Open(path)
+	c3, err := db.Open(dsn)
 	if err != nil {
 		t.Fatal(err)
 	}

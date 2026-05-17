@@ -8,7 +8,8 @@ import type {
 import type { Booking, BookingStatus } from "@/entities/booking/types";
 import type { Review } from "@/entities/review/types";
 import type { Service, ServiceInput } from "@/entities/service/types";
-import type { BookingThread, ThreadMessage } from "@/entities/thread/types";
+import type { BookingThread, ThreadMessage, ThreadSummary } from "@/entities/thread/types";
+import type { PaymentCard } from "@/entities/card/types";
 import {
   API_BASE,
   TOKEN_KEY,
@@ -20,7 +21,8 @@ export type { Vendor, Photo } from "@/entities/vendor/types";
 export type { Booking } from "@/entities/booking/types";
 export type { Review } from "@/entities/review/types";
 export type { Service, ServiceUnit, ServiceInput } from "@/entities/service/types";
-export type { BookingThread, ThreadMessage } from "@/entities/thread/types";
+export type { BookingThread, ThreadMessage, ThreadSummary } from "@/entities/thread/types";
+export type { PaymentCard, CardBrand } from "@/entities/card/types";
 
 export interface AuthResponse {
   token: string;
@@ -314,6 +316,43 @@ export const api = {
       auth: true,
     });
   },
+  payBookingMock(id: string, cardId?: string): Promise<Booking> {
+    return request<Booking>(`/api/bookings/${id}/pay/mock`, {
+      method: "POST",
+      body: JSON.stringify(cardId ? { cardId } : {}),
+      auth: true,
+    });
+  },
+
+  // cards (mock — last4 + brand only, no PSP)
+  listCards(): Promise<{ items: PaymentCard[] | null }> {
+    return request<{ items: PaymentCard[] | null }>("/api/cards", { auth: true });
+  },
+  createCard(body: {
+    number: string;
+    expMonth: number;
+    expYear: number;
+    holder?: string;
+    makeDefault?: boolean;
+  }): Promise<PaymentCard> {
+    return request<PaymentCard>("/api/cards", {
+      method: "POST",
+      body: JSON.stringify(body),
+      auth: true,
+    });
+  },
+  deleteCard(id: string): Promise<{ status: string }> {
+    return request<{ status: string }>(`/api/cards/${id}`, {
+      method: "DELETE",
+      auth: true,
+    });
+  },
+  setDefaultCard(id: string): Promise<{ status: string }> {
+    return request<{ status: string }>(`/api/cards/${id}/default`, {
+      method: "POST",
+      auth: true,
+    });
+  },
 
   // reviews
   submitReview(body: {
@@ -366,8 +405,8 @@ export const api = {
   },
 
   // threads (booking DMs)
-  listThreads(): Promise<{ items: BookingThread[] | null }> {
-    return request<{ items: BookingThread[] | null }>("/api/threads", { auth: true });
+  listThreads(): Promise<{ items: ThreadSummary[] | null }> {
+    return request<{ items: ThreadSummary[] | null }>("/api/threads", { auth: true });
   },
   getThread(id: string): Promise<{ thread: BookingThread; messages: ThreadMessage[] | null }> {
     return request<{ thread: BookingThread; messages: ThreadMessage[] | null }>(

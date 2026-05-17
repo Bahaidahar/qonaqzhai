@@ -5,7 +5,7 @@ CREATE TABLE IF NOT EXISTS users (
   password_hash TEXT NOT NULL,
   role          TEXT NOT NULL CHECK (role IN ('customer','vendor','admin')),
   status        TEXT NOT NULL DEFAULT 'active' CHECK (status IN ('active','suspended')),
-  created_at    DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
+  created_at    TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 
 CREATE TABLE IF NOT EXISTS vendors (
@@ -15,12 +15,12 @@ CREATE TABLE IF NOT EXISTS vendors (
   category     TEXT NOT NULL,
   city         TEXT NOT NULL,
   description  TEXT NOT NULL DEFAULT '',
-  price_from   INTEGER NOT NULL DEFAULT 0,
+  price_from   BIGINT NOT NULL DEFAULT 0,
   status       TEXT NOT NULL DEFAULT 'pending' CHECK (status IN ('pending','approved','rejected')),
-  rating_avg   REAL NOT NULL DEFAULT 0,
+  rating_avg   DOUBLE PRECISION NOT NULL DEFAULT 0,
   rating_count INTEGER NOT NULL DEFAULT 0,
-  created_at   DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  updated_at   DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
+  created_at   TIMESTAMPTZ NOT NULL DEFAULT now(),
+  updated_at   TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 
 CREATE INDEX IF NOT EXISTS idx_vendors_category ON vendors(category);
@@ -33,9 +33,9 @@ CREATE TABLE IF NOT EXISTS photos (
   id         TEXT PRIMARY KEY,
   vendor_id  TEXT NOT NULL REFERENCES vendors(id) ON DELETE CASCADE,
   mime       TEXT NOT NULL,
-  size       INTEGER NOT NULL,
-  data       BLOB NOT NULL,
-  created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
+  size       BIGINT NOT NULL,
+  data       BYTEA NOT NULL,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 
 CREATE INDEX IF NOT EXISTS idx_photos_vendor ON photos(vendor_id);
@@ -49,9 +49,9 @@ CREATE TABLE IF NOT EXISTS bookings (
   note         TEXT NOT NULL DEFAULT '',
   status       TEXT NOT NULL DEFAULT 'pending'
                CHECK (status IN ('pending','accepted','declined','cancelled','completed','paid')),
-  amount       INTEGER NOT NULL DEFAULT 0,
+  amount       BIGINT NOT NULL DEFAULT 0,
   payment_id   TEXT NOT NULL DEFAULT '',
-  created_at   DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
+  created_at   TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 
 CREATE INDEX IF NOT EXISTS idx_bookings_customer ON bookings(customer_id);
@@ -65,7 +65,7 @@ CREATE TABLE IF NOT EXISTS reviews (
   vendor_id   TEXT NOT NULL REFERENCES vendors(id)  ON DELETE CASCADE,
   rating      INTEGER NOT NULL CHECK (rating BETWEEN 1 AND 5),
   text        TEXT NOT NULL DEFAULT '',
-  created_at  DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
+  created_at  TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 
 CREATE INDEX IF NOT EXISTS idx_reviews_vendor ON reviews(vendor_id);
@@ -74,9 +74,9 @@ CREATE TABLE IF NOT EXISTS refresh_tokens (
   id          TEXT PRIMARY KEY,
   user_id     TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
   token_hash  TEXT NOT NULL UNIQUE,
-  expires_at  DATETIME NOT NULL,
-  revoked_at  DATETIME,
-  created_at  DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
+  expires_at  TIMESTAMPTZ NOT NULL,
+  revoked_at  TIMESTAMPTZ,
+  created_at  TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 
 CREATE INDEX IF NOT EXISTS idx_refresh_user ON refresh_tokens(user_id);
@@ -85,9 +85,9 @@ CREATE TABLE IF NOT EXISTS password_reset_tokens (
   id          TEXT PRIMARY KEY,
   user_id     TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
   token_hash  TEXT NOT NULL UNIQUE,
-  expires_at  DATETIME NOT NULL,
-  used_at     DATETIME,
-  created_at  DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
+  expires_at  TIMESTAMPTZ NOT NULL,
+  used_at     TIMESTAMPTZ,
+  created_at  TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 
 CREATE INDEX IF NOT EXISTS idx_password_reset_user ON password_reset_tokens(user_id);
@@ -100,7 +100,7 @@ CREATE TABLE IF NOT EXISTS notifications (
   title      TEXT NOT NULL,
   body       TEXT NOT NULL,
   status     TEXT NOT NULL DEFAULT 'queued',
-  created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 
 CREATE INDEX IF NOT EXISTS idx_notifications_user ON notifications(user_id);
@@ -110,22 +110,17 @@ CREATE TABLE IF NOT EXISTS fcm_tokens (
   user_id    TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
   token      TEXT NOT NULL UNIQUE,
   platform   TEXT NOT NULL DEFAULT 'unknown',
-  created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 
 CREATE INDEX IF NOT EXISTS idx_fcm_user ON fcm_tokens(user_id);
 
-CREATE VIRTUAL TABLE IF NOT EXISTS vendors_fts USING fts5(
-  name, description, content='vendors', content_rowid='rowid', tokenize='unicode61'
-);
+-- Full-text search on vendors via tsvector generated column + GIN index.
+ALTER TABLE vendors
+  ADD COLUMN IF NOT EXISTS search_tsv tsvector
+  GENERATED ALWAYS AS (
+    setweight(to_tsvector('simple', coalesce(name, '')), 'A') ||
+    setweight(to_tsvector('simple', coalesce(description, '')), 'B')
+  ) STORED;
 
-CREATE TRIGGER IF NOT EXISTS vendors_ai AFTER INSERT ON vendors BEGIN
-  INSERT INTO vendors_fts(rowid, name, description) VALUES (new.rowid, new.name, new.description);
-END;
-CREATE TRIGGER IF NOT EXISTS vendors_ad AFTER DELETE ON vendors BEGIN
-  INSERT INTO vendors_fts(vendors_fts, rowid, name, description) VALUES('delete', old.rowid, old.name, old.description);
-END;
-CREATE TRIGGER IF NOT EXISTS vendors_au AFTER UPDATE ON vendors BEGIN
-  INSERT INTO vendors_fts(vendors_fts, rowid, name, description) VALUES('delete', old.rowid, old.name, old.description);
-  INSERT INTO vendors_fts(rowid, name, description) VALUES (new.rowid, new.name, new.description);
-END;
+CREATE INDEX IF NOT EXISTS idx_vendors_search ON vendors USING GIN (search_tsv);

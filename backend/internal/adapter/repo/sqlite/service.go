@@ -23,14 +23,14 @@ func NewServiceRepo(db *sql.DB, idGen usecase.IDGen) *ServiceRepo {
 
 // Create inserts a new service.
 func (r *ServiceRepo) Create(ctx context.Context, vendorID string, in domain.ServiceInput) (*domain.Service, error) {
-	active := 1
-	if in.IsActive != nil && !*in.IsActive {
-		active = 0
+	active := true
+	if in.IsActive != nil {
+		active = *in.IsActive
 	}
 	id := r.idGen.New()
 	_, err := r.db.ExecContext(ctx,
 		`INSERT INTO services (id, vendor_id, name, description, price, unit, is_active)
-		 VALUES (?, ?, ?, ?, ?, ?, ?)`,
+		 VALUES ($1, $2, $3, $4, $5, $6, $7)`,
 		id, vendorID, in.Name, in.Description, in.Price, string(in.Unit), active,
 	)
 	if err != nil {
@@ -42,17 +42,13 @@ func (r *ServiceRepo) Create(ctx context.Context, vendorID string, in domain.Ser
 // Update modifies an existing service.
 func (r *ServiceRepo) Update(ctx context.Context, id string, in domain.ServiceInput) (*domain.Service, error) {
 	args := []any{in.Name, in.Description, in.Price, string(in.Unit)}
-	stmt := `UPDATE services SET name=?, description=?, price=?, unit=?, updated_at=CURRENT_TIMESTAMP`
+	stmt := `UPDATE services SET name=$1, description=$2, price=$3, unit=$4, updated_at=now()`
 	if in.IsActive != nil {
-		stmt += `, is_active=?`
-		v := 0
-		if *in.IsActive {
-			v = 1
-		}
-		args = append(args, v)
+		args = append(args, *in.IsActive)
+		stmt += fmt.Sprintf(`, is_active=$%d`, len(args))
 	}
-	stmt += ` WHERE id=?`
 	args = append(args, id)
+	stmt += fmt.Sprintf(` WHERE id=$%d`, len(args))
 
 	res, err := r.db.ExecContext(ctx, stmt, args...)
 	if err != nil {
@@ -69,7 +65,7 @@ func (r *ServiceRepo) Update(ctx context.Context, id string, in domain.ServiceIn
 func (r *ServiceRepo) FindByID(ctx context.Context, id string) (*domain.Service, error) {
 	row := r.db.QueryRowContext(ctx,
 		`SELECT id, vendor_id, name, description, price, unit, is_active, created_at, updated_at
-		 FROM services WHERE id = ?`, id,
+		 FROM services WHERE id = $1`, id,
 	)
 	s, err := scanService(row)
 	if errors.Is(err, sql.ErrNoRows) {
@@ -81,9 +77,9 @@ func (r *ServiceRepo) FindByID(ctx context.Context, id string) (*domain.Service,
 // ListByVendor returns services for a vendor, ordered by creation.
 func (r *ServiceRepo) ListByVendor(ctx context.Context, vendorID string, activeOnly bool) ([]*domain.Service, error) {
 	q := `SELECT id, vendor_id, name, description, price, unit, is_active, created_at, updated_at
-	      FROM services WHERE vendor_id = ?`
+	      FROM services WHERE vendor_id = $1`
 	if activeOnly {
-		q += ` AND is_active = 1`
+		q += ` AND is_active = TRUE`
 	}
 	q += ` ORDER BY created_at ASC`
 	rows, err := r.db.QueryContext(ctx, q, vendorID)
@@ -104,7 +100,7 @@ func (r *ServiceRepo) ListByVendor(ctx context.Context, vendorID string, activeO
 
 // Delete removes a service.
 func (r *ServiceRepo) Delete(ctx context.Context, id string) error {
-	res, err := r.db.ExecContext(ctx, `DELETE FROM services WHERE id = ?`, id)
+	res, err := r.db.ExecContext(ctx, `DELETE FROM services WHERE id = $1`, id)
 	if err != nil {
 		return err
 	}
@@ -120,7 +116,7 @@ func (r *ServiceRepo) Delete(ctx context.Context, id string) error {
 func (r *ServiceRepo) MinActivePrice(ctx context.Context, vendorID string) (int64, error) {
 	var price sql.NullInt64
 	if err := r.db.QueryRowContext(ctx,
-		`SELECT MIN(price) FROM services WHERE vendor_id = ? AND is_active = 1`, vendorID,
+		`SELECT MIN(price) FROM services WHERE vendor_id = $1 AND is_active = TRUE`, vendorID,
 	).Scan(&price); err != nil {
 		return 0, err
 	}
@@ -133,15 +129,13 @@ func (r *ServiceRepo) MinActivePrice(ctx context.Context, vendorID string) (int6
 func scanService(s scanner) (*domain.Service, error) {
 	var srv domain.Service
 	var unit string
-	var active int
 	if err := s.Scan(
 		&srv.ID, &srv.VendorID, &srv.Name, &srv.Description,
-		&srv.Price, &unit, &active, &srv.CreatedAt, &srv.UpdatedAt,
+		&srv.Price, &unit, &srv.IsActive, &srv.CreatedAt, &srv.UpdatedAt,
 	); err != nil {
 		return nil, err
 	}
 	srv.Unit = domain.ServiceUnit(unit)
-	srv.IsActive = active != 0
 	return &srv, nil
 }
 

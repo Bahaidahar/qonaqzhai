@@ -183,6 +183,45 @@ func (s *Service) CustomerTransition(ctx context.Context, customerID, bookingID 
 	return s.d.Bookings.Find(ctx, b.ID)
 }
 
+// MockPay marks an accepted booking as paid using a mock payment id.
+// The customerID must match the booking owner. paymentRef is opaque to the
+// service — typically a generated `mock_<random>` token or saved card id.
+func (s *Service) MockPay(ctx context.Context, customerID, bookingID, paymentRef string) (*domain.Booking, error) {
+	b, err := s.d.Bookings.Find(ctx, bookingID)
+	if err != nil {
+		return nil, err
+	}
+	if b.CustomerID != customerID {
+		return nil, domain.ErrForbidden
+	}
+	if b.Status != domain.BookingAccepted && b.Status != domain.BookingPending {
+		return nil, fmt.Errorf("cannot pay status %s: %w", b.Status, domain.ErrInvalidInput)
+	}
+	if paymentRef == "" {
+		return nil, fmt.Errorf("paymentRef required: %w", domain.ErrInvalidInput)
+	}
+	if err := s.d.Bookings.SetPayment(ctx, b.ID, paymentRef); err != nil {
+		return nil, err
+	}
+	if err := s.d.Bookings.UpdateStatus(ctx, b.ID, domain.BookingPaid); err != nil {
+		return nil, err
+	}
+	updated, err := s.d.Bookings.Find(ctx, b.ID)
+	if err != nil {
+		return nil, err
+	}
+	if v, err := s.d.Vendors.FindByID(ctx, updated.VendorID); err == nil && s.d.Notifier != nil {
+		_ = s.d.Notifier.Enqueue(ctx, &domain.Notification{
+			UserID:  v.UserID,
+			Type:    domain.NotifBookingPaid,
+			Channel: domain.ChannelBoth,
+			Title:   "Booking paid",
+			Body:    "<p>The customer has paid for their booking.</p>",
+		})
+	}
+	return updated, nil
+}
+
 // AdminTransition forces any valid status — moderation override.
 func (s *Service) AdminTransition(ctx context.Context, bookingID string, next domain.BookingStatus) (*domain.Booking, error) {
 	if !next.Valid() {

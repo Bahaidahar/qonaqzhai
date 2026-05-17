@@ -27,7 +27,7 @@ func (r *AuditRepo) Create(ctx context.Context, e *domain.AuditEntry) error {
 	}
 	_, err := r.db.ExecContext(ctx,
 		`INSERT INTO audit_log (id, actor_id, actor_email, action, target_type, target_id, meta)
-		 VALUES (?, ?, ?, ?, ?, ?, ?)`,
+		 VALUES ($1, $2, $3, $4, $5, $6, $7)`,
 		e.ID, e.ActorID, e.ActorEmail, e.Action, e.TargetType, e.TargetID, e.Meta,
 	)
 	if err != nil {
@@ -43,7 +43,7 @@ func (r *AuditRepo) List(ctx context.Context, limit int) ([]*domain.AuditEntry, 
 	}
 	rows, err := r.db.QueryContext(ctx,
 		`SELECT id, actor_id, actor_email, action, target_type, target_id, meta, created_at
-		 FROM audit_log ORDER BY created_at DESC LIMIT ?`, limit,
+		 FROM audit_log ORDER BY created_at DESC LIMIT $1`, limit,
 	)
 	if err != nil {
 		return nil, err

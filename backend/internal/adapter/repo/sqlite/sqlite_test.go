@@ -2,20 +2,20 @@ package sqlite_test
 
 import (
 	"context"
-	"path/filepath"
 	"testing"
 	"time"
 
 	"qonaqzhai-backend/internal/adapter/repo/sqlite"
 	"qonaqzhai-backend/internal/domain"
 	"qonaqzhai-backend/internal/infra/db"
+	"qonaqzhai-backend/internal/infra/db/testpg"
 	"qonaqzhai-backend/internal/infra/idgen"
 	"qonaqzhai-backend/internal/usecase"
 )
 
 func openDB(t *testing.T) (*sqlite.UserRepo, *sqlite.VendorRepo, *sqlite.BookingRepo, *sqlite.ReviewRepo, *sqlite.RefreshTokenRepo, *sqlite.PasswordResetRepo, *sqlite.PhotoRepo, *sqlite.NotificationRepo) {
 	t.Helper()
-	conn, err := db.Open(filepath.Join(t.TempDir(), "t.db"))
+	conn, err := db.Open(testpg.Start(t))
 	if err != nil {
 		t.Fatal(err)
 	}

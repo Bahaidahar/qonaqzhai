@@ -1,4 +1,4 @@
-// Package db opens the SQLite connection and applies migrations.
+// Package db opens the Postgres connection and applies migrations.
 package db
 
 import (
@@ -8,8 +8,9 @@ import (
 	"io/fs"
 	"sort"
 	"strings"
+	"time"
 
-	_ "modernc.org/sqlite"
+	_ "github.com/jackc/pgx/v5/stdlib"
 )
 
 // Migrations holds the embedded SQL migration files.
@@ -17,17 +18,22 @@ import (
 //go:embed all:migrations
 var Migrations embed.FS
 
-// Open opens the SQLite database at path, configures pragmas, and runs migrations.
-// Returns a ready-to-use *sql.DB.
-func Open(path string) (*sql.DB, error) {
-	dsn := path + "?_pragma=foreign_keys(1)&_pragma=journal_mode(WAL)"
-	db, err := sql.Open("sqlite", dsn)
-	if err != nil {
-		return nil, fmt.Errorf("sql.Open: %w", err)
+// Open opens a Postgres connection using the supplied URL (postgres://user:pass@host:5432/db?sslmode=disable),
+// pings it, and applies pending migrations.
+func Open(dsn string) (*sql.DB, error) {
+	if dsn == "" {
+		return nil, fmt.Errorf("postgres DSN required")
 	}
-	db.SetMaxOpenConns(1) // SQLite serializes writes; one conn avoids busy errors
+	db, err := sql.Open("pgx", dsn)
+	if err != nil {
+		return nil, fmt.Errorf("sql.Open pgx: %w", err)
+	}
+	db.SetMaxOpenConns(20)
+	db.SetMaxIdleConns(5)
+	db.SetConnMaxLifetime(30 * time.Minute)
 	if err := db.Ping(); err != nil {
-		return nil, fmt.Errorf("ping: %w", err)
+		_ = db.Close()
+		return nil, fmt.Errorf("postgres ping: %w", err)
 	}
 	if err := Migrate(db); err != nil {
 		_ = db.Close()
@@ -36,22 +42,22 @@ func Open(path string) (*sql.DB, error) {
 	return db, nil
 }
 
-// Migrate applies all embedded *_up.sql migrations in order.
-// Migration filenames are expected to look like `NNNN_name.up.sql`.
+// Migrate applies all embedded *_up.sql migrations in lexical order.
+// Already-applied versions are recorded in `schema_migrations`.
 func Migrate(db *sql.DB) error {
 	files, err := readMigrationFiles()
 	if err != nil {
 		return err
 	}
 	if _, err := db.Exec(`CREATE TABLE IF NOT EXISTS schema_migrations (
-		version TEXT PRIMARY KEY,
-		applied_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
+		version    TEXT PRIMARY KEY,
+		applied_at TIMESTAMPTZ NOT NULL DEFAULT now()
 	)`); err != nil {
 		return fmt.Errorf("create schema_migrations: %w", err)
 	}
 	for _, f := range files {
 		var seen int
-		if err := db.QueryRow("SELECT COUNT(*) FROM schema_migrations WHERE version = ?", f.version).Scan(&seen); err != nil {
+		if err := db.QueryRow("SELECT COUNT(*) FROM schema_migrations WHERE version = $1", f.version).Scan(&seen); err != nil {
 			return fmt.Errorf("check migration %s: %w", f.version, err)
 		}
 		if seen > 0 {
@@ -60,7 +66,7 @@ func Migrate(db *sql.DB) error {
 		if _, err := db.Exec(f.sql); err != nil {
 			return fmt.Errorf("apply %s: %w", f.name, err)
 		}
-		if _, err := db.Exec("INSERT INTO schema_migrations (version) VALUES (?)", f.version); err != nil {
+		if _, err := db.Exec("INSERT INTO schema_migrations (version) VALUES ($1)", f.version); err != nil {
 			return fmt.Errorf("record %s: %w", f.version, err)
 		}
 	}
@@ -76,7 +82,6 @@ type migrationFile struct {
 func readMigrationFiles() ([]migrationFile, error) {
 	dir, err := fs.Sub(Migrations, "migrations")
 	if err != nil {
-		// Fallback: maybe embed didn't include subdir prefix; read root.
 		dir = Migrations
 	}
 	entries, err := fs.ReadDir(dir, ".")

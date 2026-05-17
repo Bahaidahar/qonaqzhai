@@ -1,21 +1,27 @@
 package handler
 
 import (
+	"crypto/rand"
+	"encoding/hex"
 	"net/http"
 
 	"qonaqzhai-backend/internal/adapter/http/httpx"
 	"qonaqzhai-backend/internal/adapter/http/middleware"
 	"qonaqzhai-backend/internal/domain"
 	"qonaqzhai-backend/internal/usecase/booking"
+	"qonaqzhai-backend/internal/usecase/card"
 )
 
 // Booking HTTP handler.
 type Booking struct {
-	svc *booking.Service
+	svc   *booking.Service
+	cards *card.Service // optional — used for /pay/mock
 }
 
 // NewBooking constructs a Booking handler.
-func NewBooking(svc *booking.Service) *Booking { return &Booking{svc: svc} }
+func NewBooking(svc *booking.Service, cards *card.Service) *Booking {
+	return &Booking{svc: svc, cards: cards}
+}
 
 type bookingReq struct {
 	VendorID   string `json:"vendorId"`
@@ -105,4 +111,38 @@ func (h *Booking) Update(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	httpx.WriteJSON(w, http.StatusOK, b)
+}
+
+// PayMock marks a booking as paid using a mock payment id derived from the
+// customer's default saved card (if any) — no real PSP is contacted.
+func (h *Booking) PayMock(w http.ResponseWriter, r *http.Request) {
+	uid, _ := middleware.UserIDFrom(r.Context())
+	id := r.PathValue("id")
+	var req struct {
+		CardID string `json:"cardId,omitempty"`
+	}
+	_ = httpx.ReadJSON(r, &req)
+	cardID := req.CardID
+	if cardID == "" && h.cards != nil {
+		if def, err := h.cards.DefaultFor(r.Context(), uid); err == nil {
+			cardID = def.ID
+		}
+	}
+	if cardID == "" {
+		httpx.WriteError(w, http.StatusBadRequest, "no card on file")
+		return
+	}
+	paymentRef := "mock_" + randomHex(8) + "_" + cardID
+	b, err := h.svc.MockPay(r.Context(), uid, id, paymentRef)
+	if err != nil {
+		httpx.HandleError(w, err)
+		return
+	}
+	httpx.WriteJSON(w, http.StatusOK, b)
+}
+
+func randomHex(n int) string {
+	buf := make([]byte, n)
+	_, _ = rand.Read(buf)
+	return hex.EncodeToString(buf)
 }

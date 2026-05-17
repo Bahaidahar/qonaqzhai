@@ -1,7 +1,6 @@
-DROP TRIGGER IF EXISTS vendors_au;
-DROP TRIGGER IF EXISTS vendors_ad;
-DROP TRIGGER IF EXISTS vendors_ai;
-DROP TABLE IF EXISTS vendors_fts;
+DROP INDEX IF EXISTS idx_vendors_search;
+ALTER TABLE vendors DROP COLUMN IF EXISTS search_tsv;
+
 DROP TABLE IF EXISTS fcm_tokens;
 DROP TABLE IF EXISTS notifications;
 DROP TABLE IF EXISTS password_reset_tokens;

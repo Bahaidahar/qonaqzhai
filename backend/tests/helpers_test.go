@@ -10,13 +10,13 @@ import (
 	"mime/multipart"
 	"net/http"
 	"net/http/httptest"
-	"path/filepath"
 	"testing"
 	"time"
 
 	"qonaqzhai-backend/internal/app"
 	"qonaqzhai-backend/internal/domain"
 	"qonaqzhai-backend/internal/infra/config"
+	"qonaqzhai-backend/internal/infra/db/testpg"
 )
 
 type env struct {
@@ -28,9 +28,9 @@ type env struct {
 
 func newEnv(t *testing.T) *env {
 	t.Helper()
-	dir := t.TempDir()
+	dsn := testpg.Start(t)
 	cfg := config.Config{
-		DBPath:            filepath.Join(dir, "test.db"),
+		DatabaseURL:       dsn,
 		JWTSecret:         "test-secret-test-secret-test-secret",
 		CORSOrigin:        "*",
 		AccessTTL:         time.Hour,

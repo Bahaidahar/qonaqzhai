@@ -1,0 +1,23 @@
+syntax = "proto3";
+
+package auth.v1;
+
+option go_package = "qonaqzhai-backend/gen/proto/auth/v1;authv1";
+
+// AuthService verifies access tokens for other services.
+// auth-svc is the single owner of the JWT secret; core-svc and realtime-svc
+// call VerifyToken instead of decoding tokens locally.
+service AuthService {
+  rpc VerifyToken(VerifyTokenRequest) returns (VerifyTokenResponse);
+}
+
+message VerifyTokenRequest {
+  string token = 1;
+}
+
+message VerifyTokenResponse {
+  string user_id = 1;
+  string email   = 2;
+  string role    = 3; // "customer" | "vendor" | "admin"
+  int64  exp     = 4; // unix seconds
+}

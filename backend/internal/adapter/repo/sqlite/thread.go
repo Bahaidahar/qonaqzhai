@@ -30,7 +30,7 @@ func (r *ThreadRepo) CreateForBooking(ctx context.Context, bookingID, customerID
 	}
 	id := r.idGen.New()
 	if _, err := r.db.ExecContext(ctx,
-		`INSERT INTO booking_threads (id, booking_id, customer_id, vendor_id) VALUES (?, ?, ?, ?)`,
+		`INSERT INTO booking_threads (id, booking_id, customer_id, vendor_id) VALUES ($1, $2, $3, $4)`,
 		id, bookingID, customerID, vendorID,
 	); err != nil {
 		return nil, fmt.Errorf("insert thread: %w", err)
@@ -40,19 +40,19 @@ func (r *ThreadRepo) CreateForBooking(ctx context.Context, bookingID, customerID
 
 // FindByID looks up a thread by primary key.
 func (r *ThreadRepo) FindByID(ctx context.Context, id string) (*domain.BookingThread, error) {
-	return r.queryThread(ctx, `WHERE id = ?`, id)
+	return r.queryThread(ctx, `WHERE id = $1`, id)
 }
 
 // FindByBooking looks up the thread attached to a booking.
 func (r *ThreadRepo) FindByBooking(ctx context.Context, bookingID string) (*domain.BookingThread, error) {
-	return r.queryThread(ctx, `WHERE booking_id = ?`, bookingID)
+	return r.queryThread(ctx, `WHERE booking_id = $1`, bookingID)
 }
 
 // ListForUser returns threads where the user is either customer or vendor, newest first.
 func (r *ThreadRepo) ListForUser(ctx context.Context, userID string) ([]*domain.BookingThread, error) {
 	rows, err := r.db.QueryContext(ctx,
 		`SELECT id, booking_id, customer_id, vendor_id, created_at, updated_at
-		 FROM booking_threads WHERE customer_id = ? OR vendor_id = ?
+		 FROM booking_threads WHERE customer_id = $1 OR vendor_id = $2
 		 ORDER BY updated_at DESC`,
 		userID, userID,
 	)
@@ -74,7 +74,7 @@ func (r *ThreadRepo) ListForUser(ctx context.Context, userID string) ([]*domain.
 // Touch bumps updated_at on the thread (called on each new message).
 func (r *ThreadRepo) Touch(ctx context.Context, id string) error {
 	_, err := r.db.ExecContext(ctx,
-		`UPDATE booking_threads SET updated_at = CURRENT_TIMESTAMP WHERE id = ?`, id,
+		`UPDATE booking_threads SET updated_at = CURRENT_TIMESTAMP WHERE id = $1`, id,
 	)
 	return err
 }
@@ -85,14 +85,14 @@ func (r *ThreadRepo) AddMessage(ctx context.Context, m *domain.ThreadMessage) (*
 		m.ID = r.idGen.New()
 	}
 	if _, err := r.db.ExecContext(ctx,
-		`INSERT INTO thread_messages (id, thread_id, sender_id, text) VALUES (?, ?, ?, ?)`,
+		`INSERT INTO thread_messages (id, thread_id, sender_id, text) VALUES ($1, $2, $3, $4)`,
 		m.ID, m.ThreadID, m.SenderID, m.Text,
 	); err != nil {
 		return nil, fmt.Errorf("insert thread message: %w", err)
 	}
 	_ = r.Touch(ctx, m.ThreadID)
 	row := r.db.QueryRowContext(ctx,
-		`SELECT id, thread_id, sender_id, text, created_at FROM thread_messages WHERE id = ?`, m.ID,
+		`SELECT id, thread_id, sender_id, text, created_at FROM thread_messages WHERE id = $1`, m.ID,
 	)
 	var out domain.ThreadMessage
 	if err := row.Scan(&out.ID, &out.ThreadID, &out.SenderID, &out.Text, &out.CreatedAt); err != nil {
@@ -105,7 +105,7 @@ func (r *ThreadRepo) AddMessage(ctx context.Context, m *domain.ThreadMessage) (*
 func (r *ThreadRepo) ListMessages(ctx context.Context, threadID string) ([]*domain.ThreadMessage, error) {
 	rows, err := r.db.QueryContext(ctx,
 		`SELECT id, thread_id, sender_id, text, created_at FROM thread_messages
-		 WHERE thread_id = ? ORDER BY created_at ASC`, threadID,
+		 WHERE thread_id = $1 ORDER BY created_at ASC`, threadID,
 	)
 	if err != nil {
 		return nil, fmt.Errorf("list thread messages: %w", err)

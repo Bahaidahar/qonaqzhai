@@ -33,7 +33,7 @@ func (r *BookingRepo) Create(ctx context.Context, b *domain.Booking) (*domain.Bo
 	}
 	if _, err := r.db.ExecContext(ctx,
 		`INSERT INTO bookings (id, customer_id, vendor_id, service_id, event_date, guest_count, note, status, amount, payment_id)
-		 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+		 VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)`,
 		b.ID, b.CustomerID, b.VendorID, b.ServiceID, b.EventDate, b.GuestCount, b.Note,
 		string(b.Status), b.Amount, b.PaymentID,
 	); err != nil {
@@ -45,7 +45,7 @@ func (r *BookingRepo) Create(ctx context.Context, b *domain.Booking) (*domain.Bo
 // Find returns a booking by id.
 func (r *BookingRepo) Find(ctx context.Context, id string) (*domain.Booking, error) {
 	row := r.db.QueryRowContext(ctx,
-		`SELECT `+bookingCols+` FROM bookings WHERE id = ?`,
+		`SELECT `+bookingCols+` FROM bookings WHERE id = $1`,
 		id,
 	)
 	b, err := scanBooking(row)
@@ -57,12 +57,12 @@ func (r *BookingRepo) Find(ctx context.Context, id string) (*domain.Booking, err
 
 // ListForCustomer returns bookings made by customer.
 func (r *BookingRepo) ListForCustomer(ctx context.Context, customerID string) ([]*domain.Booking, error) {
-	return r.list(ctx, `WHERE customer_id = ?`, customerID)
+	return r.list(ctx, `WHERE customer_id = $1`, customerID)
 }
 
 // ListForVendor returns bookings against vendor (by vendor row id, not user id).
 func (r *BookingRepo) ListForVendor(ctx context.Context, vendorID string) ([]*domain.Booking, error) {
-	return r.list(ctx, `WHERE vendor_id = ?`, vendorID)
+	return r.list(ctx, `WHERE vendor_id = $1`, vendorID)
 }
 
 // ListAll returns every booking ordered by recency.
@@ -90,7 +90,7 @@ func (r *BookingRepo) list(ctx context.Context, where string, args ...any) ([]*d
 
 // UpdateStatus changes a booking's status.
 func (r *BookingRepo) UpdateStatus(ctx context.Context, id string, status domain.BookingStatus) error {
-	res, err := r.db.ExecContext(ctx, `UPDATE bookings SET status = ? WHERE id = ?`, string(status), id)
+	res, err := r.db.ExecContext(ctx, `UPDATE bookings SET status = $1 WHERE id = $2`, string(status), id)
 	if err != nil {
 		return err
 	}
@@ -103,7 +103,7 @@ func (r *BookingRepo) UpdateStatus(ctx context.Context, id string, status domain
 
 // SetPayment associates a payment id with a booking (called from payment webhook).
 func (r *BookingRepo) SetPayment(ctx context.Context, id, paymentID string) error {
-	res, err := r.db.ExecContext(ctx, `UPDATE bookings SET payment_id = ? WHERE id = ?`, paymentID, id)
+	res, err := r.db.ExecContext(ctx, `UPDATE bookings SET payment_id = $1 WHERE id = $2`, paymentID, id)
 	if err != nil {
 		return err
 	}
@@ -116,7 +116,7 @@ func (r *BookingRepo) SetPayment(ctx context.Context, id, paymentID string) erro
 
 // SetService associates a service id with a booking.
 func (r *BookingRepo) SetService(ctx context.Context, id, serviceID string) error {
-	res, err := r.db.ExecContext(ctx, `UPDATE bookings SET service_id = ? WHERE id = ?`, serviceID, id)
+	res, err := r.db.ExecContext(ctx, `UPDATE bookings SET service_id = $1 WHERE id = $2`, serviceID, id)
 	if err != nil {
 		return err
 	}

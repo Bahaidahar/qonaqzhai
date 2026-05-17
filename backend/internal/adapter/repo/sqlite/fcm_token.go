@@ -24,7 +24,7 @@ func (r *FCMTokenRepo) Register(ctx context.Context, userID, token, platform str
 	// idempotent insert: try insert, fall back to update on unique conflict
 	id := r.idGen.New()
 	_, err := r.db.ExecContext(ctx,
-		`INSERT INTO fcm_tokens (id, user_id, token, platform) VALUES (?, ?, ?, ?)`,
+		`INSERT INTO fcm_tokens (id, user_id, token, platform) VALUES ($1, $2, $3, $4)`,
 		id, userID, token, platform,
 	)
 	if err == nil {
@@ -34,7 +34,7 @@ func (r *FCMTokenRepo) Register(ctx context.Context, userID, token, platform str
 		return fmt.Errorf("insert fcm token: %w", err)
 	}
 	_, err = r.db.ExecContext(ctx,
-		`UPDATE fcm_tokens SET user_id = ?, platform = ? WHERE token = ?`,
+		`UPDATE fcm_tokens SET user_id = $1, platform = $2 WHERE token = $3`,
 		userID, platform, token,
 	)
 	if err != nil {
@@ -45,13 +45,13 @@ func (r *FCMTokenRepo) Register(ctx context.Context, userID, token, platform str
 
 // Unregister removes a token (e.g., after a 404 from FCM).
 func (r *FCMTokenRepo) Unregister(ctx context.Context, token string) error {
-	_, err := r.db.ExecContext(ctx, `DELETE FROM fcm_tokens WHERE token = ?`, token)
+	_, err := r.db.ExecContext(ctx, `DELETE FROM fcm_tokens WHERE token = $1`, token)
 	return err
 }
 
 // TokensForUser returns all active FCM tokens registered for user.
 func (r *FCMTokenRepo) TokensForUser(ctx context.Context, userID string) ([]string, error) {
-	rows, err := r.db.QueryContext(ctx, `SELECT token FROM fcm_tokens WHERE user_id = ?`, userID)
+	rows, err := r.db.QueryContext(ctx, `SELECT token FROM fcm_tokens WHERE user_id = $1`, userID)
 	if err != nil {
 		return nil, err
 	}

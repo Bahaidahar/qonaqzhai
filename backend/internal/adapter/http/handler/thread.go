@@ -16,10 +16,11 @@ type Thread struct {
 // NewThread constructs a Thread handler.
 func NewThread(svc *thread.Service) *Thread { return &Thread{svc: svc} }
 
-// List returns threads visible to the calling user.
+// List returns threads visible to the calling user, enriched with booking +
+// counterpart details so the inbox renders useful info instead of raw IDs.
 func (h *Thread) List(w http.ResponseWriter, r *http.Request) {
 	uid, _ := middleware.UserIDFrom(r.Context())
-	items, err := h.svc.ListForUser(r.Context(), uid)
+	items, err := h.svc.ListSummariesForUser(r.Context(), uid)
 	if err != nil {
 		httpx.HandleError(w, err)
 		return

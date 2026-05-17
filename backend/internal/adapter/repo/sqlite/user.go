@@ -32,7 +32,7 @@ func (r *UserRepo) Create(ctx context.Context, u *domain.User) (*domain.User, er
 		u.Status = domain.UserActive
 	}
 	_, err := r.db.ExecContext(ctx,
-		`INSERT INTO users (id, email, name, password_hash, role, status) VALUES (?, ?, ?, ?, ?, ?)`,
+		`INSERT INTO users (id, email, name, password_hash, role, status) VALUES ($1, $2, $3, $4, $5, $6)`,
 		u.ID, u.Email, u.Name, u.PasswordHash, string(u.Role), string(u.Status),
 	)
 	if err != nil {
@@ -46,12 +46,12 @@ func (r *UserRepo) Create(ctx context.Context, u *domain.User) (*domain.User, er
 
 // FindByID retrieves a user by primary key.
 func (r *UserRepo) FindByID(ctx context.Context, id string) (*domain.User, error) {
-	return r.queryUser(ctx, `WHERE id = ?`, id)
+	return r.queryUser(ctx, `WHERE id = $1`, id)
 }
 
 // FindByEmail retrieves a user by (unique) email.
 func (r *UserRepo) FindByEmail(ctx context.Context, email string) (*domain.User, error) {
-	return r.queryUser(ctx, `WHERE email = ?`, email)
+	return r.queryUser(ctx, `WHERE email = $1`, email)
 }
 
 // List returns all users ordered by created_at descending.
@@ -76,7 +76,7 @@ func (r *UserRepo) List(ctx context.Context) ([]*domain.User, error) {
 
 // UpdateStatus changes a user's lifecycle status.
 func (r *UserRepo) UpdateStatus(ctx context.Context, id string, status domain.UserStatus) error {
-	res, err := r.db.ExecContext(ctx, `UPDATE users SET status = ? WHERE id = ?`, string(status), id)
+	res, err := r.db.ExecContext(ctx, `UPDATE users SET status = $1 WHERE id = $2`, string(status), id)
 	if err != nil {
 		return err
 	}
@@ -89,7 +89,7 @@ func (r *UserRepo) UpdateStatus(ctx context.Context, id string, status domain.Us
 
 // UpdatePasswordHash overwrites the stored password hash.
 func (r *UserRepo) UpdatePasswordHash(ctx context.Context, id, hash string) error {
-	res, err := r.db.ExecContext(ctx, `UPDATE users SET password_hash = ? WHERE id = ?`, hash, id)
+	res, err := r.db.ExecContext(ctx, `UPDATE users SET password_hash = $1 WHERE id = $2`, hash, id)
 	if err != nil {
 		return err
 	}
@@ -128,5 +128,10 @@ func scanUser(s scanner) (*domain.User, error) {
 }
 
 func isUniqueErr(err error) bool {
-	return err != nil && strings.Contains(err.Error(), "UNIQUE constraint failed")
+	if err == nil {
+		return false
+	}
+	msg := err.Error()
+	// Postgres: "SQLSTATE 23505" (unique_violation). SQLite legacy form kept for tests.
+	return strings.Contains(msg, "23505") || strings.Contains(msg, "UNIQUE constraint failed")
 }

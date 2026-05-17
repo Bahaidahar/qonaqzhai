@@ -1,39 +1,18 @@
 "use client";
 
-import { Suspense, useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { Suspense, useCallback, useEffect, useRef, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { ChatSidebar } from "@/widgets/chat-sidebar/chat-sidebar";
 import { ChatInput } from "@/features/ai-chat/chat-input";
 import { ChatMessageView } from "@/features/ai-chat/chat-message";
 import { AuthGate } from "@/features/auth/auth-gate";
+import { useAuth } from "@/features/auth/context";
 import { RedirectIfWrongRole } from "@/features/auth/role-redirect";
 import { sendChat, userMessage } from "@/features/ai-chat/client";
 import type { ChatMessage } from "@/features/ai-chat/types";
 import { loadChat, notifyChatChanged } from "@/features/ai-chat/history";
 import { useI18n } from "@/shared/i18n/context";
-import {
-  Calendar,
-  Users,
-  Wallet,
-  Store,
-  Sparkles,
-  MessageSquare,
-} from "lucide-react";
-import type { DictKey } from "@/shared/i18n/dict";
-
-const SUGGESTIONS: { icon: typeof Sparkles; key: DictKey }[] = [
-  { icon: Sparkles, key: "suggestion_toi" },
-  { icon: Wallet, key: "suggestion_corporate" },
-  { icon: Store, key: "suggestion_photographer" },
-  { icon: MessageSquare, key: "suggestion_invitation" },
-];
-
-const CAPABILITIES: { icon: typeof Calendar; key: DictKey }[] = [
-  { icon: Calendar, key: "capability_plan" },
-  { icon: Store, key: "capability_vendors" },
-  { icon: Wallet, key: "capability_budget" },
-  { icon: Users, key: "capability_guests" },
-];
+import { MessageSquare } from "lucide-react";
 
 export default function HomePage() {
   return (
@@ -129,7 +108,8 @@ function ChatHeader({ chatId }: { chatId: string }) {
 
 function CenteredGreeting({ onSend }: { onSend: (t: string) => void }) {
   const { t } = useI18n();
-  const suggestions = useMemo(() => SUGGESTIONS, []);
+  const { user } = useAuth();
+  const firstName = (user?.name ?? user?.email ?? "").split(/[\s@]/)[0];
   return (
     <div className="relative flex h-full flex-1 flex-col items-center justify-center overflow-hidden px-6 py-10">
       <div className="pointer-events-none absolute inset-0 -z-10">
@@ -139,19 +119,11 @@ function CenteredGreeting({ onSend }: { onSend: (t: string) => void }) {
 
       <div className="w-full max-w-2xl">
         <div className="text-center">
-          <div className="mb-6 inline-flex items-center gap-2 rounded-full border bg-[var(--color-card)] px-3 py-1 text-xs font-medium">
-            <span className="relative flex h-1.5 w-1.5">
-              <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[var(--color-primary)] opacity-75" />
-              <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-[var(--color-primary)]" />
-            </span>
-            <span>{t("status_online")}</span>
-          </div>
-
           <h1 className="font-display text-6xl tracking-[-0.05em] sm:text-7xl">
             {t("hero_title_a")}
             <br />
             <span className="text-[var(--color-primary)]">
-              {t("hero_title_b")}
+              {firstName ? `${firstName}?` : t("hero_title_b")}
             </span>
           </h1>
         </div>
@@ -164,33 +136,6 @@ function CenteredGreeting({ onSend }: { onSend: (t: string) => void }) {
             autoFocus
             hint
           />
-        </div>
-
-        <div className="mt-10">
-          <div className="grid gap-2 sm:grid-cols-2">
-            {suggestions.map((s) => {
-              const label = t(s.key);
-              return (
-                <button
-                  key={s.key}
-                  onClick={() => onSend(label)}
-                  className="chip-hover group flex items-center gap-3 rounded-lg border bg-[var(--color-card)] px-4 py-3 text-left text-sm"
-                >
-                  <s.icon className="icon-pop h-4 w-4 text-[var(--color-primary)]" />
-                  <span className="flex-1">{label}</span>
-                </button>
-              );
-            })}
-          </div>
-        </div>
-
-        <div className="mt-10 flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-xs text-[var(--color-muted-foreground)]">
-          {CAPABILITIES.map((c) => (
-            <span key={c.key} className="inline-flex items-center gap-1.5">
-              <c.icon className="h-3 w-3" />
-              {t(c.key)}
-            </span>
-          ))}
         </div>
       </div>
     </div>

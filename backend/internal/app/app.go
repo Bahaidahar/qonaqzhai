@@ -26,6 +26,7 @@ import (
 	"qonaqzhai-backend/internal/usecase/admin"
 	"qonaqzhai-backend/internal/usecase/auth"
 	"qonaqzhai-backend/internal/usecase/booking"
+	"qonaqzhai-backend/internal/usecase/card"
 	"qonaqzhai-backend/internal/usecase/chat"
 	"qonaqzhai-backend/internal/usecase/notification"
 	"qonaqzhai-backend/internal/usecase/payment"
@@ -44,7 +45,7 @@ type App struct {
 
 // New builds and wires every component.
 func New(ctx context.Context, cfg config.Config) (*App, error) {
-	conn, err := db.Open(cfg.DBPath)
+	conn, err := db.Open(cfg.DatabaseURL)
 	if err != nil {
 		return nil, err
 	}
@@ -72,6 +73,7 @@ func New(ctx context.Context, cfg config.Config) (*App, error) {
 	services := sqliteadapter.NewServiceRepo(conn, ids)
 	chats := sqliteadapter.NewChatRepo(conn, ids)
 	threads := sqliteadapter.NewThreadRepo(conn, ids)
+	cards := sqliteadapter.NewCardRepo(conn, ids)
 
 	// AI (optional)
 	var aiClient usecase.AIClient
@@ -146,6 +148,7 @@ func New(ctx context.Context, cfg config.Config) (*App, error) {
 		Threads:   threads,
 		Bookings:  bookings,
 		Vendors:   vendors,
+		Users:     users,
 		Notifier:  notifSvc,
 		Publisher: wshub.HubPublisher{Hub: hub},
 	})
@@ -158,6 +161,7 @@ func New(ctx context.Context, cfg config.Config) (*App, error) {
 		Bookings: bookings, Vendors: vendors, Services: services,
 		Clock: clk, Notifier: notifSvc, Threads: threadSvc,
 	})
+	cardSvc := card.New(card.Deps{Cards: cards})
 	reviewSvc := review.New(review.Deps{Reviews: reviews, Bookings: bookings, Vendors: vendors, Clock: clk})
 	chatSvc := chat.New(chat.Deps{Vendors: vendors, Chats: chats, AI: aiClient, Logger: log})
 	adminSvc := admin.New(admin.Deps{
@@ -183,13 +187,14 @@ func New(ctx context.Context, cfg config.Config) (*App, error) {
 		Me:           handler.NewMe(users),
 		Vendor:       handler.NewVendor(vendorSvc),
 		Service:      handler.NewService(vendorSvc),
-		Booking:      handler.NewBooking(bookingSvc),
+		Booking:      handler.NewBooking(bookingSvc, cardSvc),
 		Review:       handler.NewReview(reviewSvc),
 		Chat:         handler.NewChat(chatSvc),
 		Admin:        handler.NewAdmin(adminSvc),
 		Notification: handler.NewNotification(notifSvc, fcmTokens),
 		Thread:       handler.NewThread(threadSvc),
 		WS:           handler.NewWS(hub, jwt),
+		Card:         handler.NewCard(cardSvc),
 	}
 	if paymentSvc != nil {
 		handlers.Payment = handler.NewPayment(paymentSvc)

@@ -18,7 +18,7 @@ const DEMO_ACCOUNTS: {
 }[] = [
   {
     role: "customer",
-    email: "customer@demo.kz",
+    email: "customer1@demo.kz",
     password: "demo12345",
     icon: Sparkles,
   },

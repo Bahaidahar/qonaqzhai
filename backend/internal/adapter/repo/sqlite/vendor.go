@@ -27,7 +27,7 @@ func (r *VendorRepo) Upsert(ctx context.Context, userID string, in domain.Vendor
 	existing, err := r.FindByUserID(ctx, userID)
 	if err == nil {
 		if _, err := r.db.ExecContext(ctx,
-			`UPDATE vendors SET name=?, category=?, city=?, description=?, price_from=?, updated_at=CURRENT_TIMESTAMP WHERE id=?`,
+			`UPDATE vendors SET name=$1, category=$2, city=$3, description=$4, price_from=$5, updated_at=now() WHERE id=$6`,
 			in.Name, in.Category, in.City, in.Description, in.PriceFrom, existing.ID,
 		); err != nil {
 			return nil, fmt.Errorf("update vendor: %w", err)
@@ -39,7 +39,8 @@ func (r *VendorRepo) Upsert(ctx context.Context, userID string, in domain.Vendor
 	}
 	id := r.idGen.New()
 	if _, err := r.db.ExecContext(ctx,
-		`INSERT INTO vendors (id, user_id, name, category, city, description, price_from) VALUES (?, ?, ?, ?, ?, ?, ?)`,
+		`INSERT INTO vendors (id, user_id, name, category, city, description, price_from)
+		 VALUES ($1, $2, $3, $4, $5, $6, $7)`,
 		id, userID, in.Name, in.Category, in.City, in.Description, in.PriceFrom,
 	); err != nil {
 		return nil, fmt.Errorf("insert vendor: %w", err)
@@ -49,52 +50,46 @@ func (r *VendorRepo) Upsert(ctx context.Context, userID string, in domain.Vendor
 
 // FindByID returns the vendor by primary key (with photo IDs populated).
 func (r *VendorRepo) FindByID(ctx context.Context, id string) (*domain.Vendor, error) {
-	return r.queryVendor(ctx, `WHERE id = ?`, id)
+	return r.queryVendor(ctx, `WHERE id = $1`, id)
 }
 
 // FindByUserID returns the vendor owned by userID.
 func (r *VendorRepo) FindByUserID(ctx context.Context, userID string) (*domain.Vendor, error) {
-	return r.queryVendor(ctx, `WHERE user_id = ?`, userID)
+	return r.queryVendor(ctx, `WHERE user_id = $1`, userID)
 }
 
-// Search runs the catalog query with all filters, pagination, sorting.
-// Returns the page slice + total count of matching rows.
+// Search runs the catalog query with filters, pagination, and sorting.
+// Full-text search uses the `search_tsv` generated tsvector column (GIN-indexed).
 func (r *VendorRepo) Search(ctx context.Context, q usecase.VendorQuery) ([]*domain.Vendor, int, error) {
 	var (
 		wheres []string
 		args   []any
 	)
+	add := func(template string, val any) {
+		args = append(args, val)
+		wheres = append(wheres, strings.Replace(template, "$?", fmt.Sprintf("$%d", len(args)), 1))
+	}
 
-	useFTS := strings.TrimSpace(q.Q) != ""
-	from := `FROM vendors v`
-	if useFTS {
-		from = `FROM vendors v JOIN vendors_fts f ON v.rowid = f.rowid`
-		wheres = append(wheres, `vendors_fts MATCH ?`)
-		args = append(args, ftsQuery(q.Q))
+	if s := strings.TrimSpace(q.Q); s != "" {
+		add(`v.search_tsv @@ plainto_tsquery('simple', $?)`, s)
 	}
 	if q.Status != "" {
-		wheres = append(wheres, `v.status = ?`)
-		args = append(args, string(q.Status))
+		add(`v.status = $?`, string(q.Status))
 	}
 	if q.Category != "" {
-		wheres = append(wheres, `v.category = ?`)
-		args = append(args, q.Category)
+		add(`v.category = $?`, q.Category)
 	}
 	if q.City != "" {
-		wheres = append(wheres, `v.city = ?`)
-		args = append(args, q.City)
+		add(`v.city = $?`, q.City)
 	}
 	if q.MinPrice > 0 {
-		wheres = append(wheres, `v.price_from >= ?`)
-		args = append(args, q.MinPrice)
+		add(`v.price_from >= $?`, q.MinPrice)
 	}
 	if q.MaxPrice > 0 {
-		wheres = append(wheres, `v.price_from <= ?`)
-		args = append(args, q.MaxPrice)
+		add(`v.price_from <= $?`, q.MaxPrice)
 	}
 	if q.MinRating > 0 {
-		wheres = append(wheres, `v.rating_avg >= ?`)
-		args = append(args, q.MinRating)
+		add(`v.rating_avg >= $?`, q.MinRating)
 	}
 
 	whereSQL := ""
@@ -102,9 +97,10 @@ func (r *VendorRepo) Search(ctx context.Context, q usecase.VendorQuery) ([]*doma
 		whereSQL = " WHERE " + strings.Join(wheres, " AND ")
 	}
 
-	// Count
 	var total int
-	if err := r.db.QueryRowContext(ctx, "SELECT COUNT(*) "+from+whereSQL, args...).Scan(&total); err != nil {
+	if err := r.db.QueryRowContext(ctx,
+		`SELECT COUNT(*) FROM vendors v`+whereSQL, args...,
+	).Scan(&total); err != nil {
 		return nil, 0, fmt.Errorf("count vendors: %w", err)
 	}
 
@@ -128,10 +124,13 @@ func (r *VendorRepo) Search(ctx context.Context, q usecase.VendorQuery) ([]*doma
 	}
 	offset := (page - 1) * limit
 
+	args = append(args, limit, offset)
+	limitOffset := fmt.Sprintf(" LIMIT $%d OFFSET $%d", len(args)-1, len(args))
+
 	rows, err := r.db.QueryContext(ctx,
-		`SELECT v.id, v.user_id, v.name, v.category, v.city, v.description, v.price_from, v.status, v.rating_avg, v.rating_count, v.created_at, v.updated_at `+
-			from+whereSQL+orderBy+` LIMIT ? OFFSET ?`,
-		append(args, limit, offset)...,
+		`SELECT v.id, v.user_id, v.name, v.category, v.city, v.description, v.price_from, v.status, v.rating_avg, v.rating_count, v.created_at, v.updated_at
+		 FROM vendors v`+whereSQL+orderBy+limitOffset,
+		args...,
 	)
 	if err != nil {
 		return nil, 0, fmt.Errorf("list vendors: %w", err)
@@ -162,7 +161,7 @@ func (r *VendorRepo) Search(ctx context.Context, q usecase.VendorQuery) ([]*doma
 // UpdateStatus moves a vendor to next status.
 func (r *VendorRepo) UpdateStatus(ctx context.Context, id string, status domain.VendorStatus) error {
 	res, err := r.db.ExecContext(ctx,
-		`UPDATE vendors SET status = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?`,
+		`UPDATE vendors SET status = $1, updated_at = now() WHERE id = $2`,
 		string(status), id,
 	)
 	if err != nil {
@@ -178,7 +177,7 @@ func (r *VendorRepo) UpdateStatus(ctx context.Context, id string, status domain.
 // UpdateRating persists a recomputed rating aggregate.
 func (r *VendorRepo) UpdateRating(ctx context.Context, id string, avg float64, count int) error {
 	res, err := r.db.ExecContext(ctx,
-		`UPDATE vendors SET rating_avg = ?, rating_count = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?`,
+		`UPDATE vendors SET rating_avg = $1, rating_count = $2, updated_at = now() WHERE id = $3`,
 		avg, count, id,
 	)
 	if err != nil {
@@ -227,7 +226,8 @@ func scanVendor(s scanner) (*domain.Vendor, error) {
 }
 
 func listPhotoIDs(ctx context.Context, db *sql.DB, vendorID string) ([]string, error) {
-	rows, err := db.QueryContext(ctx, `SELECT id FROM photos WHERE vendor_id = ? ORDER BY created_at ASC`, vendorID)
+	rows, err := db.QueryContext(ctx,
+		`SELECT id FROM photos WHERE vendor_id = $1 ORDER BY created_at ASC`, vendorID)
 	if err != nil {
 		return nil, err
 	}
@@ -241,19 +241,4 @@ func listPhotoIDs(ctx context.Context, db *sql.DB, vendorID string) ([]string, e
 		ids = append(ids, id)
 	}
 	return ids, rows.Err()
-}
-
-// ftsQuery wraps the user input into an FTS5 prefix expression on every token.
-// Returns a safe form that never crashes on operator characters in user input.
-func ftsQuery(raw string) string {
-	tokens := strings.Fields(raw)
-	for i, t := range tokens {
-		// strip FTS5 reserved characters by quoting each token, append * for prefix matching
-		t = strings.ReplaceAll(t, `"`, `""`)
-		tokens[i] = `"` + t + `"` + "*"
-	}
-	if len(tokens) == 0 {
-		return ""
-	}
-	return strings.Join(tokens, " ")
 }

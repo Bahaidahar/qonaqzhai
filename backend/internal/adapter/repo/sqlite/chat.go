@@ -26,7 +26,7 @@ func NewChatRepo(db *sql.DB, idGen usecase.IDGen) *ChatRepo {
 func (r *ChatRepo) Create(ctx context.Context, userID, title string) (*domain.Chat, error) {
 	id := r.idGen.New()
 	_, err := r.db.ExecContext(ctx,
-		`INSERT INTO chats (id, user_id, title) VALUES (?, ?, ?)`,
+		`INSERT INTO chats (id, user_id, title) VALUES ($1, $2, $3)`,
 		id, userID, title,
 	)
 	if err != nil {
@@ -38,7 +38,7 @@ func (r *ChatRepo) Create(ctx context.Context, userID, title string) (*domain.Ch
 // FindByID returns a chat by primary key.
 func (r *ChatRepo) FindByID(ctx context.Context, id string) (*domain.Chat, error) {
 	row := r.db.QueryRowContext(ctx,
-		`SELECT id, user_id, title, created_at, updated_at FROM chats WHERE id = ?`, id,
+		`SELECT id, user_id, title, created_at, updated_at FROM chats WHERE id = $1`, id,
 	)
 	var c domain.Chat
 	if err := row.Scan(&c.ID, &c.UserID, &c.Title, &c.CreatedAt, &c.UpdatedAt); err != nil {
@@ -57,7 +57,7 @@ func (r *ChatRepo) ListForUser(ctx context.Context, userID string, limit int) ([
 	}
 	rows, err := r.db.QueryContext(ctx,
 		`SELECT id, user_id, title, created_at, updated_at FROM chats
-		 WHERE user_id = ? ORDER BY updated_at DESC LIMIT ?`, userID, limit,
+		 WHERE user_id = $1 ORDER BY updated_at DESC LIMIT $2`, userID, limit,
 	)
 	if err != nil {
 		return nil, fmt.Errorf("list chats: %w", err)
@@ -77,7 +77,7 @@ func (r *ChatRepo) ListForUser(ctx context.Context, userID string, limit int) ([
 // UpdateTitle changes the chat title.
 func (r *ChatRepo) UpdateTitle(ctx context.Context, id, title string) error {
 	res, err := r.db.ExecContext(ctx,
-		`UPDATE chats SET title = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?`,
+		`UPDATE chats SET title = $1, updated_at = CURRENT_TIMESTAMP WHERE id = $2`,
 		title, id,
 	)
 	if err != nil {
@@ -93,14 +93,14 @@ func (r *ChatRepo) UpdateTitle(ctx context.Context, id, title string) error {
 // Touch bumps updated_at so the chat moves to the top of the sidebar.
 func (r *ChatRepo) Touch(ctx context.Context, id string) error {
 	_, err := r.db.ExecContext(ctx,
-		`UPDATE chats SET updated_at = CURRENT_TIMESTAMP WHERE id = ?`, id,
+		`UPDATE chats SET updated_at = CURRENT_TIMESTAMP WHERE id = $1`, id,
 	)
 	return err
 }
 
 // Delete removes a chat (cascades to messages).
 func (r *ChatRepo) Delete(ctx context.Context, id string) error {
-	res, err := r.db.ExecContext(ctx, `DELETE FROM chats WHERE id = ?`, id)
+	res, err := r.db.ExecContext(ctx, `DELETE FROM chats WHERE id = $1`, id)
 	if err != nil {
 		return err
 	}
@@ -126,7 +126,7 @@ func (r *ChatRepo) AddMessage(ctx context.Context, m *domain.ChatMessage) (*doma
 		blocksJSON = string(raw)
 	}
 	_, err := r.db.ExecContext(ctx,
-		`INSERT INTO chat_messages (id, chat_id, role, text, blocks_json) VALUES (?, ?, ?, ?, ?)`,
+		`INSERT INTO chat_messages (id, chat_id, role, text, blocks_json) VALUES ($1, $2, $3, $4, $5)`,
 		m.ID, m.ChatID, string(m.Role), m.Text, blocksJSON,
 	)
 	if err != nil {
@@ -140,7 +140,7 @@ func (r *ChatRepo) AddMessage(ctx context.Context, m *domain.ChatMessage) (*doma
 func (r *ChatRepo) ListMessages(ctx context.Context, chatID string) ([]*domain.ChatMessage, error) {
 	rows, err := r.db.QueryContext(ctx,
 		`SELECT id, chat_id, role, text, blocks_json, created_at FROM chat_messages
-		 WHERE chat_id = ? ORDER BY created_at ASC`, chatID,
+		 WHERE chat_id = $1 ORDER BY created_at ASC`, chatID,
 	)
 	if err != nil {
 		return nil, fmt.Errorf("list chat messages: %w", err)

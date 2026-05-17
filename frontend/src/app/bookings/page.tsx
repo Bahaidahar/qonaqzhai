@@ -1,12 +1,13 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
-import { Calendar, Users, X, Star } from "lucide-react";
+import Link from "next/link";
+import { Calendar, Users, X, Star, CreditCard } from "lucide-react";
 import { ChatSidebar } from "@/widgets/chat-sidebar/chat-sidebar";
 import { AuthGate } from "@/features/auth/auth-gate";
 import { Button } from "@/shared/ui/button";
 import { useI18n } from "@/shared/i18n/context";
-import { api, type Booking } from "@/shared/api";
+import { api, type Booking, type PaymentCard } from "@/shared/api";
 import type { DictKey } from "@/shared/i18n/dict";
 import { ReviewForm } from "@/features/reviews/review-form";
 
@@ -44,13 +45,17 @@ export default function BookingsPage() {
 function BookingsList() {
   const { t } = useI18n();
   const [items, setItems] = useState<Booking[]>([]);
+  const [cards, setCards] = useState<PaymentCard[]>([]);
   const [loading, setLoading] = useState(true);
   const [reviewingId, setReviewingId] = useState<string | null>(null);
+  const [payingId, setPayingId] = useState<string | null>(null);
+  const [payError, setPayError] = useState<string | null>(null);
 
   const load = useCallback(async () => {
     setLoading(true);
-    const res = await api.bookings();
-    setItems(res.items ?? []);
+    const [bk, cd] = await Promise.all([api.bookings(), api.listCards()]);
+    setItems(bk.items ?? []);
+    setCards(cd.items ?? []);
     setLoading(false);
   }, []);
 
@@ -63,6 +68,21 @@ function BookingsList() {
     await load();
   }
 
+  async function pay(id: string) {
+    setPayError(null);
+    setPayingId(id);
+    try {
+      await api.payBookingMock(id);
+      await load();
+    } catch (e) {
+      setPayError(e instanceof Error ? e.message : "payment failed");
+    } finally {
+      setPayingId(null);
+    }
+  }
+
+  const hasCard = cards.length > 0;
+
   return (
     <div className="mx-auto max-w-4xl px-6 py-10">
       <h1 className="font-display text-4xl tracking-[-0.045em]">
@@ -71,6 +91,12 @@ function BookingsList() {
       <p className="mt-2 text-sm text-[var(--color-muted-foreground)]">
         {t("bookings_hint")}
       </p>
+
+      {payError && (
+        <div className="mt-4 rounded-md border border-red-500/30 bg-red-500/10 px-3 py-2 text-sm text-red-700">
+          {payError}
+        </div>
+      )}
 
       {loading ? (
         <div className="mt-10 text-sm text-[var(--color-muted-foreground)]">
@@ -118,6 +144,28 @@ function BookingsList() {
                       <X className="h-4 w-4" />
                       {t("bookings_btn_cancel")}
                     </Button>
+                  )}
+                  {b.status === "accepted" && (
+                    hasCard ? (
+                      <Button
+                        size="sm"
+                        disabled={payingId === b.id}
+                        onClick={() => pay(b.id)}
+                      >
+                        <CreditCard className="h-4 w-4" />
+                        {payingId === b.id
+                          ? t("common_loading")
+                          : `${t("bookings_btn_pay")} ${b.amount.toLocaleString()} ₸`}
+                      </Button>
+                    ) : (
+                      <Link
+                        href="/cards"
+                        className="inline-flex items-center justify-center gap-1.5 rounded-md border bg-[var(--color-card)] px-3 py-1.5 text-sm font-medium hover:bg-[var(--color-muted)]"
+                      >
+                        <CreditCard className="h-4 w-4" />
+                        {t("bookings_btn_add_card")}
+                      </Link>
+                    )
                   )}
                   {b.status === "completed" && (
                     <Button

@@ -26,6 +26,16 @@ export function ChatInput({
   const { t, locale } = useI18n();
   const ph = placeholder ?? t("input_placeholder_main");
 
+  const textareaRef = useRef<HTMLTextAreaElement | null>(null);
+
+  useEffect(() => {
+    const el = textareaRef.current;
+    if (!el) return;
+    el.style.height = "auto";
+    const max = size === "lg" ? 240 : 180;
+    el.style.height = `${Math.min(el.scrollHeight, max)}px`;
+  }, [value, size]);
+
   // Snapshot of input contents at the moment recording starts so partial
   // transcripts append cleanly without overwriting prior typing.
   const baseRef = useRef("");
@@ -74,6 +84,7 @@ export function ChatInput({
         )}
       >
         <textarea
+          ref={textareaRef}
           autoFocus={autoFocus}
           value={value}
           onChange={(e) => setValue(e.target.value)}
@@ -81,7 +92,7 @@ export function ChatInput({
           placeholder={ph}
           rows={1}
           className={cn(
-            "flex-1 resize-none bg-transparent px-1 py-2.5 placeholder:text-[var(--color-muted-foreground)] focus:outline-none",
+            "flex-1 resize-none overflow-y-auto break-words bg-transparent px-1 py-2.5 leading-relaxed placeholder:text-[var(--color-muted-foreground)] focus:outline-none",
             size === "lg" ? "text-base" : "text-sm"
           )}
         />

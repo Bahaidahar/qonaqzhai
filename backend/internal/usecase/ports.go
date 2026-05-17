@@ -107,6 +107,15 @@ type AuditRepo interface {
 	List(ctx context.Context, limit int) ([]*domain.AuditEntry, error)
 }
 
+// CardRepo persists saved payment cards (mock — last4 + brand only, no PAN).
+type CardRepo interface {
+	Create(ctx context.Context, c *domain.PaymentCard) (*domain.PaymentCard, error)
+	FindByID(ctx context.Context, id string) (*domain.PaymentCard, error)
+	ListForUser(ctx context.Context, userID string) ([]*domain.PaymentCard, error)
+	Delete(ctx context.Context, id string) error
+	SetDefault(ctx context.Context, userID, cardID string) error
+}
+
 // ThreadRepo persists booking-scoped DM threads between customer and vendor.
 type ThreadRepo interface {
 	CreateForBooking(ctx context.Context, bookingID, customerID, vendorID string) (*domain.BookingThread, error)

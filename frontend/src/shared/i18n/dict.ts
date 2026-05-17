@@ -97,6 +97,56 @@ type Dict = {
   common_cancel: string;
   common_search: string;
   common_back: string;
+  common_delete: string;
+  threads_title: string;
+  threads_hint: string;
+  threads_empty: string;
+  threads_unknown_vendor: string;
+  threads_unknown_user: string;
+  notif_signup_welcome_title: string;
+  notif_signup_welcome_body: string;
+  notif_password_reset_title: string;
+  notif_password_reset_body: string;
+  notif_booking_created_title: string;
+  notif_booking_created_body: string;
+  notif_booking_accepted_title: string;
+  notif_booking_accepted_body: string;
+  notif_booking_declined_title: string;
+  notif_booking_declined_body: string;
+  notif_booking_paid_title: string;
+  notif_booking_paid_body: string;
+  notif_vendor_approved_title: string;
+  notif_vendor_approved_body: string;
+  notif_vendor_rejected_title: string;
+  notif_vendor_rejected_body: string;
+  notif_thread_message_title: string;
+  notif_channel_email: string;
+  notif_channel_push: string;
+  notif_status_pending: string;
+  notif_status_sent: string;
+  notif_status_failed: string;
+  booking_status_pending: string;
+  booking_status_accepted: string;
+  booking_status_declined: string;
+  booking_status_cancelled: string;
+  booking_status_completed: string;
+  booking_status_paid: string;
+  // cards (saved payment instruments — mock)
+  cards_title: string;
+  cards_hint: string;
+  cards_empty: string;
+  cards_add: string;
+  cards_save: string;
+  cards_default: string;
+  cards_make_default: string;
+  cards_field_number: string;
+  cards_field_exp: string;
+  cards_field_holder: string;
+  cards_err_exp: string;
+  cards_disclaimer: string;
+  nav_cards: string;
+  bookings_btn_pay: string;
+  bookings_btn_add_card: string;
   // admin users
   users_title: string;
   users_hint: string;
@@ -123,6 +173,17 @@ type Dict = {
   admin_btn_reject: string;
   admin_btn_suspend: string;
   admin_btn_reapprove: string;
+  funnel_submitted: string;
+  funnel_pending: string;
+  funnel_approved: string;
+  funnel_rejected: string;
+  admin_btn_preview: string;
+  admin_btn_hide: string;
+  admin_preview_no_photos: string;
+  admin_preview_no_description: string;
+  admin_preview_no_services: string;
+  admin_preview_services: string;
+  admin_preview_description: string;
   // vendors catalog (customer)
   vendors_title: string;
   vendors_hint: string;
@@ -130,6 +191,13 @@ type Dict = {
   vendors_filter_all: string;
   vendors_empty: string;
   vendors_from: string;
+  vendors_price_max_ph: string;
+  vendors_sort_aria: string;
+  vendors_sort_newest: string;
+  vendors_sort_price_asc: string;
+  vendors_sort_price_desc: string;
+  vendors_sort_rating_desc: string;
+  vendors_total_suffix: string;
   // vendor detail
   vendor_detail_back: string;
   vendor_detail_starting: string;
@@ -356,10 +424,59 @@ export const DICT: Record<Locale, Dict> = {
     nav_messages: "Messages",
     nav_admin_vendors: "Vendor moderation",
     common_loading: "Loading...",
+    threads_title: "Messages",
+    threads_hint: "Direct chats with vendors / customers, scoped to each accepted booking.",
+    threads_empty: "No active conversations. Threads open automatically when a vendor accepts a booking.",
+    threads_unknown_vendor: "Vendor",
+    threads_unknown_user: "User",
+    notif_signup_welcome_title: "Welcome",
+    notif_signup_welcome_body: "Your account is ready.",
+    notif_password_reset_title: "Password reset",
+    notif_password_reset_body: "We sent a reset link to your inbox.",
+    notif_booking_created_title: "New booking request",
+    notif_booking_created_body: "You have a new booking request — please review it in your inbox.",
+    notif_booking_accepted_title: "Booking accepted",
+    notif_booking_accepted_body: "The vendor accepted your booking.",
+    notif_booking_declined_title: "Booking declined",
+    notif_booking_declined_body: "The vendor declined your booking.",
+    notif_booking_paid_title: "Booking paid",
+    notif_booking_paid_body: "Your booking has been paid.",
+    notif_vendor_approved_title: "Vendor approved",
+    notif_vendor_approved_body: "Your vendor profile is now visible in the catalog.",
+    notif_vendor_rejected_title: "Vendor rejected",
+    notif_vendor_rejected_body: "Your vendor profile was rejected by moderation.",
+    notif_thread_message_title: "New message",
+    notif_channel_email: "email",
+    notif_channel_push: "push",
+    notif_status_pending: "pending",
+    notif_status_sent: "sent",
+    notif_status_failed: "failed",
+    booking_status_pending: "Pending",
+    booking_status_accepted: "Accepted",
+    booking_status_declined: "Declined",
+    booking_status_cancelled: "Cancelled",
+    booking_status_completed: "Completed",
+    booking_status_paid: "Paid",
     common_save: "Save",
     common_cancel: "Cancel",
     common_search: "Search...",
     common_back: "Back",
+    common_delete: "Delete",
+    cards_title: "Saved cards",
+    cards_hint: "Add a card to pay vendors after they accept your booking. Mock — no real payment is taken.",
+    cards_empty: "No cards yet.",
+    cards_add: "Add card",
+    cards_save: "Save card",
+    cards_default: "Default",
+    cards_make_default: "Set default",
+    cards_field_number: "Card number",
+    cards_field_exp: "Expiry (MM/YY)",
+    cards_field_holder: "Cardholder",
+    cards_err_exp: "Invalid expiry date",
+    cards_disclaimer: "Demo only — we never call a real payment processor and the PAN is discarded immediately.",
+    nav_cards: "Cards",
+    bookings_btn_pay: "Pay",
+    bookings_btn_add_card: "Add card to pay",
     users_title: "Users",
     users_hint: "Manage all platform users.",
     users_filter_all: "all",
@@ -384,10 +501,28 @@ export const DICT: Record<Locale, Dict> = {
     admin_btn_reject: "Reject",
     admin_btn_suspend: "Suspend",
     admin_btn_reapprove: "Re-approve",
+    funnel_submitted: "Submitted",
+    funnel_pending: "Pending",
+    funnel_approved: "Approved",
+    funnel_rejected: "Rejected",
+    admin_btn_preview: "Preview",
+    admin_btn_hide: "Hide",
+    admin_preview_no_photos: "No photos uploaded.",
+    admin_preview_no_description: "No description provided.",
+    admin_preview_no_services: "No services listed.",
+    admin_preview_services: "Services",
+    admin_preview_description: "Description",
     vendors_title: "Vendors",
     vendors_hint: "Verified partners for your next event.",
     vendors_search_ph: "Search...",
     vendors_filter_all: "All",
+    vendors_price_max_ph: "Max price (₸)",
+    vendors_sort_aria: "Sort",
+    vendors_sort_newest: "Newest",
+    vendors_sort_price_asc: "Price ↑",
+    vendors_sort_price_desc: "Price ↓",
+    vendors_sort_rating_desc: "Top rated",
+    vendors_total_suffix: "total",
     vendors_empty: "No vendors found",
     vendors_from: "from",
     vendor_detail_back: "Back to catalog",
@@ -596,10 +731,59 @@ export const DICT: Record<Locale, Dict> = {
     nav_messages: "Сообщения",
     nav_admin_vendors: "Модерация",
     common_loading: "Загрузка...",
+    threads_title: "Сообщения",
+    threads_hint: "Прямые чаты с подрядчиками / клиентами по принятым бронированиям.",
+    threads_empty: "Нет активных переписок. Чаты открываются автоматически, когда подрядчик принимает бронь.",
+    threads_unknown_vendor: "Подрядчик",
+    threads_unknown_user: "Пользователь",
+    notif_signup_welcome_title: "Добро пожаловать",
+    notif_signup_welcome_body: "Аккаунт готов.",
+    notif_password_reset_title: "Сброс пароля",
+    notif_password_reset_body: "Мы отправили ссылку для сброса на вашу почту.",
+    notif_booking_created_title: "Новый запрос на бронь",
+    notif_booking_created_body: "Поступил новый запрос на бронирование — проверьте во вкладке броней.",
+    notif_booking_accepted_title: "Бронь принята",
+    notif_booking_accepted_body: "Подрядчик принял вашу бронь.",
+    notif_booking_declined_title: "Бронь отклонена",
+    notif_booking_declined_body: "Подрядчик отклонил вашу бронь.",
+    notif_booking_paid_title: "Оплата прошла",
+    notif_booking_paid_body: "Бронь оплачена.",
+    notif_vendor_approved_title: "Профиль одобрен",
+    notif_vendor_approved_body: "Ваш профиль виден в каталоге.",
+    notif_vendor_rejected_title: "Профиль отклонён",
+    notif_vendor_rejected_body: "Модерация отклонила ваш профиль.",
+    notif_thread_message_title: "Новое сообщение",
+    notif_channel_email: "email",
+    notif_channel_push: "push",
+    notif_status_pending: "ожидает",
+    notif_status_sent: "отправлено",
+    notif_status_failed: "ошибка",
+    booking_status_pending: "Ожидает",
+    booking_status_accepted: "Принято",
+    booking_status_declined: "Отклонено",
+    booking_status_cancelled: "Отменено",
+    booking_status_completed: "Завершено",
+    booking_status_paid: "Оплачено",
     common_save: "Сохранить",
     common_cancel: "Отмена",
     common_search: "Поиск...",
     common_back: "Назад",
+    common_delete: "Удалить",
+    cards_title: "Карты",
+    cards_hint: "Добавьте карту, чтобы оплатить бронь после её подтверждения подрядчиком. Мок — реальная оплата не производится.",
+    cards_empty: "Нет сохранённых карт.",
+    cards_add: "Добавить карту",
+    cards_save: "Сохранить карту",
+    cards_default: "По умолчанию",
+    cards_make_default: "Сделать основной",
+    cards_field_number: "Номер карты",
+    cards_field_exp: "Срок (ММ/ГГ)",
+    cards_field_holder: "Держатель",
+    cards_err_exp: "Неверный срок действия",
+    cards_disclaimer: "Демо — мы не обращаемся к реальному платёжному провайдеру и не сохраняем номер карты.",
+    nav_cards: "Карты",
+    bookings_btn_pay: "Оплатить",
+    bookings_btn_add_card: "Добавить карту",
     users_title: "Пользователи",
     users_hint: "Управление всеми пользователями платформы.",
     users_filter_all: "все",
@@ -624,10 +808,28 @@ export const DICT: Record<Locale, Dict> = {
     admin_btn_reject: "Отклонить",
     admin_btn_suspend: "Снять",
     admin_btn_reapprove: "Восстановить",
+    funnel_submitted: "Поданы",
+    funnel_pending: "На модерации",
+    funnel_approved: "Одобрены",
+    funnel_rejected: "Отклонены",
+    admin_btn_preview: "Предпросмотр",
+    admin_btn_hide: "Свернуть",
+    admin_preview_no_photos: "Нет загруженных фото.",
+    admin_preview_no_description: "Описание не заполнено.",
+    admin_preview_no_services: "Услуги не добавлены.",
+    admin_preview_services: "Услуги",
+    admin_preview_description: "Описание",
     vendors_title: "Подрядчики",
     vendors_hint: "Проверенные партнёры для твоего события.",
     vendors_search_ph: "Поиск...",
     vendors_filter_all: "Все",
+    vendors_price_max_ph: "Макс. цена (₸)",
+    vendors_sort_aria: "Сортировка",
+    vendors_sort_newest: "Сначала новые",
+    vendors_sort_price_asc: "Цена ↑",
+    vendors_sort_price_desc: "Цена ↓",
+    vendors_sort_rating_desc: "Топ рейтинг",
+    vendors_total_suffix: "всего",
     vendors_empty: "Подрядчиков не найдено",
     vendors_from: "от",
     vendor_detail_back: "К каталогу",
@@ -836,10 +1038,59 @@ export const DICT: Record<Locale, Dict> = {
     nav_messages: "Хабарламалар",
     nav_admin_vendors: "Модерация",
     common_loading: "Жүктеу...",
+    threads_title: "Хабарламалар",
+    threads_hint: "Қабылданған брондар бойынша мердігер / клиентпен тікелей чат.",
+    threads_empty: "Белсенді чат жоқ. Мердігер бронды қабылдағанда чат автоматты ашылады.",
+    threads_unknown_vendor: "Мердігер",
+    threads_unknown_user: "Қолданушы",
+    notif_signup_welcome_title: "Қош келдіңіз",
+    notif_signup_welcome_body: "Аккаунт дайын.",
+    notif_password_reset_title: "Құпиясөзді қалпына келтіру",
+    notif_password_reset_body: "Поштаңызға қалпына келтіру сілтемесін жібердік.",
+    notif_booking_created_title: "Жаңа брондау сұранысы",
+    notif_booking_created_body: "Жаңа сұраныс келді — брон қойындысын қараңыз.",
+    notif_booking_accepted_title: "Брон қабылданды",
+    notif_booking_accepted_body: "Мердігер броныңызды қабылдады.",
+    notif_booking_declined_title: "Брон бас тартылды",
+    notif_booking_declined_body: "Мердігер броннан бас тартты.",
+    notif_booking_paid_title: "Төлем расталды",
+    notif_booking_paid_body: "Брон төленді.",
+    notif_vendor_approved_title: "Профиль мақұлданды",
+    notif_vendor_approved_body: "Профиліңіз каталогта көрінеді.",
+    notif_vendor_rejected_title: "Профиль қабылданбады",
+    notif_vendor_rejected_body: "Модерация профильді қабылдамады.",
+    notif_thread_message_title: "Жаңа хабарлама",
+    notif_channel_email: "email",
+    notif_channel_push: "push",
+    notif_status_pending: "күтілуде",
+    notif_status_sent: "жіберілді",
+    notif_status_failed: "қате",
+    booking_status_pending: "Күтілуде",
+    booking_status_accepted: "Қабылданды",
+    booking_status_declined: "Бас тартылды",
+    booking_status_cancelled: "Болдырылмады",
+    booking_status_completed: "Аяқталды",
+    booking_status_paid: "Төленді",
     common_save: "Сақтау",
     common_cancel: "Бас тарту",
     common_search: "Іздеу...",
     common_back: "Артқа",
+    common_delete: "Жою",
+    cards_title: "Карталар",
+    cards_hint: "Орындаушы броньды растағаннан кейін төлеу үшін карта қосыңыз. Мок — нақты төлем жасалмайды.",
+    cards_empty: "Сақталған карта жоқ.",
+    cards_add: "Карта қосу",
+    cards_save: "Картаны сақтау",
+    cards_default: "Әдепкі",
+    cards_make_default: "Әдепкі ету",
+    cards_field_number: "Карта нөмірі",
+    cards_field_exp: "Мерзімі (АА/ЖЖ)",
+    cards_field_holder: "Иесі",
+    cards_err_exp: "Жарамсыз мерзім",
+    cards_disclaimer: "Демо — нақты төлем провайдеріне жүгінбейміз, картаның толық нөмірін сақтамаймыз.",
+    nav_cards: "Карталар",
+    bookings_btn_pay: "Төлеу",
+    bookings_btn_add_card: "Карта қосу",
     users_title: "Қолданушылар",
     users_hint: "Платформа қолданушыларын басқару.",
     users_filter_all: "барлығы",
@@ -864,10 +1115,28 @@ export const DICT: Record<Locale, Dict> = {
     admin_btn_reject: "Қабылдамау",
     admin_btn_suspend: "Алып тастау",
     admin_btn_reapprove: "Қайтару",
+    funnel_submitted: "Жіберілді",
+    funnel_pending: "Модерацияда",
+    funnel_approved: "Мақұлданды",
+    funnel_rejected: "Қабылданбады",
+    admin_btn_preview: "Алдын ала қарау",
+    admin_btn_hide: "Жасыру",
+    admin_preview_no_photos: "Фото жоқ.",
+    admin_preview_no_description: "Сипаттама жоқ.",
+    admin_preview_no_services: "Қызметтер жоқ.",
+    admin_preview_services: "Қызметтер",
+    admin_preview_description: "Сипаттама",
     vendors_title: "Мердігерлер",
     vendors_hint: "Сенімді әріптестер сенің іс-шараңа.",
     vendors_search_ph: "Іздеу...",
     vendors_filter_all: "Барлығы",
+    vendors_price_max_ph: "Макс. баға (₸)",
+    vendors_sort_aria: "Сұрыптау",
+    vendors_sort_newest: "Жаңалары",
+    vendors_sort_price_asc: "Баға ↑",
+    vendors_sort_price_desc: "Баға ↓",
+    vendors_sort_rating_desc: "Үздік рейтинг",
+    vendors_total_suffix: "барлығы",
     vendors_empty: "Мердігер табылмады",
     vendors_from: "бастап",
     vendor_detail_back: "Каталогқа",

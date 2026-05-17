@@ -28,7 +28,7 @@ func (r *PasswordResetRepo) Create(ctx context.Context, t *domain.PasswordResetT
 		t.ID = r.idGen.New()
 	}
 	_, err := r.db.ExecContext(ctx,
-		`INSERT INTO password_reset_tokens (id, user_id, token_hash, expires_at) VALUES (?, ?, ?, ?)`,
+		`INSERT INTO password_reset_tokens (id, user_id, token_hash, expires_at) VALUES ($1, $2, $3, $4)`,
 		t.ID, t.UserID, t.TokenHash, t.ExpiresAt,
 	)
 	if err != nil {
@@ -41,7 +41,7 @@ func (r *PasswordResetRepo) Create(ctx context.Context, t *domain.PasswordResetT
 func (r *PasswordResetRepo) FindByHash(ctx context.Context, hash string) (*domain.PasswordResetToken, error) {
 	row := r.db.QueryRowContext(ctx,
 		`SELECT id, user_id, token_hash, expires_at, used_at, created_at
-		 FROM password_reset_tokens WHERE token_hash = ?`, hash,
+		 FROM password_reset_tokens WHERE token_hash = $1`, hash,
 	)
 	var t domain.PasswordResetToken
 	var used sql.NullTime
@@ -59,7 +59,7 @@ func (r *PasswordResetRepo) FindByHash(ctx context.Context, hash string) (*domai
 
 // MarkUsed records the reset token as consumed.
 func (r *PasswordResetRepo) MarkUsed(ctx context.Context, id string, at time.Time) error {
-	_, err := r.db.ExecContext(ctx, `UPDATE password_reset_tokens SET used_at = ? WHERE id = ?`, at, id)
+	_, err := r.db.ExecContext(ctx, `UPDATE password_reset_tokens SET used_at = $1 WHERE id = $2`, at, id)
 	return err
 }
 

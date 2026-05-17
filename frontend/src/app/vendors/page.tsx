@@ -70,7 +70,8 @@ function VendorsCatalog() {
         {t("vendors_title")}
       </h1>
       <p className="mt-2 text-sm text-[var(--color-muted-foreground)]">
-        {t("vendors_hint")} · <span className="font-mono">{total}</span> total
+        {t("vendors_hint")} · <span className="font-mono">{total}</span>{" "}
+        {t("vendors_total_suffix")}
       </p>
 
       <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:items-center">
@@ -87,7 +88,7 @@ function VendorsCatalog() {
           type="number"
           value={priceMax}
           onChange={(e) => setPriceMax(e.target.value)}
-          placeholder="Max price (₸)"
+          placeholder={t("vendors_price_max_ph")}
           className="sm:max-w-40"
         />
         <div className="sm:max-w-48">
@@ -95,12 +96,12 @@ function VendorsCatalog() {
             value={sort}
             onChange={(v) => setSort(v as SortKey)}
             options={[
-              { value: "newest", label: "Newest" },
-              { value: "price_asc", label: "Price ↑" },
-              { value: "price_desc", label: "Price ↓" },
-              { value: "rating_desc", label: "Top rated" },
+              { value: "newest", label: t("vendors_sort_newest") },
+              { value: "price_asc", label: t("vendors_sort_price_asc") },
+              { value: "price_desc", label: t("vendors_sort_price_desc") },
+              { value: "rating_desc", label: t("vendors_sort_rating_desc") },
             ]}
-            aria-label="Sort"
+            aria-label={t("vendors_sort_aria")}
           />
         </div>
       </div>

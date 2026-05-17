@@ -6,7 +6,7 @@ CREATE TABLE IF NOT EXISTS audit_log (
   target_type TEXT NOT NULL,
   target_id   TEXT NOT NULL,
   meta        TEXT NOT NULL DEFAULT '',
-  created_at  DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
+  created_at  TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 
 CREATE INDEX IF NOT EXISTS idx_audit_actor ON audit_log(actor_id);

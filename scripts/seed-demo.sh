@@ -54,7 +54,7 @@ create_booking() {
   api -X POST "$API/api/bookings" -H "authorization: Bearer $ctok" \
     -H 'content-type: application/json' \
     -d "$(jq -nc --arg v "$vid" --arg d "$date" --argjson g "$guests" --argjson a "$amount" \
-       '{vendorId:$v,eventDate:$d,guestCount:$g,amount:$a,note:"demo booking"}')" \
+       '{vendorId:$v,eventDate:$d,guestCount:$g,amount:$a,note:"демо-бронирование"}')" \
     | jq -r .id
 }
 
@@ -101,25 +101,25 @@ echo "==> Customers"
 CUSTOMER_TOKENS=()
 for n in 1 2 3 4 5; do
   email="customer${n}@demo.kz"
-  CUSTOMER_TOKENS+=("$(signup_or_login "$email" "demo12345" "Customer $n" "customer")")
+  CUSTOMER_TOKENS+=("$(signup_or_login "$email" "demo12345" "Клиент $n" "customer")")
 done
 
 echo "==> Vendors"
 declare -a VENDORS_CATS=(Venue Venue Venue Catering Catering Photo Video Decor Music Cakes Photo Video)
 declare -a VENDORS_CITIES=(Almaty Almaty Almaty Almaty Almaty Almaty Almaty Almaty Almaty Almaty Almaty Almaty)
 declare -a VENDORS_NAMES=(
-  "Rixos Almaty Ballroom"
-  "Esentai Ballroom"
-  "St Regis Astana"
-  "Aizada Catering"
-  "Bayan Catering"
-  "Studio Aitu Photo"
-  "Daulet Video"
-  "Almaty Floral Studio"
-  "DJ Bahytzhan"
-  "Cakes by Anel"
-  "Tengri Photo"
-  "Wedding Reels"
+  "Бальный зал «Риксос Алматы»"
+  "Банкетный зал «Есентай»"
+  "Бальный зал «Сент-Реджис»"
+  "Кейтеринг «Айзада»"
+  "Кейтеринг «Баян»"
+  "Фотостудия «Айту»"
+  "Видеопродакшн «Даулет»"
+  "Флористическая студия «Алматы»"
+  "Диджей «Бахытжан»"
+  "Торты от Анель"
+  "Фотостудия «Тенгри»"
+  "Свадебные ролики"
 )
 declare -a VENDORS_PRICES=(
   1500000
@@ -136,18 +136,18 @@ declare -a VENDORS_PRICES=(
   700000
 )
 declare -a VENDORS_DESCS=(
-  "Premier ballroom in the heart of Almaty — capacity 400, stage, sound system included."
-  "Elegant Esentai venue with rooftop terrace and curated catering partners."
-  "Five-star ballroom in Astana with custom menus and floral arches."
-  "Aigerim Saparbekova's catering — national dishes, plov, beshbarmak, vegetarian options."
-  "Modern catering for corporate events and weddings, halal-certified."
-  "Award-winning wedding and event photography studio."
-  "Cinematic video, drone footage, same-day highlight reels."
-  "Bespoke floral installations: ceremony arches, table runners, bridal bouquets."
-  "Live DJ + MC, sound, light, smoke. Toi and corporate events."
-  "Custom cake design, fondant, gluten-free options."
-  "Documentary-style wedding photography across Kazakhstan."
-  "Cinematic wedding films and editorial reels."
+  "Премиум бальный зал в центре Алматы — вместимость 400, сцена, звук в комплекте."
+  "Элегантная площадка «Есентай» с террасой на крыше и проверенными кейтеринг-партнёрами."
+  "Пятизвёздочный бальный зал в Астане с авторскими меню и цветочными арками."
+  "Кейтеринг от Айгерим Сапарбековой — национальные блюда, плов, бешбармак, вегетарианские опции."
+  "Современный кейтеринг для корпоративов и свадеб, халяль-сертифицирован."
+  "Студия свадебной и событийной фотографии с наградами."
+  "Кинематографичное видео, съёмка с дрона, монтаж в день съёмки."
+  "Авторские цветочные композиции: арки, дорожки, букеты невесты."
+  "Живой диджей и ведущий, звук, свет, дым-машина. Той и корпоративы."
+  "Авторские торты, мастика, безглютеновые варианты."
+  "Документальная свадебная фотография по всему Казахстану."
+  "Кинематографичные свадебные фильмы и репортажные ролики."
 )
 
 declare -a VENDOR_IDS
@@ -170,32 +170,32 @@ for ((i=0; i<n; i++)); do
   if [ "$existing_svc" = "0" ]; then
     case "${VENDORS_CATS[$i]}" in
       Venue)
-        create_service "$VTOK" "Hall rental (4 hours)" "Main hall with stage + sound" "${VENDORS_PRICES[$i]}" "fixed"
-        create_service "$VTOK" "Premium evening package" "Full day + decor + waiters" "$(( ${VENDORS_PRICES[$i]} * 2 ))" "fixed"
+        create_service "$VTOK" "Аренда зала (4 часа)" "Основной зал со сценой и звуком" "${VENDORS_PRICES[$i]}" "fixed"
+        create_service "$VTOK" "Премиум вечерний пакет" "Полный день + декор + официанты" "$(( ${VENDORS_PRICES[$i]} * 2 ))" "fixed"
         ;;
       Catering)
-        create_service "$VTOK" "National menu (per guest)" "Plov, beshbarmak, salads, dessert" 12000 "person"
-        create_service "$VTOK" "European menu (per guest)" "Beef wellington, salmon, sides" 18000 "person"
+        create_service "$VTOK" "Национальное меню (за гостя)" "Плов, бешбармак, салаты, десерт" 12000 "person"
+        create_service "$VTOK" "Европейское меню (за гостя)" "Бёф Веллингтон, лосось, гарниры" 18000 "person"
         ;;
       Photo)
-        create_service "$VTOK" "Wedding day (8 hours)" "Full coverage + 200 edited photos" "${VENDORS_PRICES[$i]}" "fixed"
-        create_service "$VTOK" "Extra hour" "Additional shooting hour" 35000 "hour"
+        create_service "$VTOK" "Свадебный день (8 часов)" "Полное покрытие + 200 обработанных фото" "${VENDORS_PRICES[$i]}" "fixed"
+        create_service "$VTOK" "Дополнительный час" "Дополнительный час съёмки" 35000 "hour"
         ;;
       Video)
-        create_service "$VTOK" "Highlight reel (3 min)" "Cinematic edit + drone footage" "${VENDORS_PRICES[$i]}" "fixed"
-        create_service "$VTOK" "Full ceremony (60 min)" "Full ceremony recording" 250000 "fixed"
+        create_service "$VTOK" "Хайлайт-ролик (3 мин)" "Кинематографичный монтаж + съёмка с дрона" "${VENDORS_PRICES[$i]}" "fixed"
+        create_service "$VTOK" "Полная церемония (60 мин)" "Запись полной церемонии" 250000 "fixed"
         ;;
       Music)
-        create_service "$VTOK" "DJ + sound (per hour)" "Live DJ + lighting" 25000 "hour"
-        create_service "$VTOK" "Full evening package" "5 hours + MC + smoke machine" 200000 "fixed"
+        create_service "$VTOK" "Диджей + звук (за час)" "Живой диджей + освещение" 25000 "hour"
+        create_service "$VTOK" "Полный вечерний пакет" "5 часов + ведущий + дым-машина" 200000 "fixed"
         ;;
       Decor)
-        create_service "$VTOK" "Ceremony arch" "Floral arch + aisle decor" 150000 "fixed"
-        create_service "$VTOK" "Table runner (per table)" "Florals + candles" 12000 "item"
+        create_service "$VTOK" "Свадебная арка" "Цветочная арка + декор прохода" 150000 "fixed"
+        create_service "$VTOK" "Декор стола (за стол)" "Цветы + свечи" 12000 "item"
         ;;
       Cakes)
-        create_service "$VTOK" "Wedding cake (3 tiers)" "Fondant, custom design" "${VENDORS_PRICES[$i]}" "fixed"
-        create_service "$VTOK" "Cupcakes (per item)" "Custom flavor" 1500 "item"
+        create_service "$VTOK" "Свадебный торт (3 яруса)" "Мастика, авторский дизайн" "${VENDORS_PRICES[$i]}" "fixed"
+        create_service "$VTOK" "Капкейки (за шт.)" "Авторский вкус" 1500 "item"
         ;;
     esac
   fi
@@ -205,8 +205,8 @@ done
 
 # Leave one vendor pending for admin moderation demo.
 echo "==> Pending vendor (for moderation demo)"
-PTOK=$(signup_or_login "vendor_pending@demo.kz" "demo12345" "Pending Co" "vendor")
-upsert_vendor "$PTOK" "Aizhana Pending Co" "Decor" "Almaty" 200000 "Awaiting moderation." >/dev/null
+PTOK=$(signup_or_login "vendor_pending@demo.kz" "demo12345" "Ожидание модерации" "vendor")
+upsert_vendor "$PTOK" "Айжана Декор" "Decor" "Almaty" 200000 "Ожидает модерации." >/dev/null
 
 echo "==> Bookings + reviews"
 DATES=("2026-08-12" "2026-09-04" "2026-10-22" "2026-11-15" "2026-12-01")

@@ -25,7 +25,7 @@ func NewPhotoRepo(db *sql.DB, idGen usecase.IDGen) *PhotoRepo {
 func (r *PhotoRepo) Create(ctx context.Context, vendorID, mime string, data []byte) (*domain.Photo, error) {
 	id := r.idGen.New()
 	if _, err := r.db.ExecContext(ctx,
-		`INSERT INTO photos (id, vendor_id, mime, size, data) VALUES (?, ?, ?, ?, ?)`,
+		`INSERT INTO photos (id, vendor_id, mime, size, data) VALUES ($1, $2, $3, $4, $5)`,
 		id, vendorID, mime, len(data), data,
 	); err != nil {
 		return nil, fmt.Errorf("insert photo: %w", err)
@@ -37,7 +37,7 @@ func (r *PhotoRepo) Create(ctx context.Context, vendorID, mime string, data []by
 func (r *PhotoRepo) Find(ctx context.Context, id string) (*domain.Photo, error) {
 	var p domain.Photo
 	err := r.db.QueryRowContext(ctx,
-		`SELECT id, vendor_id, mime, size, data, created_at FROM photos WHERE id = ?`, id,
+		`SELECT id, vendor_id, mime, size, data, created_at FROM photos WHERE id = $1`, id,
 	).Scan(&p.ID, &p.VendorID, &p.MIME, &p.Size, &p.Data, &p.CreatedAt)
 	if errors.Is(err, sql.ErrNoRows) {
 		return nil, domain.ErrNotFound
@@ -50,7 +50,7 @@ func (r *PhotoRepo) Find(ctx context.Context, id string) (*domain.Photo, error) 
 
 // Delete removes a photo by id (idempotent — missing IDs return nil).
 func (r *PhotoRepo) Delete(ctx context.Context, id string) error {
-	_, err := r.db.ExecContext(ctx, `DELETE FROM photos WHERE id = ?`, id)
+	_, err := r.db.ExecContext(ctx, `DELETE FROM photos WHERE id = $1`, id)
 	return err
 }
 

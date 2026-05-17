@@ -26,6 +26,7 @@ PLAN.md
 # ---- Go backend ----
 backend/qonaqzhai
 backend/qonaqzhai-backend
+backend/bin/
 backend/*.db
 backend/*.db-shm
 backend/*.db-wal

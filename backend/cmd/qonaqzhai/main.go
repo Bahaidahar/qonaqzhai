@@ -6,6 +6,7 @@ import (
 	"errors"
 	"log"
 	"net/http"
+	"net/url"
 	"os"
 	"os/signal"
 	"syscall"
@@ -16,6 +17,18 @@ import (
 	"qonaqzhai-backend/internal/app"
 	"qonaqzhai-backend/internal/infra/config"
 )
+
+// redactDSN hides credentials before logging the Postgres DSN.
+func redactDSN(dsn string) string {
+	u, err := url.Parse(dsn)
+	if err != nil {
+		return "<dsn>"
+	}
+	if u.User != nil {
+		u.User = url.UserPassword(u.User.Username(), "***")
+	}
+	return u.String()
+}
 
 func main() {
 	if err := godotenv.Load(); err != nil && !os.IsNotExist(err) {
@@ -45,7 +58,7 @@ func main() {
 	}
 
 	go func() {
-		log.Printf("qonaqzhai backend listening on %s · db=%s", cfg.Addr, cfg.DBPath)
+		log.Printf("qonaqzhai backend listening on %s · db=%s", cfg.Addr, redactDSN(cfg.DatabaseURL))
 		if err := srv.ListenAndServe(); err != nil && !errors.Is(err, http.ErrServerClosed) {
 			log.Fatalf("server error: %v", err)
 		}
