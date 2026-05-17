@@ -26,7 +26,8 @@ const CATEGORIES = [
   "Other",
 ];
 
-const CITIES = ["Almaty", "Astana", "Shymkent", "Karaganda", "Aktobe", "Atyrau"];
+// MVP locked to Almaty; multi-city support will be re-enabled at expansion time.
+const FIXED_CITY = "Almaty";
 
 export default function VendorDashboardPage() {
   return (
@@ -52,7 +53,8 @@ function VendorEditor() {
 
   const [name, setName] = useState("");
   const [category, setCategory] = useState(CATEGORIES[0]);
-  const [city, setCity] = useState(CITIES[0]);
+  // City is locked to Almaty (MVP). Kept as state so the upsert payload stays consistent.
+  const [city] = useState(FIXED_CITY);
   const [description, setDescription] = useState("");
   const [priceFrom, setPriceFrom] = useState("0");
 
@@ -63,7 +65,7 @@ function VendorEditor() {
       setVendor(v);
       setName(v.name);
       setCategory(v.category);
-      setCity(v.city);
+      // City stays Almaty regardless of stored value.
       setDescription(v.description);
       setPriceFrom(String(v.priceFrom));
     } catch (err) {
@@ -141,11 +143,9 @@ function VendorEditor() {
             />
           </Field>
           <Field label={t("vendor_profile_field_city")}>
-            <Select
-              value={city}
-              onChange={setCity}
-              options={CITIES.map((v) => ({ value: v, label: labels.city(v) }))}
-            />
+            <div className="flex h-11 w-full items-center rounded-xl border bg-[var(--color-muted)]/40 px-4 text-sm text-[var(--color-muted-foreground)]">
+              {labels.city(FIXED_CITY)}
+            </div>
           </Field>
           <Field label={t("vendor_profile_field_price")}>
             <Input

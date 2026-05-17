@@ -6,7 +6,8 @@ import '../../domain/entities/vendor.dart';
 import '../viewmodels/vendor_catalog_viewmodel.dart';
 
 const _categories = ['All', 'Venue', 'Catering', 'Photo', 'Video', 'Decor', 'Music', 'Cakes'];
-const _cities = ['All', 'Almaty', 'Astana', 'Shymkent'];
+// MVP locked to Almaty.
+const _fixedCity = 'Almaty';
 const _sorts = {
   'newest': 'Newest',
   'price_asc': 'Price ↑',
@@ -24,7 +25,6 @@ class VendorCatalogScreen extends ConsumerStatefulWidget {
 class _VendorCatalogScreenState extends ConsumerState<VendorCatalogScreen> {
   final _search = TextEditingController();
   String _category = 'All';
-  String _city = 'All';
   String _sort = 'newest';
   int? _priceMax;
 
@@ -38,7 +38,7 @@ class _VendorCatalogScreenState extends ConsumerState<VendorCatalogScreen> {
     ref.read(vendorCatalogProvider.notifier).load(VendorQuery(
           query: _search.text.trim().isEmpty ? null : _search.text.trim(),
           category: _category == 'All' ? null : _category,
-          city: _city == 'All' ? null : _city,
+          city: _fixedCity,
           priceMax: _priceMax,
           sort: _sort,
           limit: 30,
@@ -139,18 +139,6 @@ class _VendorCatalogScreenState extends ConsumerState<VendorCatalogScreen> {
                           label: Text(c),
                           selected: _category == c,
                           onSelected: (_) => setSt(() => _category = c),
-                        ))
-                    .toList(),
-              ),
-              const SizedBox(height: 12),
-              const Text('City'),
-              Wrap(
-                spacing: 6,
-                children: _cities
-                    .map((c) => ChoiceChip(
-                          label: Text(c),
-                          selected: _city == c,
-                          onSelected: (_) => setSt(() => _city = c),
                         ))
                     .toList(),
               ),

@@ -106,7 +106,7 @@ done
 
 echo "==> Vendors"
 declare -a VENDORS_CATS=(Venue Venue Venue Catering Catering Photo Video Decor Music Cakes Photo Video)
-declare -a VENDORS_CITIES=(Almaty Almaty Astana Almaty Shymkent Almaty Astana Almaty Shymkent Almaty Astana Almaty)
+declare -a VENDORS_CITIES=(Almaty Almaty Almaty Almaty Almaty Almaty Almaty Almaty Almaty Almaty Almaty Almaty)
 declare -a VENDORS_NAMES=(
   "Rixos Almaty Ballroom"
   "Esentai Ballroom"

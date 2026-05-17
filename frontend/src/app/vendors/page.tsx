@@ -14,7 +14,8 @@ import { api, photoURL, type Vendor } from "@/shared/api";
 import { formatKZT } from "@/shared/lib/utils";
 
 const CATEGORIES = ["All", "Venue", "Catering", "Music & DJ", "Photo & Video", "Decor & Florists", "Cakes"];
-const CITIES = ["All", "Almaty", "Astana", "Shymkent"];
+// MVP locked to Almaty — city filter is implicit.
+const FIXED_CITY = "Almaty";
 
 type SortKey = "newest" | "price_asc" | "price_desc" | "rating_desc";
 
@@ -37,7 +38,6 @@ function VendorsCatalog() {
   const [total, setTotal] = useState(0);
   const [loading, setLoading] = useState(true);
   const [category, setCategory] = useState("All");
-  const [city, setCity] = useState("All");
   const [sort, setSort] = useState<SortKey>("newest");
   const [priceMax, setPriceMax] = useState<string>("");
   const [search, setSearch] = useState("");
@@ -50,7 +50,7 @@ function VendorsCatalog() {
         .vendors({
           q: search || undefined,
           category: category === "All" ? undefined : category,
-          city: city === "All" ? undefined : city,
+          city: FIXED_CITY,
           priceMax: priceMax ? Number(priceMax) : undefined,
           sort,
           limit: 24,
@@ -62,7 +62,7 @@ function VendorsCatalog() {
         .finally(() => setLoading(false));
     }, 250);
     return () => window.clearTimeout(timer);
-  }, [search, category, city, sort, priceMax]);
+  }, [search, category, sort, priceMax]);
 
   return (
     <div className="mx-auto max-w-6xl px-6 py-10">
@@ -107,7 +107,6 @@ function VendorsCatalog() {
 
       <div className="mt-4 flex flex-col gap-3">
         <Pills value={category} onChange={setCategory} options={CATEGORIES} kind="category" />
-        <Pills value={city} onChange={setCity} options={CITIES} kind="city" />
       </div>
 
       {loading ? (
