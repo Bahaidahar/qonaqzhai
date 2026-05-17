@@ -107,6 +107,18 @@ type AuditRepo interface {
 	List(ctx context.Context, limit int) ([]*domain.AuditEntry, error)
 }
 
+// ThreadRepo persists booking-scoped DM threads between customer and vendor.
+type ThreadRepo interface {
+	CreateForBooking(ctx context.Context, bookingID, customerID, vendorID string) (*domain.BookingThread, error)
+	FindByBooking(ctx context.Context, bookingID string) (*domain.BookingThread, error)
+	FindByID(ctx context.Context, id string) (*domain.BookingThread, error)
+	ListForUser(ctx context.Context, userID string) ([]*domain.BookingThread, error)
+	Touch(ctx context.Context, id string) error
+
+	AddMessage(ctx context.Context, m *domain.ThreadMessage) (*domain.ThreadMessage, error)
+	ListMessages(ctx context.Context, threadID string) ([]*domain.ThreadMessage, error)
+}
+
 // ChatRepo persists chats + messages per user.
 type ChatRepo interface {
 	Create(ctx context.Context, userID, title string) (*domain.Chat, error)

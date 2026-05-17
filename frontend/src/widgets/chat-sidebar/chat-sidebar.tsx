@@ -35,11 +35,13 @@ const NAV_BY_ROLE: Record<"customer" | "vendor" | "admin", NavItem[]> = {
     { href: "/", icon: MessageSquare, labelKey: "nav_chat" },
     { href: "/vendors", icon: Store, labelKey: "nav_vendors" },
     { href: "/bookings", icon: ClipboardList, labelKey: "nav_bookings" },
+    { href: "/threads", icon: MessageSquare, labelKey: "nav_messages" },
     { href: "/notifications", icon: Bell, labelKey: "nav_notifications" },
   ],
   vendor: [
     { href: "/vendor", icon: User, labelKey: "nav_vendor_profile" },
     { href: "/vendor/bookings", icon: ClipboardList, labelKey: "nav_bookings" },
+    { href: "/threads", icon: MessageSquare, labelKey: "nav_messages" },
     { href: "/notifications", icon: Bell, labelKey: "nav_notifications" },
   ],
   admin: [

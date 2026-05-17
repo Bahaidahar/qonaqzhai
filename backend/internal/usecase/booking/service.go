@@ -16,13 +16,20 @@ type Notifier interface {
 	Enqueue(ctx context.Context, n *domain.Notification) error
 }
 
+// ThreadOpener opens a customer↔vendor DM thread when a booking is accepted.
+// Implemented by the thread usecase service.
+type ThreadOpener interface {
+	EnsureForBooking(ctx context.Context, b *domain.Booking) (*domain.BookingThread, error)
+}
+
 // Deps bundles booking service collaborators.
 type Deps struct {
 	Bookings usecase.BookingRepo
 	Vendors  usecase.VendorRepo
 	Services usecase.ServiceRepo // optional — used to validate / price services on create
 	Clock    usecase.Clock
-	Notifier Notifier // optional
+	Notifier Notifier     // optional
+	Threads  ThreadOpener // optional — when set, threads auto-open on accept
 }
 
 // Service exposes booking operations.
@@ -120,7 +127,15 @@ func (s *Service) VendorTransition(ctx context.Context, vendorUserID, bookingID 
 		return nil, err
 	}
 	s.notifyVendorTransition(ctx, b, next)
-	return s.d.Bookings.Find(ctx, b.ID)
+	updated, err := s.d.Bookings.Find(ctx, b.ID)
+	if err != nil {
+		return nil, err
+	}
+	// Auto-open DM thread the moment the vendor accepts the booking.
+	if next == domain.BookingAccepted && s.d.Threads != nil {
+		_, _ = s.d.Threads.EnsureForBooking(ctx, updated)
+	}
+	return updated, nil
 }
 
 func (s *Service) notifyVendorTransition(ctx context.Context, b *domain.Booking, next domain.BookingStatus) {

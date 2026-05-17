@@ -10,6 +10,8 @@ import '../../features/auth/presentation/screens/signup_screen.dart';
 import '../../features/auth/presentation/viewmodels/auth_viewmodel.dart';
 import '../../features/booking/presentation/screens/booking_form_screen.dart';
 import '../../features/booking/presentation/screens/bookings_screen.dart';
+import '../../features/messaging/presentation/screens/thread_chat_screen.dart';
+import '../../features/messaging/presentation/screens/threads_screen.dart';
 import '../../features/notifications/presentation/screens/notifications_screen.dart';
 import '../../features/reviews/presentation/screens/review_submit_screen.dart';
 import '../../features/vendor_catalog/presentation/screens/vendor_catalog_screen.dart';
@@ -37,7 +39,12 @@ final appRouterProvider = Provider<GoRouter>((ref) {
           GoRoute(path: '/vendors', builder: (_, __) => const VendorCatalogScreen()),
           GoRoute(path: '/bookings', builder: (_, __) => const BookingsScreen()),
           GoRoute(path: '/notifications', builder: (_, __) => const NotificationsScreen()),
+          GoRoute(path: '/threads', builder: (_, __) => const ThreadsScreen()),
         ],
+      ),
+      GoRoute(
+        path: '/threads/:id',
+        builder: (_, state) => ThreadChatScreen(id: state.pathParameters['id']!),
       ),
       GoRoute(
         path: '/vendors/:id',
@@ -88,7 +95,8 @@ class _HomeShell extends StatelessWidget {
     final loc = GoRouterState.of(context).matchedLocation;
     if (loc.startsWith('/vendors')) return 1;
     if (loc.startsWith('/bookings')) return 2;
-    if (loc.startsWith('/notifications')) return 3;
+    if (loc.startsWith('/threads')) return 3;
+    if (loc.startsWith('/notifications')) return 4;
     return 0;
   }
 
@@ -111,6 +119,9 @@ class _HomeShell extends StatelessWidget {
               context.go('/bookings');
               break;
             case 3:
+              context.go('/threads');
+              break;
+            case 4:
               context.go('/notifications');
               break;
           }
@@ -119,6 +130,7 @@ class _HomeShell extends StatelessWidget {
           NavigationDestination(icon: Icon(Icons.chat_bubble_outline), label: 'AI'),
           NavigationDestination(icon: Icon(Icons.store_outlined), label: 'Vendors'),
           NavigationDestination(icon: Icon(Icons.calendar_month_outlined), label: 'Bookings'),
+          NavigationDestination(icon: Icon(Icons.mark_chat_unread_outlined), label: 'Chats'),
           NavigationDestination(icon: Icon(Icons.notifications_outlined), label: 'Inbox'),
         ],
       ),

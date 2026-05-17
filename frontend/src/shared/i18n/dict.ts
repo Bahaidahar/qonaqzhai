@@ -89,6 +89,7 @@ type Dict = {
   nav_vendor_profile: string;
   nav_admin_users: string;
   nav_notifications: string;
+  nav_messages: string;
   nav_admin_vendors: string;
   // common
   common_loading: string;
@@ -352,6 +353,7 @@ export const DICT: Record<Locale, Dict> = {
     nav_vendor_profile: "My profile",
     nav_admin_users: "Users",
     nav_notifications: "Notifications",
+    nav_messages: "Messages",
     nav_admin_vendors: "Vendor moderation",
     common_loading: "Loading...",
     common_save: "Save",
@@ -591,6 +593,7 @@ export const DICT: Record<Locale, Dict> = {
     nav_vendor_profile: "Мой профиль",
     nav_admin_users: "Пользователи",
     nav_notifications: "Уведомления",
+    nav_messages: "Сообщения",
     nav_admin_vendors: "Модерация",
     common_loading: "Загрузка...",
     common_save: "Сохранить",
@@ -830,6 +833,7 @@ export const DICT: Record<Locale, Dict> = {
     nav_vendor_profile: "Профилім",
     nav_admin_users: "Қолданушылар",
     nav_notifications: "Хабарландырулар",
+    nav_messages: "Хабарламалар",
     nav_admin_vendors: "Модерация",
     common_loading: "Жүктеу...",
     common_save: "Сақтау",

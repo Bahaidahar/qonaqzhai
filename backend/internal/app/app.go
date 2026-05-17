@@ -29,6 +29,7 @@ import (
 	"qonaqzhai-backend/internal/usecase/notification"
 	"qonaqzhai-backend/internal/usecase/payment"
 	"qonaqzhai-backend/internal/usecase/review"
+	"qonaqzhai-backend/internal/usecase/thread"
 	"qonaqzhai-backend/internal/usecase/vendor"
 )
 
@@ -69,6 +70,7 @@ func New(ctx context.Context, cfg config.Config) (*App, error) {
 	auditRepo := sqliteadapter.NewAuditRepo(conn, ids)
 	services := sqliteadapter.NewServiceRepo(conn, ids)
 	chats := sqliteadapter.NewChatRepo(conn, ids)
+	threads := sqliteadapter.NewThreadRepo(conn, ids)
 
 	// AI (optional)
 	var aiClient usecase.AIClient
@@ -137,7 +139,13 @@ func New(ctx context.Context, cfg config.Config) (*App, error) {
 		authSvc.SetMailer(mailer)
 	}
 	vendorSvc := vendor.New(vendor.Deps{Vendors: vendors, Photos: photos, Services: services, Clock: clk})
-	bookingSvc := booking.New(booking.Deps{Bookings: bookings, Vendors: vendors, Services: services, Clock: clk, Notifier: notifSvc})
+	threadSvc := thread.New(thread.Deps{
+		Threads: threads, Bookings: bookings, Vendors: vendors, Notifier: notifSvc,
+	})
+	bookingSvc := booking.New(booking.Deps{
+		Bookings: bookings, Vendors: vendors, Services: services,
+		Clock: clk, Notifier: notifSvc, Threads: threadSvc,
+	})
 	reviewSvc := review.New(review.Deps{Reviews: reviews, Bookings: bookings, Vendors: vendors, Clock: clk})
 	chatSvc := chat.New(chat.Deps{Vendors: vendors, Chats: chats, AI: aiClient, Logger: log})
 	adminSvc := admin.New(admin.Deps{
@@ -168,6 +176,7 @@ func New(ctx context.Context, cfg config.Config) (*App, error) {
 		Chat:         handler.NewChat(chatSvc),
 		Admin:        handler.NewAdmin(adminSvc),
 		Notification: handler.NewNotification(notifSvc, fcmTokens),
+		Thread:       handler.NewThread(threadSvc),
 	}
 	if paymentSvc != nil {
 		handlers.Payment = handler.NewPayment(paymentSvc)

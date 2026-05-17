@@ -8,6 +8,7 @@ import type {
 import type { Booking, BookingStatus } from "@/entities/booking/types";
 import type { Review } from "@/entities/review/types";
 import type { Service, ServiceInput } from "@/entities/service/types";
+import type { BookingThread, ThreadMessage } from "@/entities/thread/types";
 import {
   API_BASE,
   TOKEN_KEY,
@@ -19,6 +20,7 @@ export type { Vendor, Photo } from "@/entities/vendor/types";
 export type { Booking } from "@/entities/booking/types";
 export type { Review } from "@/entities/review/types";
 export type { Service, ServiceUnit, ServiceInput } from "@/entities/service/types";
+export type { BookingThread, ThreadMessage } from "@/entities/thread/types";
 
 export interface AuthResponse {
   token: string;
@@ -359,6 +361,24 @@ export const api = {
   deleteService(id: string): Promise<void> {
     return request<void>(`/api/vendor/services/${id}`, {
       method: "DELETE",
+      auth: true,
+    });
+  },
+
+  // threads (booking DMs)
+  listThreads(): Promise<{ items: BookingThread[] | null }> {
+    return request<{ items: BookingThread[] | null }>("/api/threads", { auth: true });
+  },
+  getThread(id: string): Promise<{ thread: BookingThread; messages: ThreadMessage[] | null }> {
+    return request<{ thread: BookingThread; messages: ThreadMessage[] | null }>(
+      `/api/threads/${id}`,
+      { auth: true },
+    );
+  },
+  sendThreadMessage(id: string, text: string): Promise<ThreadMessage> {
+    return request<ThreadMessage>(`/api/threads/${id}/messages`, {
+      method: "POST",
+      body: JSON.stringify({ text }),
       auth: true,
     });
   },

@@ -25,6 +25,7 @@ type Handlers struct {
 	Admin        *handler.Admin
 	Payment      *handler.Payment      // optional — nil disables routes
 	Notification *handler.Notification // optional — nil disables routes
+	Thread       *handler.Thread
 }
 
 // RouterConfig bundles router-level dependencies.
@@ -72,6 +73,9 @@ func NewRouter(h Handlers, cfg RouterConfig) http.Handler {
 	mux.Handle("DELETE /api/chats/{id}", cfg.Auth.Required(http.HandlerFunc(h.Chat.DeleteChat)))
 	mux.Handle("GET /api/bookings", cfg.Auth.Required(http.HandlerFunc(h.Booking.List)))
 	mux.Handle("PATCH /api/bookings/{id}", cfg.Auth.Required(http.HandlerFunc(h.Booking.Update)))
+	mux.Handle("GET /api/threads", cfg.Auth.Required(http.HandlerFunc(h.Thread.List)))
+	mux.Handle("GET /api/threads/{id}", cfg.Auth.Required(http.HandlerFunc(h.Thread.Get)))
+	mux.Handle("POST /api/threads/{id}/messages", cfg.Auth.Required(http.HandlerFunc(h.Thread.Send)))
 
 	// vendor
 	vendorOnly := cfg.Auth.RequireRole(domain.RoleVendor)
