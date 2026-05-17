@@ -13,6 +13,7 @@ import (
 	"qonaqzhai-backend/internal/adapter/pay"
 	"qonaqzhai-backend/internal/adapter/push"
 	sqliteadapter "qonaqzhai-backend/internal/adapter/repo/sqlite"
+	wshub "qonaqzhai-backend/internal/adapter/ws"
 	"qonaqzhai-backend/internal/domain"
 	"qonaqzhai-backend/internal/infra/clock"
 	"qonaqzhai-backend/internal/infra/config"
@@ -139,9 +140,20 @@ func New(ctx context.Context, cfg config.Config) (*App, error) {
 		authSvc.SetMailer(mailer)
 	}
 	vendorSvc := vendor.New(vendor.Deps{Vendors: vendors, Photos: photos, Services: services, Clock: clk})
+	// WebSocket hub for realtime fan-out.
+	hub := wshub.NewHub(log)
 	threadSvc := thread.New(thread.Deps{
-		Threads: threads, Bookings: bookings, Vendors: vendors, Notifier: notifSvc,
+		Threads:   threads,
+		Bookings:  bookings,
+		Vendors:   vendors,
+		Notifier:  notifSvc,
+		Publisher: wshub.HubPublisher{Hub: hub},
 	})
+	// Wire incoming WS messages → thread usecase. The hub then echoes the saved
+	// message back via Publisher to both participants.
+	hub.OnIncoming = func(userID string, m wshub.IncomingMessage) {
+		_, _ = threadSvc.Send(ctx, userID, m.ThreadID, m.Text)
+	}
 	bookingSvc := booking.New(booking.Deps{
 		Bookings: bookings, Vendors: vendors, Services: services,
 		Clock: clk, Notifier: notifSvc, Threads: threadSvc,
@@ -177,6 +189,7 @@ func New(ctx context.Context, cfg config.Config) (*App, error) {
 		Admin:        handler.NewAdmin(adminSvc),
 		Notification: handler.NewNotification(notifSvc, fcmTokens),
 		Thread:       handler.NewThread(threadSvc),
+		WS:           handler.NewWS(hub, jwt),
 	}
 	if paymentSvc != nil {
 		handlers.Payment = handler.NewPayment(paymentSvc)

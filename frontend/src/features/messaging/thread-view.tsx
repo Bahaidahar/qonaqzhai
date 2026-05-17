@@ -3,14 +3,25 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Send } from "lucide-react";
 import { Button } from "@/shared/ui/button";
-import { api, type BookingThread, type ThreadMessage } from "@/shared/api";
+import {
+  api,
+  getToken,
+  type BookingThread,
+  type ThreadMessage,
+} from "@/shared/api";
+import { API_BASE } from "@/shared/config/env";
 import { useAuth } from "@/features/auth/context";
 
 interface Props {
   threadId: string;
 }
 
-/** Render a thread + send input, polls every 4s for new messages. */
+function wsUrl(token: string): string {
+  const base = API_BASE.replace(/^http/, "ws");
+  return `${base}/api/ws?token=${encodeURIComponent(token)}`;
+}
+
+/** Realtime thread chat over a WebSocket. Falls back to REST POST on socket down. */
 export function ThreadView({ threadId }: Props) {
   const { user } = useAuth();
   const [thread, setThread] = useState<BookingThread | null>(null);
@@ -19,9 +30,11 @@ export function ThreadView({ threadId }: Props) {
   const [error, setError] = useState<string | null>(null);
   const [draft, setDraft] = useState("");
   const [sending, setSending] = useState(false);
+  const [connected, setConnected] = useState(false);
+  const wsRef = useRef<WebSocket | null>(null);
   const bottomRef = useRef<HTMLDivElement>(null);
 
-  const load = useCallback(async () => {
+  const loadHistory = useCallback(async () => {
     try {
       const r = await api.getThread(threadId);
       setThread(r.thread);
@@ -34,10 +47,48 @@ export function ThreadView({ threadId }: Props) {
   }, [threadId]);
 
   useEffect(() => {
-    void load();
-    const t = window.setInterval(() => void load(), 4000);
-    return () => window.clearInterval(t);
-  }, [load]);
+    void loadHistory();
+  }, [loadHistory]);
+
+  useEffect(() => {
+    const token = getToken();
+    if (!token) return;
+    let cancelled = false;
+    let retry: number | null = null;
+
+    function connect() {
+      const ws = new WebSocket(wsUrl(token!));
+      wsRef.current = ws;
+      ws.onopen = () => setConnected(true);
+      ws.onmessage = (ev) => {
+        try {
+          const env = JSON.parse(ev.data) as { op: string; data: ThreadMessage };
+          if (env.op !== "thread.message") return;
+          if (env.data.threadId !== threadId) return;
+          setMessages((prev) => {
+            if (prev.some((m) => m.id === env.data.id)) return prev;
+            return [...prev, env.data];
+          });
+        } catch {
+          /* ignore */
+        }
+      };
+      ws.onerror = () => setConnected(false);
+      ws.onclose = () => {
+        setConnected(false);
+        if (cancelled) return;
+        retry = window.setTimeout(connect, 2000);
+      };
+    }
+    connect();
+
+    return () => {
+      cancelled = true;
+      if (retry) window.clearTimeout(retry);
+      wsRef.current?.close();
+      wsRef.current = null;
+    };
+  }, [threadId]);
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -49,8 +100,13 @@ export function ThreadView({ threadId }: Props) {
     if (!text || !thread) return;
     setSending(true);
     try {
-      const m = await api.sendThreadMessage(thread.id, text);
-      setMessages((prev) => [...prev, m]);
+      const ws = wsRef.current;
+      if (ws && ws.readyState === WebSocket.OPEN) {
+        ws.send(JSON.stringify({ op: "message", data: { threadId: thread.id, text } }));
+      } else {
+        const m = await api.sendThreadMessage(thread.id, text);
+        setMessages((prev) => [...prev, m]);
+      }
       setDraft("");
     } catch (err) {
       setError(err instanceof Error ? err.message : "send failed");
@@ -63,7 +119,11 @@ export function ThreadView({ threadId }: Props) {
     return <div className="p-6 text-sm text-[var(--color-muted-foreground)]">Loading…</div>;
   }
   if (error || !thread) {
-    return <div className="p-6 text-sm text-[var(--color-destructive)]">{error ?? "thread not found"}</div>;
+    return (
+      <div className="p-6 text-sm text-[var(--color-destructive)]">
+        {error ?? "thread not found"}
+      </div>
+    );
   }
 
   const myId = user?.id;
@@ -75,6 +135,18 @@ export function ThreadView({ threadId }: Props) {
         <span className="text-sm font-medium">{peerLabel}</span>
         <span className="font-mono text-[10px] uppercase tracking-widest text-[var(--color-muted-foreground)]">
           booking {thread.bookingId.slice(0, 8)}
+        </span>
+        <span
+          className={`ml-auto inline-flex items-center gap-1.5 text-[10px] ${
+            connected ? "text-emerald-500" : "text-[var(--color-muted-foreground)]"
+          }`}
+        >
+          <span
+            className={`h-1.5 w-1.5 rounded-full ${
+              connected ? "bg-emerald-500" : "bg-[var(--color-muted-foreground)]"
+            }`}
+          />
+          {connected ? "live" : "offline"}
         </span>
       </header>
 

@@ -16,12 +16,18 @@ type Notifier interface {
 	Enqueue(ctx context.Context, n *domain.Notification) error
 }
 
+// Publisher broadcasts realtime events to connected users (e.g. WebSocket hub).
+type Publisher interface {
+	Publish(event string, payload any, userIDs ...string)
+}
+
 // Deps bundles thread service collaborators.
 type Deps struct {
-	Threads  usecase.ThreadRepo
-	Bookings usecase.BookingRepo
-	Vendors  usecase.VendorRepo
-	Notifier Notifier // optional
+	Threads   usecase.ThreadRepo
+	Bookings  usecase.BookingRepo
+	Vendors   usecase.VendorRepo
+	Notifier  Notifier  // optional
+	Publisher Publisher // optional — realtime fan-out
 }
 
 // Service exposes thread operations.
@@ -79,6 +85,11 @@ func (s *Service) Send(ctx context.Context, userID, threadID, text string) (*dom
 	})
 	if err != nil {
 		return nil, err
+	}
+	// Realtime fan-out to both participants (sender + peer). The sender's other
+	// devices benefit from the echo too.
+	if s.d.Publisher != nil {
+		s.d.Publisher.Publish("thread.message", m, t.CustomerID, t.VendorID)
 	}
 	s.notifyOther(ctx, t, userID, text)
 	return m, nil

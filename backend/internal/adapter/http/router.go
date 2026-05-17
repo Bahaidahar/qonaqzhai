@@ -26,6 +26,7 @@ type Handlers struct {
 	Payment      *handler.Payment      // optional — nil disables routes
 	Notification *handler.Notification // optional — nil disables routes
 	Thread       *handler.Thread
+	WS           *handler.WS // optional — realtime socket upgrade
 }
 
 // RouterConfig bundles router-level dependencies.
@@ -76,6 +77,10 @@ func NewRouter(h Handlers, cfg RouterConfig) http.Handler {
 	mux.Handle("GET /api/threads", cfg.Auth.Required(http.HandlerFunc(h.Thread.List)))
 	mux.Handle("GET /api/threads/{id}", cfg.Auth.Required(http.HandlerFunc(h.Thread.Get)))
 	mux.Handle("POST /api/threads/{id}/messages", cfg.Auth.Required(http.HandlerFunc(h.Thread.Send)))
+	if h.WS != nil {
+		// WebSocket upgrade — auth handled inside handler via ?token= query.
+		mux.HandleFunc("GET /api/ws", h.WS.Connect)
+	}
 
 	// vendor
 	vendorOnly := cfg.Auth.RequireRole(domain.RoleVendor)
