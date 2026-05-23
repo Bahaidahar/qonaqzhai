@@ -5,7 +5,8 @@ use (
 	./pkg
 	./services/auth
 	./services/core
+	./services/gateway
 	./services/payment
 	./services/realtime
-	./services/gateway
+	./tests/e2e
 )
