@@ -1,0 +1,11 @@
+go 1.25.0
+
+use (
+	./gen/proto
+	./pkg
+	./services/auth
+	./services/core
+	./services/payment
+	./services/realtime
+	./services/gateway
+)
