@@ -1,0 +1,35 @@
+syntax = "proto3";
+
+package realtime.v1;
+
+option go_package = "qonaqzhai-backend/gen/proto/realtime/v1;realtimev1";
+
+// RealtimeService owns chat threads and WebSocket fan-out.
+// core-svc calls EnsureThread when a booking is accepted.
+// Any service may call PublishEvent to push to user devices.
+service RealtimeService {
+  rpc EnsureThread(EnsureThreadRequest) returns (Thread);
+  rpc PublishEvent(PublishEventRequest) returns (PublishEventResponse);
+}
+
+message Thread {
+  string id          = 1;
+  string booking_id  = 2;
+  string customer_id = 3;
+  string vendor_id   = 4;
+  int64  created_at  = 5;
+  int64  updated_at  = 6;
+}
+
+message EnsureThreadRequest {
+  string booking_id  = 1;
+  string customer_id = 2;
+  string vendor_id   = 3;
+}
+
+message PublishEventRequest {
+  string event           = 1;
+  bytes  payload_json    = 2;
+  repeated string user_ids = 3;
+}
+message PublishEventResponse { int32 delivered = 1; }

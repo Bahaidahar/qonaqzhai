@@ -1,0 +1,57 @@
+syntax = "proto3";
+
+package payment.v1;
+
+option go_package = "qonaqzhai-backend/gen/proto/payment/v1;paymentv1";
+
+// PaymentService owns saved cards and payment lifecycle.
+// core-svc calls Charge when confirming a booking; on success it then calls
+// core.MarkBookingPaid to commit the cross-service saga.
+service PaymentService {
+  rpc Charge(ChargeRequest) returns (Payment);
+  rpc Refund(RefundRequest) returns (Payment);
+  rpc GetPayment(GetPaymentRequest) returns (Payment);
+  rpc ListCardsByUser(ListCardsByUserRequest) returns (ListCardsByUserResponse);
+}
+
+message Payment {
+  string id         = 1;
+  string booking_id = 2;
+  string user_id    = 3;
+  string card_id    = 4;
+  int64  amount     = 5;
+  string currency   = 6;
+  string status     = 7;
+  string provider_ref = 8;
+  int64  created_at = 9;
+}
+
+message ChargeRequest {
+  string booking_id = 1;
+  string user_id    = 2;
+  string card_id    = 3;
+  int64  amount     = 4;
+  string currency   = 5;
+}
+
+message RefundRequest {
+  string payment_id = 1;
+  int64  amount     = 2;
+}
+
+message GetPaymentRequest { string payment_id = 1; }
+
+message Card {
+  string id         = 1;
+  string user_id    = 2;
+  string brand      = 3;
+  string last4      = 4;
+  int32  exp_month  = 5;
+  int32  exp_year   = 6;
+  string holder     = 7;
+  bool   is_default = 8;
+  int64  created_at = 9;
+}
+
+message ListCardsByUserRequest { string user_id = 1; }
+message ListCardsByUserResponse { repeated Card cards = 1; }

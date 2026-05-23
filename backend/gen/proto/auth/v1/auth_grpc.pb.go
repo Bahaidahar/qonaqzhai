@@ -2,7 +2,7 @@
 // versions:
 // - protoc-gen-go-grpc v1.6.2
 // - protoc             v7.34.1
-// source: proto/auth/v1/auth.proto
+// source: auth/v1/auth.proto
 
 package authv1
 
@@ -19,18 +19,25 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	AuthService_VerifyToken_FullMethodName = "/auth.v1.AuthService/VerifyToken"
+	AuthService_VerifyToken_FullMethodName    = "/auth.v1.AuthService/VerifyToken"
+	AuthService_GetUser_FullMethodName        = "/auth.v1.AuthService/GetUser"
+	AuthService_GetUsersBatch_FullMethodName  = "/auth.v1.AuthService/GetUsersBatch"
+	AuthService_AdminListUsers_FullMethodName = "/auth.v1.AuthService/AdminListUsers"
+	AuthService_AdminSetStatus_FullMethodName = "/auth.v1.AuthService/AdminSetStatus"
 )
 
 // AuthServiceClient is the client API for AuthService service.
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 //
-// AuthService verifies access tokens for other services.
-// auth-svc is the single owner of the JWT secret; core-svc and realtime-svc
-// call VerifyToken instead of decoding tokens locally.
+// AuthService is the sole owner of the JWT secret and the users table.
+// Other services call AuthService instead of decoding tokens locally.
 type AuthServiceClient interface {
 	VerifyToken(ctx context.Context, in *VerifyTokenRequest, opts ...grpc.CallOption) (*VerifyTokenResponse, error)
+	GetUser(ctx context.Context, in *GetUserRequest, opts ...grpc.CallOption) (*User, error)
+	GetUsersBatch(ctx context.Context, in *GetUsersBatchRequest, opts ...grpc.CallOption) (*GetUsersBatchResponse, error)
+	AdminListUsers(ctx context.Context, in *AdminListUsersRequest, opts ...grpc.CallOption) (*AdminListUsersResponse, error)
+	AdminSetStatus(ctx context.Context, in *AdminSetStatusRequest, opts ...grpc.CallOption) (*User, error)
 }
 
 type authServiceClient struct {
@@ -51,15 +58,58 @@ func (c *authServiceClient) VerifyToken(ctx context.Context, in *VerifyTokenRequ
 	return out, nil
 }
 
+func (c *authServiceClient) GetUser(ctx context.Context, in *GetUserRequest, opts ...grpc.CallOption) (*User, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(User)
+	err := c.cc.Invoke(ctx, AuthService_GetUser_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *authServiceClient) GetUsersBatch(ctx context.Context, in *GetUsersBatchRequest, opts ...grpc.CallOption) (*GetUsersBatchResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(GetUsersBatchResponse)
+	err := c.cc.Invoke(ctx, AuthService_GetUsersBatch_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *authServiceClient) AdminListUsers(ctx context.Context, in *AdminListUsersRequest, opts ...grpc.CallOption) (*AdminListUsersResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(AdminListUsersResponse)
+	err := c.cc.Invoke(ctx, AuthService_AdminListUsers_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *authServiceClient) AdminSetStatus(ctx context.Context, in *AdminSetStatusRequest, opts ...grpc.CallOption) (*User, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(User)
+	err := c.cc.Invoke(ctx, AuthService_AdminSetStatus_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // AuthServiceServer is the server API for AuthService service.
 // All implementations must embed UnimplementedAuthServiceServer
 // for forward compatibility.
 //
-// AuthService verifies access tokens for other services.
-// auth-svc is the single owner of the JWT secret; core-svc and realtime-svc
-// call VerifyToken instead of decoding tokens locally.
+// AuthService is the sole owner of the JWT secret and the users table.
+// Other services call AuthService instead of decoding tokens locally.
 type AuthServiceServer interface {
 	VerifyToken(context.Context, *VerifyTokenRequest) (*VerifyTokenResponse, error)
+	GetUser(context.Context, *GetUserRequest) (*User, error)
+	GetUsersBatch(context.Context, *GetUsersBatchRequest) (*GetUsersBatchResponse, error)
+	AdminListUsers(context.Context, *AdminListUsersRequest) (*AdminListUsersResponse, error)
+	AdminSetStatus(context.Context, *AdminSetStatusRequest) (*User, error)
 	mustEmbedUnimplementedAuthServiceServer()
 }
 
@@ -72,6 +122,18 @@ type UnimplementedAuthServiceServer struct{}
 
 func (UnimplementedAuthServiceServer) VerifyToken(context.Context, *VerifyTokenRequest) (*VerifyTokenResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method VerifyToken not implemented")
+}
+func (UnimplementedAuthServiceServer) GetUser(context.Context, *GetUserRequest) (*User, error) {
+	return nil, status.Error(codes.Unimplemented, "method GetUser not implemented")
+}
+func (UnimplementedAuthServiceServer) GetUsersBatch(context.Context, *GetUsersBatchRequest) (*GetUsersBatchResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method GetUsersBatch not implemented")
+}
+func (UnimplementedAuthServiceServer) AdminListUsers(context.Context, *AdminListUsersRequest) (*AdminListUsersResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method AdminListUsers not implemented")
+}
+func (UnimplementedAuthServiceServer) AdminSetStatus(context.Context, *AdminSetStatusRequest) (*User, error) {
+	return nil, status.Error(codes.Unimplemented, "method AdminSetStatus not implemented")
 }
 func (UnimplementedAuthServiceServer) mustEmbedUnimplementedAuthServiceServer() {}
 func (UnimplementedAuthServiceServer) testEmbeddedByValue()                     {}
@@ -112,6 +174,78 @@ func _AuthService_VerifyToken_Handler(srv interface{}, ctx context.Context, dec 
 	return interceptor(ctx, in, info, handler)
 }
 
+func _AuthService_GetUser_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetUserRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AuthServiceServer).GetUser(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: AuthService_GetUser_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AuthServiceServer).GetUser(ctx, req.(*GetUserRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _AuthService_GetUsersBatch_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetUsersBatchRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AuthServiceServer).GetUsersBatch(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: AuthService_GetUsersBatch_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AuthServiceServer).GetUsersBatch(ctx, req.(*GetUsersBatchRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _AuthService_AdminListUsers_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(AdminListUsersRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AuthServiceServer).AdminListUsers(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: AuthService_AdminListUsers_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AuthServiceServer).AdminListUsers(ctx, req.(*AdminListUsersRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _AuthService_AdminSetStatus_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(AdminSetStatusRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AuthServiceServer).AdminSetStatus(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: AuthService_AdminSetStatus_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AuthServiceServer).AdminSetStatus(ctx, req.(*AdminSetStatusRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // AuthService_ServiceDesc is the grpc.ServiceDesc for AuthService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -123,7 +257,23 @@ var AuthService_ServiceDesc = grpc.ServiceDesc{
 			MethodName: "VerifyToken",
 			Handler:    _AuthService_VerifyToken_Handler,
 		},
+		{
+			MethodName: "GetUser",
+			Handler:    _AuthService_GetUser_Handler,
+		},
+		{
+			MethodName: "GetUsersBatch",
+			Handler:    _AuthService_GetUsersBatch_Handler,
+		},
+		{
+			MethodName: "AdminListUsers",
+			Handler:    _AuthService_AdminListUsers_Handler,
+		},
+		{
+			MethodName: "AdminSetStatus",
+			Handler:    _AuthService_AdminSetStatus_Handler,
+		},
 	},
 	Streams:  []grpc.StreamDesc{},
-	Metadata: "proto/auth/v1/auth.proto",
+	Metadata: "auth/v1/auth.proto",
 }

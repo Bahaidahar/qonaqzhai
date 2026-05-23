@@ -4,20 +4,47 @@ package auth.v1;
 
 option go_package = "qonaqzhai-backend/gen/proto/auth/v1;authv1";
 
-// AuthService verifies access tokens for other services.
-// auth-svc is the single owner of the JWT secret; core-svc and realtime-svc
-// call VerifyToken instead of decoding tokens locally.
+// AuthService is the sole owner of the JWT secret and the users table.
+// Other services call AuthService instead of decoding tokens locally.
 service AuthService {
   rpc VerifyToken(VerifyTokenRequest) returns (VerifyTokenResponse);
+  rpc GetUser(GetUserRequest) returns (User);
+  rpc GetUsersBatch(GetUsersBatchRequest) returns (GetUsersBatchResponse);
+  rpc AdminListUsers(AdminListUsersRequest) returns (AdminListUsersResponse);
+  rpc AdminSetStatus(AdminSetStatusRequest) returns (User);
 }
 
-message VerifyTokenRequest {
-  string token = 1;
-}
-
+message VerifyTokenRequest { string token = 1; }
 message VerifyTokenResponse {
   string user_id = 1;
   string email   = 2;
-  string role    = 3; // "customer" | "vendor" | "admin"
-  int64  exp     = 4; // unix seconds
+  string role    = 3;
+  int64  exp     = 4;
+  string status  = 5;
+}
+
+message User {
+  string id         = 1;
+  string email      = 2;
+  string name       = 3;
+  string role       = 4;
+  string status     = 5;
+  int64  created_at = 6;
+}
+
+message GetUserRequest { string user_id = 1; }
+
+message GetUsersBatchRequest { repeated string user_ids = 1; }
+message GetUsersBatchResponse { repeated User users = 1; }
+
+message AdminListUsersRequest {
+  int32  limit  = 1;
+  int32  offset = 2;
+  string role   = 3;
+}
+message AdminListUsersResponse { repeated User users = 1; }
+
+message AdminSetStatusRequest {
+  string user_id = 1;
+  string status  = 2;
 }

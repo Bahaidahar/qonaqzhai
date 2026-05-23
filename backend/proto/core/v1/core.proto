@@ -1,0 +1,78 @@
+syntax = "proto3";
+
+package core.v1;
+
+option go_package = "qonaqzhai-backend/gen/proto/core/v1;corev1";
+
+// CoreService exposes read-only views into vendors and bookings for other services.
+// Mutations stay HTTP-only (called by clients through gateway).
+service CoreService {
+  rpc GetVendor(GetVendorRequest) returns (Vendor);
+  rpc GetVendorByUser(GetVendorByUserRequest) returns (Vendor);
+  rpc ListVendorsByIDs(ListVendorsByIDsRequest) returns (ListVendorsByIDsResponse);
+  rpc GetBooking(GetBookingRequest) returns (Booking);
+  rpc IsBookingAccepted(IsBookingAcceptedRequest) returns (IsBookingAcceptedResponse);
+  rpc MarkBookingPaid(MarkBookingPaidRequest) returns (Booking);
+  rpc AdminStats(AdminStatsRequest) returns (AdminStatsResponse);
+}
+
+message Vendor {
+  string id           = 1;
+  string user_id      = 2;
+  string name         = 3;
+  string category     = 4;
+  string city         = 5;
+  string description  = 6;
+  int64  price_from   = 7;
+  string status       = 8;
+  double rating_avg   = 9;
+  int32  rating_count = 10;
+  repeated string photo_ids = 11;
+  int64  created_at   = 12;
+  int64  updated_at   = 13;
+}
+
+message GetVendorRequest { string vendor_id = 1; }
+message GetVendorByUserRequest { string user_id = 1; }
+message ListVendorsByIDsRequest { repeated string vendor_ids = 1; }
+message ListVendorsByIDsResponse { repeated Vendor vendors = 1; }
+
+message Booking {
+  string id          = 1;
+  string customer_id = 2;
+  string vendor_id   = 3;
+  string service_id  = 4;
+  string event_date  = 5;
+  int32  guest_count = 6;
+  string note        = 7;
+  string status      = 8;
+  int64  amount      = 9;
+  string payment_id  = 10;
+  int64  created_at  = 11;
+}
+
+message GetBookingRequest { string booking_id = 1; }
+message IsBookingAcceptedRequest { string booking_id = 1; }
+message IsBookingAcceptedResponse {
+  bool   accepted    = 1;
+  string customer_id = 2;
+  string vendor_id   = 3;
+  string vendor_user_id = 4;
+}
+
+message MarkBookingPaidRequest {
+  string booking_id  = 1;
+  string payment_id  = 2;
+}
+
+message AdminStatsRequest {}
+message AdminStatsResponse {
+  int32 vendors_total     = 1;
+  int32 vendors_pending   = 2;
+  int32 vendors_approved  = 3;
+  int32 bookings_total    = 4;
+  int32 bookings_pending  = 5;
+  int32 bookings_accepted = 6;
+  int32 bookings_paid     = 7;
+  int64 gmv               = 8;
+}
