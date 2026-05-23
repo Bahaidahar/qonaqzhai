@@ -1,0 +1,163 @@
+# Production-ish microservice stack. Each service has its own Postgres; only
+# the gateway is exposed to the host. Override env values via a .env file
+# next to this compose file.
+#
+#   docker compose -f deploy/docker-compose.yml up --build
+
+x-build-defaults: &build-defaults
+  context: ..
+  dockerfile: deploy/service.Dockerfile
+
+services:
+  auth-db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: qonaqzhai
+      POSTGRES_PASSWORD: qonaqzhai
+      POSTGRES_DB: qonaqzhai_auth
+    volumes: [auth-db-data:/var/lib/postgresql/data]
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U qonaqzhai -d qonaqzhai_auth"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+    restart: unless-stopped
+
+  core-db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: qonaqzhai
+      POSTGRES_PASSWORD: qonaqzhai
+      POSTGRES_DB: qonaqzhai_core
+    volumes: [core-db-data:/var/lib/postgresql/data]
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U qonaqzhai -d qonaqzhai_core"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+    restart: unless-stopped
+
+  payment-db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: qonaqzhai
+      POSTGRES_PASSWORD: qonaqzhai
+      POSTGRES_DB: qonaqzhai_payment
+    volumes: [payment-db-data:/var/lib/postgresql/data]
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U qonaqzhai -d qonaqzhai_payment"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+    restart: unless-stopped
+
+  realtime-db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: qonaqzhai
+      POSTGRES_PASSWORD: qonaqzhai
+      POSTGRES_DB: qonaqzhai_realtime
+    volumes: [realtime-db-data:/var/lib/postgresql/data]
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U qonaqzhai -d qonaqzhai_realtime"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+    restart: unless-stopped
+
+  auth:
+    build:
+      <<: *build-defaults
+      args: { SERVICE: auth }
+    depends_on:
+      auth-db: { condition: service_healthy }
+    environment:
+      AUTH_DATABASE_URL: postgres://qonaqzhai:qonaqzhai@auth-db:5432/qonaqzhai_auth?sslmode=disable
+      AUTH_HTTP_ADDR: ":8081"
+      AUTH_GRPC_ADDR: ":9081"
+      JWT_SECRET: ${JWT_SECRET:?set JWT_SECRET in your env / .env}
+      ADMIN_EMAIL: ${ADMIN_EMAIL:-}
+      ADMIN_PASSWORD: ${ADMIN_PASSWORD:-}
+      SMTP_HOST: ${SMTP_HOST:-}
+      SMTP_PORT: ${SMTP_PORT:-587}
+      SMTP_USER: ${SMTP_USER:-}
+      SMTP_PASSWORD: ${SMTP_PASSWORD:-}
+      SMTP_FROM: ${SMTP_FROM:-}
+    restart: unless-stopped
+
+  core:
+    build:
+      <<: *build-defaults
+      args: { SERVICE: core }
+    depends_on:
+      core-db: { condition: service_healthy }
+      auth: { condition: service_started }
+      payment: { condition: service_started }
+      realtime: { condition: service_started }
+    environment:
+      CORE_DATABASE_URL: postgres://qonaqzhai:qonaqzhai@core-db:5432/qonaqzhai_core?sslmode=disable
+      CORE_HTTP_ADDR: ":8082"
+      CORE_GRPC_ADDR: ":9082"
+      AUTH_GRPC_ADDR: "auth:9081"
+      PAYMENT_GRPC_ADDR: "payment:9083"
+      REALTIME_GRPC_ADDR: "realtime:9084"
+    restart: unless-stopped
+
+  payment:
+    build:
+      <<: *build-defaults
+      args: { SERVICE: payment }
+    depends_on:
+      payment-db: { condition: service_healthy }
+      auth: { condition: service_started }
+    environment:
+      PAYMENT_DATABASE_URL: postgres://qonaqzhai:qonaqzhai@payment-db:5432/qonaqzhai_payment?sslmode=disable
+      PAYMENT_HTTP_ADDR: ":8083"
+      PAYMENT_GRPC_ADDR: ":9083"
+      AUTH_GRPC_ADDR: "auth:9081"
+      CORE_GRPC_ADDR: "core:9082"
+      PAYBOX_MERCHANT_ID: ${PAYBOX_MERCHANT_ID:-}
+      PAYBOX_SECRET_KEY: ${PAYBOX_SECRET_KEY:-}
+      PAYBOX_SANDBOX: ${PAYBOX_SANDBOX:-true}
+    restart: unless-stopped
+
+  realtime:
+    build:
+      <<: *build-defaults
+      args: { SERVICE: realtime }
+    depends_on:
+      realtime-db: { condition: service_healthy }
+      auth: { condition: service_started }
+    environment:
+      REALTIME_DATABASE_URL: postgres://qonaqzhai:qonaqzhai@realtime-db:5432/qonaqzhai_realtime?sslmode=disable
+      REALTIME_HTTP_ADDR: ":8084"
+      REALTIME_GRPC_ADDR: ":9084"
+      AUTH_GRPC_ADDR: "auth:9081"
+    restart: unless-stopped
+
+  gateway:
+    build:
+      <<: *build-defaults
+      args: { SERVICE: gateway }
+    depends_on:
+      - auth
+      - core
+      - payment
+      - realtime
+    environment:
+      GATEWAY_ADDR: ":8080"
+      AUTH_GRPC_ADDR: "auth:9081"
+      AUTH_HTTP_URL: "http://auth:8081"
+      CORE_HTTP_URL: "http://core:8082"
+      PAYMENT_HTTP_URL: "http://payment:8083"
+      REALTIME_HTTP_URL: "http://realtime:8084"
+      CORS_ORIGIN: ${CORS_ORIGIN:-*}
+    ports:
+      - "${GATEWAY_PUBLIC_PORT:-8080}:8080"
+    restart: unless-stopped
+
+volumes:
+  auth-db-data:
+  core-db-data:
+  payment-db-data:
+  realtime-db-data:
