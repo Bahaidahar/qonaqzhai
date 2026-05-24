@@ -77,23 +77,31 @@ func (r *CardRepo) ListByUser(ctx context.Context, userID string) ([]*domain.Car
 	return out, rows.Err()
 }
 
-// Delete removes a card. If the deleted card was default, promotes the next.
+// Delete removes a card. If the deleted card was default, promotes the next
+// in a single transaction so the user never ends up without a default card.
 func (r *CardRepo) Delete(ctx context.Context, id string) error {
 	c, err := r.Find(ctx, id)
 	if err != nil {
 		return err
 	}
-	if _, err := r.db.ExecContext(ctx, `DELETE FROM cards WHERE id = $1`, id); err != nil {
+	tx, err := r.db.BeginTx(ctx, nil)
+	if err != nil {
 		return err
 	}
+	defer tx.Rollback()
+	if _, err := tx.ExecContext(ctx, `DELETE FROM cards WHERE id = $1`, id); err != nil {
+		return fmt.Errorf("delete card: %w", err)
+	}
 	if c.IsDefault {
-		_, _ = r.db.ExecContext(ctx,
+		if _, err := tx.ExecContext(ctx,
 			`UPDATE cards SET is_default = TRUE
 			 WHERE id = (SELECT id FROM cards WHERE user_id = $1 ORDER BY created_at ASC LIMIT 1)`,
 			c.UserID,
-		)
+		); err != nil {
+			return fmt.Errorf("promote default card: %w", err)
+		}
 	}
-	return nil
+	return tx.Commit()
 }
 
 // SetDefault flips the default flag for the given card and demotes siblings.

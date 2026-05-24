@@ -23,11 +23,10 @@ import (
 	"qonaqzhai-backend/pkg/grpcutil"
 	"qonaqzhai-backend/pkg/logger"
 
-	"qonaqzhai-backend/services/core/internal/adapter/clock"
 	coregrpc "qonaqzhai-backend/services/core/internal/adapter/grpc"
 	"qonaqzhai-backend/services/core/internal/adapter/grpcclient"
 	corehttp "qonaqzhai-backend/services/core/internal/adapter/http"
-	"qonaqzhai-backend/services/core/internal/adapter/idgen"
+	"qonaqzhai-backend/pkg/idgen"
 	"qonaqzhai-backend/services/core/internal/adapter/repo"
 	"qonaqzhai-backend/services/core/internal/usecase/admin"
 	"qonaqzhai-backend/services/core/internal/usecase/booking"
@@ -50,7 +49,6 @@ func run(log *slog.Logger) error {
 		"postgres://qonaqzhai:qonaqzhai@localhost:5433/qonaqzhai_core?sslmode=disable")
 	httpAddr := config.EnvOr("CORE_HTTP_ADDR", ":8082")
 	grpcAddr := config.EnvOr("CORE_GRPC_ADDR", ":9082")
-	cors := config.EnvOr("CORS_ORIGIN", "*")
 	authAddr := config.EnvOr("AUTH_GRPC_ADDR", "localhost:9081")
 	paymentAddr := os.Getenv("PAYMENT_GRPC_ADDR")
 	realtimeAddr := os.Getenv("REALTIME_GRPC_ADDR")
@@ -62,19 +60,16 @@ func run(log *slog.Logger) error {
 	defer db.Close()
 
 	id := idgen.New()
-	_ = clock.New() // reserved for future timestamp injection in usecases
 
 	vendors := repo.NewVendorRepo(db, id)
 	bookings := repo.NewBookingRepo(db, id)
-	services := repo.NewServiceRepo(db, id)
-	_ = services
 	photos := repo.NewPhotoRepo(db, id)
 	reviews := repo.NewReviewRepo(db, id)
 	notifications := repo.NewNotificationRepo(db, id)
 	fcmTokens := repo.NewFCMTokenRepo(db, id)
 
 	vendorSvc := vendor.New(vendor.Deps{Vendors: vendors, Reviews: reviews})
-	reviewSvc := review.New(review.Deps{Reviews: reviews, Bookings: bookings, Vendors: vendors})
+	reviewSvc := review.New(review.Deps{Reviews: reviews, Bookings: bookings, Vendors: vendors, Logger: log})
 	photoSvc := photo.New(photo.Deps{Photos: photos, Vendors: vendors})
 	notifSvc := notification.New(notification.Deps{Notifications: notifications, FCMTokens: fcmTokens})
 	adminSvc := admin.New(admin.Deps{Vendors: vendors, Bookings: bookings})
@@ -116,13 +111,15 @@ func run(log *slog.Logger) error {
 	}
 
 	httpSrv := &http.Server{
-		Addr: httpAddr, Handler: corehttp.Mux(handler, mw, cors, log),
+		Addr: httpAddr, Handler: corehttp.Mux(handler, mw, log),
 		ReadHeaderTimeout: 5 * time.Second,
 	}
 
 	grpcSrv := grpc.NewServer(
-		grpc.UnaryInterceptor(grpcutil.LoggingUnaryInterceptor(log)),
-		grpc.ChainUnaryInterceptor(grpcutil.RecoverUnaryInterceptor(log)),
+		grpc.ChainUnaryInterceptor(
+			grpcutil.LoggingUnaryInterceptor(log),
+			grpcutil.RecoverUnaryInterceptor(log),
+		),
 	)
 	corev1.RegisterCoreServiceServer(grpcSrv, coregrpc.New(vendorSvc, bookingSvc, adminSvc))
 

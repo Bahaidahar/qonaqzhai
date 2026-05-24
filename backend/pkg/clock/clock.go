@@ -1,9 +1,10 @@
-// Package clock provides the system clock implementation.
+// Package clock provides a System clock implementation that every service can
+// embed via DI. Tests substitute a fixed clock.
 package clock
 
 import "time"
 
-// System implements ports.Clock against the OS wall clock.
+// System reports the OS wall clock in UTC.
 type System struct{}
 
 // New returns a System clock.

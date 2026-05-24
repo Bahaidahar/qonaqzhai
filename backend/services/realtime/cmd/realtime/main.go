@@ -22,11 +22,11 @@ import (
 	"qonaqzhai-backend/pkg/grpcutil"
 	"qonaqzhai-backend/pkg/logger"
 
-	"qonaqzhai-backend/services/realtime/internal/adapter/clock"
+	"qonaqzhai-backend/pkg/clock"
 	realtimegrpc "qonaqzhai-backend/services/realtime/internal/adapter/grpc"
 	"qonaqzhai-backend/services/realtime/internal/adapter/grpcclient"
 	realtimehttp "qonaqzhai-backend/services/realtime/internal/adapter/http"
-	"qonaqzhai-backend/services/realtime/internal/adapter/idgen"
+	"qonaqzhai-backend/pkg/idgen"
 	"qonaqzhai-backend/services/realtime/internal/adapter/repo"
 	"qonaqzhai-backend/services/realtime/internal/adapter/ws"
 	"qonaqzhai-backend/services/realtime/internal/ports"
@@ -46,7 +46,6 @@ func run(log *slog.Logger) error {
 		"postgres://qonaqzhai:qonaqzhai@localhost:5433/qonaqzhai_realtime?sslmode=disable")
 	httpAddr := config.EnvOr("REALTIME_HTTP_ADDR", ":8084")
 	grpcAddr := config.EnvOr("REALTIME_GRPC_ADDR", ":9084")
-	cors := config.EnvOr("CORS_ORIGIN", "*")
 	authAddr := config.EnvOr("AUTH_GRPC_ADDR", "localhost:9081")
 
 	db, err := repo.Open(dsn)
@@ -76,7 +75,11 @@ func run(log *slog.Logger) error {
 		if m.ThreadID == "" || m.Text == "" {
 			return
 		}
-		_, _ = threadSvc.Send(context.Background(), userID, m.ThreadID, m.Text)
+		ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+		defer cancel()
+		if _, err := threadSvc.Send(ctx, userID, m.ThreadID, m.Text); err != nil {
+			log.Warn("ws thread send", "user", userID, "thread", m.ThreadID, "err", err)
+		}
 	}
 
 	verifier, err := pkgauth.NewVerifier(authAddr)
@@ -89,13 +92,15 @@ func run(log *slog.Logger) error {
 	handler := &realtimehttp.Handler{Threads: threadSvc, Hub: hub}
 
 	httpSrv := &http.Server{
-		Addr: httpAddr, Handler: realtimehttp.Mux(handler, mw, cors, log),
+		Addr: httpAddr, Handler: realtimehttp.Mux(handler, mw, log),
 		ReadHeaderTimeout: 5 * time.Second,
 	}
 
 	grpcSrv := grpc.NewServer(
-		grpc.UnaryInterceptor(grpcutil.LoggingUnaryInterceptor(log)),
-		grpc.ChainUnaryInterceptor(grpcutil.RecoverUnaryInterceptor(log)),
+		grpc.ChainUnaryInterceptor(
+			grpcutil.LoggingUnaryInterceptor(log),
+			grpcutil.RecoverUnaryInterceptor(log),
+		),
 	)
 	realtimev1.RegisterRealtimeServiceServer(grpcSrv, realtimegrpc.New(threadSvc, hub))
 

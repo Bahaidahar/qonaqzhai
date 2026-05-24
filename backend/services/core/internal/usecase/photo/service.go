@@ -22,14 +22,13 @@ type Service struct{ d Deps }
 // New constructs a photo Service.
 func New(d Deps) *Service { return &Service{d: d} }
 
-// Upload validates + stores a vendor photo. The caller must own vendorID.
-func (s *Service) Upload(ctx context.Context, vendorUserID, mime string, data []byte) (*domain.Photo, error) {
+// Upload validates + stores a vendor photo. The caller must own vendorID. The
+// MIME is sniffed from the byte stream, NOT trusted from the Content-Type
+// header (the client controls headers). Only jpeg/png/webp/gif are accepted.
+func (s *Service) Upload(ctx context.Context, vendorUserID string, data []byte) (*domain.Photo, error) {
 	v, err := s.d.Vendors.FindByUserID(ctx, vendorUserID)
 	if err != nil {
 		return nil, err
-	}
-	if !domain.ValidPhotoMIME(mime) {
-		return nil, fmt.Errorf("mime: %w", errs.ErrInvalidInput)
 	}
 	size := int64(len(data))
 	if size == 0 {
@@ -37,6 +36,10 @@ func (s *Service) Upload(ctx context.Context, vendorUserID, mime string, data []
 	}
 	if size > domain.MaxPhotoSize {
 		return nil, errs.ErrTooLarge
+	}
+	mime := domain.DetectPhotoMIME(data)
+	if mime == "" {
+		return nil, fmt.Errorf("not an allowed image type: %w", errs.ErrInvalidInput)
 	}
 	return s.d.Photos.Insert(ctx, &domain.Photo{
 		VendorID: v.ID, MIME: mime, Size: size, Data: data,

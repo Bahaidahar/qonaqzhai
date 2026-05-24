@@ -53,23 +53,26 @@ func (r *BookingRepo) Find(ctx context.Context, id string) (*domain.Booking, err
 	return b, err
 }
 
-// ListForCustomer returns bookings made by customer.
-func (r *BookingRepo) ListForCustomer(ctx context.Context, customerID string) ([]*domain.Booking, error) {
-	return r.list(ctx, `WHERE customer_id = $1`, customerID)
+// ListForCustomer returns paginated bookings made by customer.
+func (r *BookingRepo) ListForCustomer(ctx context.Context, customerID string, p ports.Page) ([]*domain.Booking, error) {
+	return r.list(ctx, p, `WHERE customer_id = $1`, customerID)
 }
 
-// ListForVendor returns bookings against a vendor.
-func (r *BookingRepo) ListForVendor(ctx context.Context, vendorID string) ([]*domain.Booking, error) {
-	return r.list(ctx, `WHERE vendor_id = $1`, vendorID)
+// ListForVendor returns paginated bookings against a vendor.
+func (r *BookingRepo) ListForVendor(ctx context.Context, vendorID string, p ports.Page) ([]*domain.Booking, error) {
+	return r.list(ctx, p, `WHERE vendor_id = $1`, vendorID)
 }
 
-// ListAll returns every booking ordered by recency.
-func (r *BookingRepo) ListAll(ctx context.Context) ([]*domain.Booking, error) {
-	return r.list(ctx, ``)
+// ListAll returns paginated bookings ordered by recency. Admin-only.
+func (r *BookingRepo) ListAll(ctx context.Context, p ports.Page) ([]*domain.Booking, error) {
+	return r.list(ctx, p, ``)
 }
 
-func (r *BookingRepo) list(ctx context.Context, where string, args ...any) ([]*domain.Booking, error) {
-	q := `SELECT ` + bookingCols + ` FROM bookings ` + where + ` ORDER BY created_at DESC`
+func (r *BookingRepo) list(ctx context.Context, p ports.Page, where string, args ...any) ([]*domain.Booking, error) {
+	p = p.Clamp()
+	args = append(args, p.Limit, p.Offset)
+	q := `SELECT ` + bookingCols + ` FROM bookings ` + where +
+		fmt.Sprintf(` ORDER BY created_at DESC LIMIT $%d OFFSET $%d`, len(args)-1, len(args))
 	rows, err := r.db.QueryContext(ctx, q, args...)
 	if err != nil {
 		return nil, fmt.Errorf("list bookings: %w", err)
@@ -104,6 +107,25 @@ func (r *BookingRepo) SetPayment(ctx context.Context, id, paymentID string) erro
 	res, err := r.db.ExecContext(ctx, `UPDATE bookings SET payment_id = $1 WHERE id = $2`, paymentID, id)
 	if err != nil {
 		return err
+	}
+	n, _ := res.RowsAffected()
+	if n == 0 {
+		return errs.ErrNotFound
+	}
+	return nil
+}
+
+// MarkPaid atomically sets payment_id + status='paid' in a single statement so
+// the saga cannot leave the booking half-updated when the second UPDATE in
+// usecase code fails. Idempotent: re-applying with the same payment_id is a
+// no-op.
+func (r *BookingRepo) MarkPaid(ctx context.Context, id, paymentID string) error {
+	res, err := r.db.ExecContext(ctx,
+		`UPDATE bookings SET payment_id = $1, status = 'paid' WHERE id = $2`,
+		paymentID, id,
+	)
+	if err != nil {
+		return fmt.Errorf("mark paid: %w", err)
 	}
 	n, _ := res.RowsAffected()
 	if n == 0 {

@@ -93,7 +93,10 @@ func (h *Handler) Logout(w http.ResponseWriter, r *http.Request) {
 	var req struct {
 		RefreshToken string `json:"refreshToken"`
 	}
-	_ = httpx.ReadJSON(r, &req)
+	if err := httpx.ReadJSON(r, &req); err != nil {
+		httpx.WriteError(w, http.StatusBadRequest, "invalid json")
+		return
+	}
 	if err := h.svc.Logout(r.Context(), req.RefreshToken); err != nil {
 		httpx.HandleError(w, err)
 		return

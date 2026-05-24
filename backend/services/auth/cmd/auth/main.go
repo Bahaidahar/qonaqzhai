@@ -25,11 +25,11 @@ import (
 	"qonaqzhai-backend/pkg/grpcutil"
 	"qonaqzhai-backend/pkg/logger"
 
-	"qonaqzhai-backend/services/auth/internal/adapter/clock"
+	"qonaqzhai-backend/pkg/clock"
 	authgrpc "qonaqzhai-backend/services/auth/internal/adapter/grpc"
 	"qonaqzhai-backend/services/auth/internal/adapter/hasher"
 	authhttp "qonaqzhai-backend/services/auth/internal/adapter/http"
-	"qonaqzhai-backend/services/auth/internal/adapter/idgen"
+	"qonaqzhai-backend/pkg/idgen"
 	"qonaqzhai-backend/services/auth/internal/adapter/mail"
 	"qonaqzhai-backend/services/auth/internal/adapter/repo"
 	"qonaqzhai-backend/services/auth/internal/usecase"
@@ -48,7 +48,6 @@ func run(log *slog.Logger) error {
 		"postgres://qonaqzhai:qonaqzhai@localhost:5433/qonaqzhai_auth?sslmode=disable")
 	httpAddr := config.EnvOr("AUTH_HTTP_ADDR", ":8081")
 	grpcAddr := config.EnvOr("AUTH_GRPC_ADDR", ":9081")
-	cors := config.EnvOr("CORS_ORIGIN", "*")
 
 	jwtSecret := os.Getenv("JWT_SECRET")
 	if jwtSecret == "" {
@@ -99,14 +98,16 @@ func run(log *slog.Logger) error {
 	mw := pkgauth.NewMiddleware(localVerifier{signer: signer}, 2*time.Second)
 	httpSrv := &http.Server{
 		Addr:              httpAddr,
-		Handler:           authhttp.Mux(authhttp.NewHandler(svc), mw, cors, log),
+		Handler:           authhttp.Mux(authhttp.NewHandler(svc), mw, log),
 		ReadHeaderTimeout: 5 * time.Second,
 	}
 
 	// gRPC server.
 	grpcSrv := grpc.NewServer(
-		grpc.UnaryInterceptor(grpcutil.LoggingUnaryInterceptor(log)),
-		grpc.ChainUnaryInterceptor(grpcutil.RecoverUnaryInterceptor(log)),
+		grpc.ChainUnaryInterceptor(
+			grpcutil.LoggingUnaryInterceptor(log),
+			grpcutil.RecoverUnaryInterceptor(log),
+		),
 	)
 	authv1.RegisterAuthServiceServer(grpcSrv, authgrpc.New(svc))
 

@@ -9,6 +9,33 @@ import (
 	"qonaqzhai-backend/services/core/internal/domain"
 )
 
+// Page is the limit+offset paginator used by every list endpoint.
+type Page struct {
+	Limit  int
+	Offset int
+}
+
+// Pagination defaults / safety caps for Page.Clamp.
+const (
+	DefaultLimit = 50
+	MaxLimit     = 200
+)
+
+// Clamp normalises Page values: defaults zero/negative limit to DefaultLimit,
+// caps it at MaxLimit, and floors offset at 0.
+func (p Page) Clamp() Page {
+	if p.Limit <= 0 {
+		p.Limit = DefaultLimit
+	}
+	if p.Limit > MaxLimit {
+		p.Limit = MaxLimit
+	}
+	if p.Offset < 0 {
+		p.Offset = 0
+	}
+	return p
+}
+
 // VendorQuery is the search/filter set for the public catalog.
 type VendorQuery struct {
 	Q         string
@@ -39,11 +66,12 @@ type VendorRepo interface {
 type BookingRepo interface {
 	Create(ctx context.Context, b *domain.Booking) (*domain.Booking, error)
 	Find(ctx context.Context, id string) (*domain.Booking, error)
-	ListForCustomer(ctx context.Context, customerID string) ([]*domain.Booking, error)
-	ListForVendor(ctx context.Context, vendorID string) ([]*domain.Booking, error)
-	ListAll(ctx context.Context) ([]*domain.Booking, error)
+	ListForCustomer(ctx context.Context, customerID string, p Page) ([]*domain.Booking, error)
+	ListForVendor(ctx context.Context, vendorID string, p Page) ([]*domain.Booking, error)
+	ListAll(ctx context.Context, p Page) ([]*domain.Booking, error)
 	UpdateStatus(ctx context.Context, id string, status domain.BookingStatus) error
 	SetPayment(ctx context.Context, id, paymentID string) error
+	MarkPaid(ctx context.Context, id, paymentID string) error
 	Stats(ctx context.Context) (BookingStats, error)
 }
 
@@ -76,7 +104,7 @@ type PhotoRepo interface {
 // ReviewRepo persists reviews.
 type ReviewRepo interface {
 	Create(ctx context.Context, r *domain.Review) (*domain.Review, error)
-	ListForVendor(ctx context.Context, vendorID string) ([]*domain.Review, error)
+	ListForVendor(ctx context.Context, vendorID string, p Page) ([]*domain.Review, error)
 	FindByBooking(ctx context.Context, bookingID string) (*domain.Review, error)
 	AggregateForVendor(ctx context.Context, vendorID string) (float64, int, error)
 }
@@ -84,7 +112,7 @@ type ReviewRepo interface {
 // NotificationRepo persists in-app notifications.
 type NotificationRepo interface {
 	Enqueue(ctx context.Context, n *domain.Notification) (*domain.Notification, error)
-	ListForUser(ctx context.Context, userID string, limit int) ([]*domain.Notification, error)
+	ListForUser(ctx context.Context, userID string, p Page) ([]*domain.Notification, error)
 	MarkSent(ctx context.Context, id string) error
 }
 

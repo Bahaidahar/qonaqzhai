@@ -209,11 +209,9 @@ func (r *VendorRepo) queryVendor(ctx context.Context, where string, args ...any)
 	if err != nil {
 		return nil, err
 	}
-	ids, err := listPhotoIDs(ctx, r.db, v.ID)
-	if err != nil {
+	if _, err := attachPhotos(ctx, r.db, []*domain.Vendor{v}); err != nil {
 		return nil, err
 	}
-	v.PhotoIDs = ids
 	return v, nil
 }
 
@@ -229,14 +227,41 @@ func (r *VendorRepo) scanWithPhotos(ctx context.Context, rows *sql.Rows) ([]*dom
 	if err := rows.Err(); err != nil {
 		return nil, err
 	}
-	for _, v := range out {
-		ids, err := listPhotoIDs(ctx, r.db, v.ID)
-		if err != nil {
+	return attachPhotos(ctx, r.db, out)
+}
+
+// attachPhotos performs a single batch lookup of photo ids for the supplied
+// vendors and populates each vendor's PhotoIDs slice in stable insert order.
+// Replaces the previous per-vendor SELECT loop (N+1).
+func attachPhotos(ctx context.Context, db *sql.DB, vs []*domain.Vendor) ([]*domain.Vendor, error) {
+	if len(vs) == 0 {
+		return vs, nil
+	}
+	ids := make([]string, 0, len(vs))
+	idx := make(map[string]*domain.Vendor, len(vs))
+	for _, v := range vs {
+		v.PhotoIDs = []string{}
+		ids = append(ids, v.ID)
+		idx[v.ID] = v
+	}
+	rows, err := db.QueryContext(ctx,
+		`SELECT vendor_id, id FROM photos WHERE vendor_id = ANY($1) ORDER BY created_at ASC`,
+		ids,
+	)
+	if err != nil {
+		return nil, fmt.Errorf("photos batch: %w", err)
+	}
+	defer rows.Close()
+	for rows.Next() {
+		var vid, pid string
+		if err := rows.Scan(&vid, &pid); err != nil {
 			return nil, err
 		}
-		v.PhotoIDs = ids
+		if v, ok := idx[vid]; ok {
+			v.PhotoIDs = append(v.PhotoIDs, pid)
+		}
 	}
-	return out, nil
+	return vs, rows.Err()
 }
 
 func scanVendor(s scanner) (*domain.Vendor, error) {
@@ -252,24 +277,6 @@ func scanVendor(s scanner) (*domain.Vendor, error) {
 	}
 	v.Status = domain.VendorStatus(status)
 	return &v, nil
-}
-
-func listPhotoIDs(ctx context.Context, db *sql.DB, vendorID string) ([]string, error) {
-	rows, err := db.QueryContext(ctx,
-		`SELECT id FROM photos WHERE vendor_id = $1 ORDER BY created_at ASC`, vendorID)
-	if err != nil {
-		return nil, err
-	}
-	defer rows.Close()
-	ids := []string{}
-	for rows.Next() {
-		var id string
-		if err := rows.Scan(&id); err != nil {
-			return nil, err
-		}
-		ids = append(ids, id)
-	}
-	return ids, rows.Err()
 }
 
 var _ ports.VendorRepo = (*VendorRepo)(nil)

@@ -22,12 +22,12 @@ import (
 	"qonaqzhai-backend/pkg/grpcutil"
 	"qonaqzhai-backend/pkg/logger"
 
-	"qonaqzhai-backend/services/payment/internal/adapter/clock"
+	"qonaqzhai-backend/pkg/clock"
 	"qonaqzhai-backend/services/payment/internal/adapter/gateway"
 	paymentgrpc "qonaqzhai-backend/services/payment/internal/adapter/grpc"
 	"qonaqzhai-backend/services/payment/internal/adapter/grpcclient"
 	paymenthttp "qonaqzhai-backend/services/payment/internal/adapter/http"
-	"qonaqzhai-backend/services/payment/internal/adapter/idgen"
+	"qonaqzhai-backend/pkg/idgen"
 	"qonaqzhai-backend/services/payment/internal/adapter/repo"
 	"qonaqzhai-backend/services/payment/internal/ports"
 	"qonaqzhai-backend/services/payment/internal/usecase/card"
@@ -47,7 +47,6 @@ func run(log *slog.Logger) error {
 		"postgres://qonaqzhai:qonaqzhai@localhost:5433/qonaqzhai_payment?sslmode=disable")
 	httpAddr := config.EnvOr("PAYMENT_HTTP_ADDR", ":8083")
 	grpcAddr := config.EnvOr("PAYMENT_GRPC_ADDR", ":9083")
-	cors := config.EnvOr("CORS_ORIGIN", "*")
 	authAddr := config.EnvOr("AUTH_GRPC_ADDR", "localhost:9081")
 	coreAddr := os.Getenv("CORE_GRPC_ADDR")
 
@@ -96,13 +95,15 @@ func run(log *slog.Logger) error {
 	handler := &paymenthttp.Handler{Cards: cardSvc, Payments: paymentSvc}
 
 	httpSrv := &http.Server{
-		Addr: httpAddr, Handler: paymenthttp.Mux(handler, mw, cors, log),
+		Addr: httpAddr, Handler: paymenthttp.Mux(handler, mw, log),
 		ReadHeaderTimeout: 5 * time.Second,
 	}
 
 	grpcSrv := grpc.NewServer(
-		grpc.UnaryInterceptor(grpcutil.LoggingUnaryInterceptor(log)),
-		grpc.ChainUnaryInterceptor(grpcutil.RecoverUnaryInterceptor(log)),
+		grpc.ChainUnaryInterceptor(
+			grpcutil.LoggingUnaryInterceptor(log),
+			grpcutil.RecoverUnaryInterceptor(log),
+		),
 	)
 	paymentv1.RegisterPaymentServiceServer(grpcSrv, paymentgrpc.New(paymentSvc, cardSvc))
 

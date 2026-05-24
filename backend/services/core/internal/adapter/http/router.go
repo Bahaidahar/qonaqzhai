@@ -11,7 +11,9 @@ import (
 )
 
 // Mux wires every core HTTP route. mw verifies tokens via auth-svc gRPC.
-func Mux(h *Handler, mw *pkgauth.Middleware, corsOrigin string, log *slog.Logger) http.Handler {
+// Note: no CORS layer — core sits behind the gateway and never serves
+// browsers directly. Gateway owns CORS.
+func Mux(h *Handler, mw *pkgauth.Middleware, log *slog.Logger) http.Handler {
 	rl := httpx.NewRateLimiter(rate.Limit(30), 60)
 	mux := http.NewServeMux()
 
@@ -47,6 +49,5 @@ func Mux(h *Handler, mw *pkgauth.Middleware, corsOrigin string, log *slog.Logger
 
 	withLimit := rl.PerIP()(mux)
 	withRecover := httpx.Recover(log)(withLimit)
-	withLog := httpx.AccessLog(log)(withRecover)
-	return httpx.CORS(corsOrigin, withLog)
+	return httpx.AccessLog(log)(withRecover)
 }

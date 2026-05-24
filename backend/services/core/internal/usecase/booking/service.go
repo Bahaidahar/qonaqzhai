@@ -111,8 +111,12 @@ func (s *Service) CustomerCancel(ctx context.Context, customerID, bookingID stri
 }
 
 // Pay charges a saved card on payment-svc and, on success, flips the booking
-// to paid. Best-effort saga: a charge that succeeds but fails to update the
-// booking will surface via reconciliation (payment.GetPayment lookup).
+// to paid in a single atomic UPDATE (see BookingRepo.MarkPaid). The saga is
+// still not strictly two-phase: if the capture succeeds but MarkPaid fails the
+// caller sees an error and the customer keeps the captured payment. Customer
+// retries Pay → payment.Charge returns ErrAlreadyExists (unique on booking_id)
+// → we recover the existing payment id via Payments.Charge response and finish
+// the local commit.
 func (s *Service) Pay(ctx context.Context, customerID, bookingID, cardID, currency string) (*domain.Booking, error) {
 	b, err := s.d.Bookings.Find(ctx, bookingID)
 	if err != nil {
@@ -140,11 +144,8 @@ func (s *Service) Pay(ctx context.Context, customerID, bookingID, cardID, curren
 	if res.Status != "captured" {
 		return nil, fmt.Errorf("payment %s: %w", res.Status, errs.ErrConflict)
 	}
-	if err := s.d.Bookings.SetPayment(ctx, b.ID, res.ID); err != nil {
-		return nil, err
-	}
-	if err := s.d.Bookings.UpdateStatus(ctx, b.ID, domain.BookingPaid); err != nil {
-		return nil, err
+	if err := s.d.Bookings.MarkPaid(ctx, b.ID, res.ID); err != nil {
+		return nil, fmt.Errorf("mark paid (payment %s captured): %w", res.ID, err)
 	}
 	v, _ := s.d.Vendors.FindByID(ctx, b.VendorID)
 	if v != nil {
@@ -155,18 +156,12 @@ func (s *Service) Pay(ctx context.Context, customerID, bookingID, cardID, curren
 
 // MarkPaid is the gRPC entrypoint payment-svc uses to push back a webhook-style
 // confirmation when the customer paid via redirect rather than direct Charge.
+// One atomic UPDATE.
 func (s *Service) MarkPaid(ctx context.Context, bookingID, paymentID string) (*domain.Booking, error) {
-	b, err := s.d.Bookings.Find(ctx, bookingID)
-	if err != nil {
+	if err := s.d.Bookings.MarkPaid(ctx, bookingID, paymentID); err != nil {
 		return nil, err
 	}
-	if err := s.d.Bookings.SetPayment(ctx, b.ID, paymentID); err != nil {
-		return nil, err
-	}
-	if err := s.d.Bookings.UpdateStatus(ctx, b.ID, domain.BookingPaid); err != nil {
-		return nil, err
-	}
-	return s.d.Bookings.Find(ctx, b.ID)
+	return s.d.Bookings.Find(ctx, bookingID)
 }
 
 // Find returns a booking visible to the caller (customer or owning vendor).
@@ -209,18 +204,18 @@ func (s *Service) IsAccepted(ctx context.Context, id string) (*domain.Booking, s
 	return b, v.UserID, true, nil
 }
 
-// ListForCustomer returns bookings made by customer.
-func (s *Service) ListForCustomer(ctx context.Context, customerID string) ([]*domain.Booking, error) {
-	return s.d.Bookings.ListForCustomer(ctx, customerID)
+// ListForCustomer returns paginated bookings made by customer.
+func (s *Service) ListForCustomer(ctx context.Context, customerID string, p ports.Page) ([]*domain.Booking, error) {
+	return s.d.Bookings.ListForCustomer(ctx, customerID, p)
 }
 
-// ListForVendor returns bookings against vendorID.
-func (s *Service) ListForVendor(ctx context.Context, vendorUserID string) ([]*domain.Booking, error) {
+// ListForVendor returns paginated bookings against vendorID.
+func (s *Service) ListForVendor(ctx context.Context, vendorUserID string, p ports.Page) ([]*domain.Booking, error) {
 	v, err := s.d.Vendors.FindByUserID(ctx, vendorUserID)
 	if err != nil {
 		return nil, err
 	}
-	return s.d.Bookings.ListForVendor(ctx, v.ID)
+	return s.d.Bookings.ListForVendor(ctx, v.ID, p)
 }
 
 // Stats returns aggregate booking counts + GMV.

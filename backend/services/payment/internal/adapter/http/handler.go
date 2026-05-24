@@ -84,8 +84,8 @@ func (h *Handler) ListPayments(w http.ResponseWriter, r *http.Request) {
 	httpx.WriteJSON(w, http.StatusOK, ps)
 }
 
-// Mux wires payment HTTP routes.
-func Mux(h *Handler, mw *pkgauth.Middleware, corsOrigin string, log *slog.Logger) http.Handler {
+// Mux wires payment HTTP routes. No CORS — payment sits behind the gateway.
+func Mux(h *Handler, mw *pkgauth.Middleware, log *slog.Logger) http.Handler {
 	rl := httpx.NewRateLimiter(rate.Limit(20), 40)
 	mux := http.NewServeMux()
 	mux.HandleFunc("GET /api/health", h.Health)
@@ -97,6 +97,5 @@ func Mux(h *Handler, mw *pkgauth.Middleware, corsOrigin string, log *slog.Logger
 
 	withLimit := rl.PerIP()(mux)
 	withRecover := httpx.Recover(log)(withLimit)
-	withLog := httpx.AccessLog(log)(withRecover)
-	return httpx.CORS(corsOrigin, withLog)
+	return httpx.AccessLog(log)(withRecover)
 }

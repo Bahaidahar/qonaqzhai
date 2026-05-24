@@ -42,15 +42,13 @@ func (r *NotificationRepo) Enqueue(ctx context.Context, n *domain.Notification) 
 	return n, nil
 }
 
-// ListForUser returns the latest limit notifications for userID.
-func (r *NotificationRepo) ListForUser(ctx context.Context, userID string, limit int) ([]*domain.Notification, error) {
-	if limit <= 0 || limit > 100 {
-		limit = 50
-	}
+// ListForUser returns paginated notifications for userID, newest first.
+func (r *NotificationRepo) ListForUser(ctx context.Context, userID string, p ports.Page) ([]*domain.Notification, error) {
+	p = p.Clamp()
 	rows, err := r.db.QueryContext(ctx,
 		`SELECT id, user_id, type, channel, title, body, status, created_at
-		 FROM notifications WHERE user_id = $1 ORDER BY created_at DESC LIMIT $2`,
-		userID, limit,
+		 FROM notifications WHERE user_id = $1 ORDER BY created_at DESC LIMIT $2 OFFSET $3`,
+		userID, p.Limit, p.Offset,
 	)
 	if err != nil {
 		return nil, fmt.Errorf("list notifications: %w", err)

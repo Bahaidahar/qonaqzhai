@@ -142,20 +142,28 @@ func (h *Handler) CreateBooking(w http.ResponseWriter, r *http.Request) {
 func (h *Handler) ListMyBookings(w http.ResponseWriter, r *http.Request) {
 	uid, _ := pkgauth.UserIDFrom(r.Context())
 	role, _ := pkgauth.RoleFrom(r.Context())
+	page := readPage(r)
 	var (
 		bs  []*domain.Booking
 		err error
 	)
 	if role == "vendor" {
-		bs, err = h.Bookings.ListForVendor(r.Context(), uid)
+		bs, err = h.Bookings.ListForVendor(r.Context(), uid, page)
 	} else {
-		bs, err = h.Bookings.ListForCustomer(r.Context(), uid)
+		bs, err = h.Bookings.ListForCustomer(r.Context(), uid, page)
 	}
 	if err != nil {
 		httpx.HandleError(w, err)
 		return
 	}
 	httpx.WriteJSON(w, http.StatusOK, bs)
+}
+
+// readPage extracts limit + offset query params with sane defaults.
+func readPage(r *http.Request) ports.Page {
+	limit, _ := strconv.Atoi(r.URL.Query().Get("limit"))
+	offset, _ := strconv.Atoi(r.URL.Query().Get("offset"))
+	return ports.Page{Limit: limit, Offset: offset}
 }
 
 func (h *Handler) BookingTransition(w http.ResponseWriter, r *http.Request) {
@@ -232,7 +240,7 @@ func (h *Handler) SubmitReview(w http.ResponseWriter, r *http.Request) {
 
 func (h *Handler) ListReviews(w http.ResponseWriter, r *http.Request) {
 	vendorID := r.PathValue("vendorId")
-	rv, err := h.Reviews.ListForVendor(r.Context(), vendorID)
+	rv, err := h.Reviews.ListForVendor(r.Context(), vendorID, readPage(r))
 	if err != nil {
 		httpx.HandleError(w, err)
 		return
@@ -249,8 +257,7 @@ func (h *Handler) UploadPhoto(w http.ResponseWriter, r *http.Request) {
 		httpx.WriteError(w, http.StatusBadRequest, "read body")
 		return
 	}
-	mime := r.Header.Get("Content-Type")
-	p, err := h.Photos.Upload(r.Context(), uid, mime, data)
+	p, err := h.Photos.Upload(r.Context(), uid, data)
 	if err != nil {
 		httpx.HandleError(w, err)
 		return
@@ -284,8 +291,7 @@ func (h *Handler) DeletePhoto(w http.ResponseWriter, r *http.Request) {
 
 func (h *Handler) ListNotifications(w http.ResponseWriter, r *http.Request) {
 	uid, _ := pkgauth.UserIDFrom(r.Context())
-	limit, _ := strconv.Atoi(r.URL.Query().Get("limit"))
-	ns, err := h.Notifications.ListForUser(r.Context(), uid, limit)
+	ns, err := h.Notifications.ListForUser(r.Context(), uid, readPage(r))
 	if err != nil {
 		httpx.HandleError(w, err)
 		return

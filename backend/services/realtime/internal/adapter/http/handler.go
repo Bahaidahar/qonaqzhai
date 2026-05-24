@@ -83,8 +83,8 @@ func (h *Handler) WSConnect(w http.ResponseWriter, r *http.Request) {
 	h.Hub.Attach(c, uid)
 }
 
-// Mux wires every HTTP route.
-func Mux(h *Handler, mw *pkgauth.Middleware, corsOrigin string, log *slog.Logger) http.Handler {
+// Mux wires every HTTP route. No CORS — realtime sits behind the gateway.
+func Mux(h *Handler, mw *pkgauth.Middleware, log *slog.Logger) http.Handler {
 	rl := httpx.NewRateLimiter(rate.Limit(40), 80)
 	mux := http.NewServeMux()
 	mux.HandleFunc("GET /api/health", h.Health)
@@ -95,6 +95,5 @@ func Mux(h *Handler, mw *pkgauth.Middleware, corsOrigin string, log *slog.Logger
 
 	withLimit := rl.PerIP()(mux)
 	withRecover := httpx.Recover(log)(withLimit)
-	withLog := httpx.AccessLog(log)(withRecover)
-	return httpx.CORS(corsOrigin, withLog)
+	return httpx.AccessLog(log)(withRecover)
 }

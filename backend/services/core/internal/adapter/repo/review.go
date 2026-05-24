@@ -42,11 +42,12 @@ func (r *ReviewRepo) Create(ctx context.Context, in *domain.Review) (*domain.Rev
 	return r.find(ctx, in.ID)
 }
 
-// ListForVendor returns reviews for vendorID, newest first.
-func (r *ReviewRepo) ListForVendor(ctx context.Context, vendorID string) ([]*domain.Review, error) {
+// ListForVendor returns paginated reviews for vendorID, newest first.
+func (r *ReviewRepo) ListForVendor(ctx context.Context, vendorID string, p ports.Page) ([]*domain.Review, error) {
+	p = p.Clamp()
 	rows, err := r.db.QueryContext(ctx,
-		`SELECT `+reviewCols+` FROM reviews WHERE vendor_id = $1 ORDER BY created_at DESC`,
-		vendorID,
+		`SELECT `+reviewCols+` FROM reviews WHERE vendor_id = $1 ORDER BY created_at DESC LIMIT $2 OFFSET $3`,
+		vendorID, p.Limit, p.Offset,
 	)
 	if err != nil {
 		return nil, fmt.Errorf("list reviews: %w", err)

@@ -20,9 +20,9 @@ type Service struct{ d Deps }
 // New constructs a notification Service.
 func New(d Deps) *Service { return &Service{d: d} }
 
-// ListForUser returns the latest notifications for userID.
-func (s *Service) ListForUser(ctx context.Context, userID string, limit int) ([]*domain.Notification, error) {
-	return s.d.Notifications.ListForUser(ctx, userID, limit)
+// ListForUser returns the paginated notifications for userID.
+func (s *Service) ListForUser(ctx context.Context, userID string, p ports.Page) ([]*domain.Notification, error) {
+	return s.d.Notifications.ListForUser(ctx, userID, p)
 }
 
 // RegisterToken upserts an FCM token bound to userID.
