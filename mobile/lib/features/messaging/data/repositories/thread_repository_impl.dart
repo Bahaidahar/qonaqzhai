@@ -1,6 +1,5 @@
 import 'package:dio/dio.dart';
 
-import '../../../../core/network/api_endpoints.dart';
 import '../../domain/entities/thread.dart';
 
 abstract class ThreadRepository {

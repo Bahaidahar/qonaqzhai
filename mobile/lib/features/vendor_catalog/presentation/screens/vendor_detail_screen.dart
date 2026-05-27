@@ -5,7 +5,6 @@ import 'package:go_router/go_router.dart';
 
 import '../../../../core/network/api_endpoints.dart';
 import '../../../reviews/presentation/viewmodels/review_viewmodel.dart';
-import '../../data/repositories/vendor_repository_impl.dart';
 import '../../domain/entities/vendor.dart';
 import '../viewmodels/vendor_catalog_viewmodel.dart';
 
