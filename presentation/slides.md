@@ -1,202 +1,575 @@
 ---
 marp: true
-theme: default
 size: 16:9
 paginate: true
-backgroundColor: #fff
-color: #1a2740
-header: 'Qonaqzhai · AI-Powered Event Marketplace for Kazakhstan'
-footer: 'Diploma Defense · May 2026'
+theme: default
 style: |
+  /* ─── Base — palette mirrors frontend/src/app/globals.css ── */
+  :root {
+    --brand: #5B47F4;          /* electric indigo — site primary */
+    --brand-dark: #4538C7;
+    --brand-soft: #EEEBFF;     /* primary-tint surface */
+    --ink: #0F1024;            /* foreground oklch(0.14 0.018 275) */
+    --ink-soft: #1B1D3A;
+    --muted: #6B6C82;
+    --bg: #FFFFFF;             /* editorial white */
+    --bg-muted: #F6F6FA;
+    --card: #FFFFFF;
+    --line: #E5E5EE;
+  }
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500&display=swap');
+
   section {
-    font-family: -apple-system, BlinkMacSystemFont, 'Inter', 'Helvetica Neue', sans-serif;
-    font-size: 24px;
-    padding: 50px 60px;
-    background: linear-gradient(180deg, #fff 0%, #f4f7fb 100%);
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    font-size: 22px;
+    color: var(--ink);
+    background: var(--bg);
+    padding: 60px 70px 50px 70px;
+    position: relative;
+    letter-spacing: -0.01em;
   }
-  section.lead {
-    background: linear-gradient(135deg, #0a3d62 0%, #1e3a8a 100%);
-    color: #fff;
+
+  /* accent stripe top-right — single indigo accent, no gradient */
+  section::before {
+    content: '';
+    position: absolute;
+    top: 0; right: 0;
+    width: 240px; height: 4px;
+    background: var(--brand);
   }
-  section.lead h1 {
-    color: #fff;
-    border: none;
-    font-size: 78px;
-    margin-bottom: 8px;
+
+  /* brand mark bottom-left */
+  section::after {
+    content: 'QONAQZHAI';
+    position: absolute;
+    bottom: 22px; left: 70px;
+    font-size: 12px;
+    font-weight: 800;
+    letter-spacing: 0.25em;
+    color: var(--brand);
   }
-  section.lead h2, section.lead h3 { color: #d4e3f5; border: none; }
-  section.lead p, section.lead em { color: #d4e3f5; }
-  h1 { color: #0a3d62; font-size: 44px; border-bottom: 3px solid #0a3d62; padding-bottom: 8px; margin-top: 0; }
-  h2 { color: #1e3a8a; font-size: 30px; margin-top: 18px; }
-  h3 { color: #2a4d7c; font-size: 22px; }
-  p, li { line-height: 1.45; }
-  ul, ol { margin-left: 24px; }
-  strong { color: #0a3d62; }
+
+  /* page number top-right */
+  section[data-marpit-pagination]::after,
+  section:not(.lead):not(.section) {
+    counter-increment: page;
+  }
+  /* page number — use a dedicated element */
+  section:not(.lead):not(.section)[data-marpit-pagination] {
+    /* default pagination already handled by Marp */
+  }
+
+  /* ─── Headings ─────────────────────────────────────── */
+  h1 {
+    font-size: 52px;
+    font-weight: 800;
+    color: var(--ink);
+    margin: 0 0 22px 0;
+    letter-spacing: -0.035em;
+    line-height: 1.05;
+    padding-bottom: 0;
+    border-bottom: none;
+    display: block;
+  }
+  h2 {
+    font-size: 26px;
+    font-weight: 600;
+    color: var(--muted);
+    margin: 8px 0 16px 0;
+    letter-spacing: -0.018em;
+    line-height: 1.3;
+  }
+  h3 {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--brand);
+    margin: 14px 0 8px 0;
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+  }
+  h4 { font-size: 19px; font-weight: 700; color: var(--ink); margin: 10px 0 4px; }
+
+  p { line-height: 1.55; margin: 6px 0; }
+  strong { color: var(--ink); font-weight: 700; }
+  em { color: var(--brand); font-style: normal; font-weight: 600; }
+
+  ul, ol { margin: 4px 0 4px 20px; padding: 0; }
+  li { margin: 4px 0; line-height: 1.5; }
+  li::marker { color: var(--brand); }
+
+  /* ─── Code ─────────────────────────────────────────── */
   code {
-    background: #eef2f7;
-    color: #1e3a8a;
-    padding: 2px 6px;
-    border-radius: 3px;
-    font-size: 19px;
+    font-family: 'JetBrains Mono', monospace;
+    background: var(--brand-soft);
+    color: var(--brand-dark);
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 18px;
+    font-weight: 500;
   }
   pre {
-    background: #0f172a !important;
-    color: #e2e8f0;
-    padding: 16px 20px;
-    border-radius: 8px;
-    font-size: 16px;
-    line-height: 1.35;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    background: var(--ink);
+    color: #E2E5F0;
+    padding: 22px 26px;
+    border-radius: 12px;
+    font-size: 15px;
+    line-height: 1.45;
+    box-shadow: 0 10px 30px -10px rgba(15, 16, 36, 0.35);
+    margin: 12px 0;
+    overflow-x: auto;
   }
-  pre code { background: transparent; color: inherit; padding: 0; font-size: 16px; }
+  pre code {
+    background: transparent;
+    color: inherit;
+    padding: 0;
+    font-size: 15px;
+    font-weight: 400;
+  }
+
+  /* ─── Tables ───────────────────────────────────────── */
   table {
-    border-collapse: collapse;
+    border-collapse: separate;
+    border-spacing: 0;
     width: 100%;
-    font-size: 19px;
-    margin: 8px 0;
+    font-size: 17px;
+    margin: 10px 0;
+    border-radius: 10px;
+    overflow: hidden;
+    border: 1px solid var(--line);
   }
-  th { background: #0a3d62; color: #fff; padding: 8px 10px; text-align: left; }
-  td { border: 1px solid #d4dae3; padding: 7px 10px; vertical-align: top; }
-  tr:nth-child(even) td { background: #f4f7fb; }
-  a { color: #0a66c2; text-decoration: none; }
-  blockquote { border-left: 4px solid #0a3d62; padding-left: 16px; color: #4a5568; }
-  section::after { color: #888; font-size: 14px; }
-  header { color: #4a5568; font-size: 14px; }
-  footer { color: #4a5568; font-size: 14px; }
-  .columns { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+  thead th {
+    background: var(--bg-muted);
+    color: var(--ink);
+    padding: 12px 14px;
+    text-align: left;
+    font-weight: 700;
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    border-bottom: 1px solid var(--line);
+  }
+  td {
+    background: var(--card);
+    padding: 11px 14px;
+    border-top: 1px solid var(--line);
+    vertical-align: top;
+  }
+  tbody tr:first-child td { border-top: none; }
+  tbody tr:hover td { background: var(--brand-soft); }
+
+  /* ─── Links ────────────────────────────────────────── */
+  a { color: var(--brand-dark); text-decoration: none; border-bottom: 1.5px solid var(--brand); }
+
+  /* ─── Pagination ──────────────────────────────────── */
+  section::after {
+    /* override above for pagination */
+  }
+  /* pagination styled by marp natively */
+
+  /* ─── LEAD (title / closing) ──────────────────────── */
+  section.lead {
+    background:
+      radial-gradient(circle at 18% 22%, rgba(91,71,244,0.30) 0%, transparent 55%),
+      radial-gradient(circle at 82% 78%, rgba(91,71,244,0.18) 0%, transparent 60%),
+      linear-gradient(160deg, #0F1024 0%, #15163B 60%, #1B1D3A 100%);
+    color: #fff;
+    padding: 80px 90px;
+  }
+  section.lead::before {
+    width: 100%;
+    height: 4px;
+    background: var(--brand);
+  }
+  section.lead::after {
+    color: rgba(255,255,255,0.5);
+    bottom: 40px;
+  }
+  section.lead h1 {
+    font-size: 96px;
+    color: #fff;
+    border: none;
+    padding: 0;
+    margin: 0 0 20px 0;
+    font-weight: 900;
+    letter-spacing: -0.045em;
+    line-height: 0.95;
+  }
+  section.lead h2 {
+    color: rgba(255,255,255,0.92);
+    font-size: 32px;
+    font-weight: 400;
+    margin: 0 0 40px 0;
+    max-width: 80%;
+    letter-spacing: -0.015em;
+  }
+  section.lead h3 {
+    color: var(--brand);
+    font-size: 15px;
+    letter-spacing: 0.2em;
+    margin-top: 60px;
+    font-weight: 700;
+  }
+  section.lead p { color: rgba(255,255,255,0.85); font-size: 22px; }
+  section.lead strong { color: var(--brand); }
+  section.lead a { color: var(--brand); border-color: var(--brand); }
+
+  /* ─── SECTION DIVIDER ─────────────────────────────── */
+  section.section {
+    background: var(--ink);
+    color: #fff;
+    padding: 100px 90px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+  section.section::before {
+    width: 240px;
+    height: 4px;
+    background: var(--brand);
+    top: 0; left: 0; right: auto;
+  }
+  section.section::after {
+    color: rgba(255,255,255,0.45);
+  }
+  section.section .num {
+    color: var(--brand);
+    font-size: 140px;
+    font-weight: 900;
+    line-height: 0.85;
+    letter-spacing: -0.05em;
+    margin-bottom: 24px;
+    opacity: 0.95;
+  }
+  section.section h1 {
+    color: #fff;
+    font-size: 64px;
+    border: none;
+    padding: 0;
+    margin: 0;
+    font-weight: 800;
+    letter-spacing: -0.035em;
+  }
+  section.section h2 {
+    color: rgba(255,255,255,0.72);
+    font-size: 24px;
+    font-weight: 400;
+    margin-top: 16px;
+    max-width: 70%;
+    letter-spacing: -0.015em;
+  }
+
+  /* ─── DARK content slide ──────────────────────────── */
+  section.dark {
+    background: var(--ink);
+    color: #E2E5F0;
+  }
+  section.dark::before { background: var(--brand); }
+  section.dark h1 { color: #fff; border-bottom-color: var(--brand); }
+  section.dark h2 { color: rgba(255,255,255,0.85); }
+  section.dark h3 { color: var(--brand); }
+  section.dark strong { color: #fff; }
+  section.dark em { color: var(--brand); }
+  section.dark td { background: rgba(255,255,255,0.04); color: #E2E5F0; border-top-color: rgba(255,255,255,0.08); }
+  section.dark tbody tr:hover td { background: rgba(91,71,244,0.12); }
+  section.dark::after { color: var(--brand); }
+  section.dark code { background: rgba(91,71,244,0.22); color: #C7C0FF; }
+
+  /* ─── Helpers ─────────────────────────────────────── */
+  .columns-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 32px; margin-top: 16px; }
+  .columns-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 22px; margin-top: 16px; }
+
+  .card {
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-left: 3px solid var(--brand);
+    border-radius: 10px;
+    padding: 18px 22px;
+    box-shadow: 0 1px 3px rgba(15, 16, 36, 0.04);
+  }
+  .card.tint {
+    background: var(--brand-soft);
+    border-color: rgba(91,71,244,0.18);
+    border-left-color: var(--brand);
+  }
+  .card.dark {
+    background: var(--ink);
+    color: #fff;
+    border-color: var(--ink-soft);
+    border-left-color: var(--brand);
+  }
+  .card.dark strong { color: var(--brand); }
+  .card h4 {
+    margin-top: 0;
+    color: var(--brand);
+    text-transform: uppercase;
+    font-size: 13px;
+    letter-spacing: 0.12em;
+    font-weight: 700;
+  }
+  section.dark .card { background: rgba(255,255,255,0.04); border-color: rgba(255,255,255,0.08); color: #E2E5F0; }
+  section.dark .card h4 { color: var(--brand); }
+  section.dark .card strong { color: #fff; }
+
   .pill {
     display: inline-block;
-    background: #0a3d62;
+    background: var(--ink);
     color: #fff;
-    padding: 4px 12px;
-    border-radius: 999px;
-    font-size: 16px;
+    padding: 5px 14px;
+    border-radius: 6px;
+    font-size: 13px;
     font-weight: 600;
-    margin-right: 6px;
+    margin: 3px 4px 3px 0;
+    letter-spacing: 0.02em;
+  }
+  .pill.brand { background: var(--brand); }
+  .pill.tint { background: var(--brand-soft); color: var(--brand-dark); }
+  .pill.outline { background: transparent; color: var(--ink); border: 1.5px solid var(--line); }
+
+  .stat-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 18px;
+    margin: 20px 0;
   }
   .stat {
-    display: inline-block;
-    background: #fff;
-    border: 2px solid #0a3d62;
+    background: var(--card);
+    border: 1px solid var(--line);
     border-radius: 12px;
-    padding: 12px 18px;
-    margin: 6px 8px 6px 0;
+    padding: 22px 18px;
     text-align: center;
-    min-width: 110px;
+    box-shadow: 0 1px 3px rgba(15, 16, 36, 0.04);
   }
-  .stat .n { display: block; color: #0a3d62; font-size: 32px; font-weight: 800; line-height: 1; }
-  .stat .l { display: block; color: #4a5568; font-size: 14px; margin-top: 4px; }
+  .stat .n {
+    display: block;
+    color: var(--brand);
+    font-size: 46px;
+    font-weight: 900;
+    line-height: 1;
+    letter-spacing: -0.035em;
+  }
+  .stat .l {
+    display: block;
+    color: var(--muted);
+    font-size: 13px;
+    margin-top: 8px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    font-weight: 600;
+  }
+
+  .kicker {
+    display: inline-block;
+    color: var(--brand);
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    margin-bottom: 10px;
+    padding: 4px 0;
+    border-bottom: 2px solid var(--brand);
+  }
+
+  .lead-stat {
+    font-size: 92px;
+    font-weight: 900;
+    color: var(--brand);
+    line-height: 1;
+    letter-spacing: -0.045em;
+  }
+  .lead-stat .unit { color: var(--ink); font-size: 36px; font-weight: 700; margin-left: 6px; }
+
+  .timeline {
+    display: grid;
+    grid-template-columns: 30px 1fr;
+    gap: 14px;
+    margin: 10px 0;
+  }
+  .timeline .num {
+    background: var(--brand);
+    color: #fff;
+    width: 30px; height: 30px;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 800;
+    font-size: 14px;
+  }
 ---
 
 <!-- _class: lead -->
 <!-- _paginate: false -->
-<!-- _header: '' -->
+
+<span class="kicker" >Diploma Defense · May 2026</span>
 
 # Qonaqzhai
 
-## AI-Powered Event Services Marketplace for Kazakhstan
+## AI-powered event services marketplace for Kazakhstan.
+## Connecting customers, vendors, and traditions.
 
-**Diploma Defense — May 2026**
-
-Bahaidahar · Astana IT University
+### Bahaidahar · Astana IT University
 
 ---
 
-# Problem
+<!-- _class: section -->
 
-## Event planning in KZ is broken
+<div class="num">01</div>
 
-<div class="columns">
+# The Problem
 
-**Today**
+## Event planning in Kazakhstan is fragmented, untrustworthy, and ignores local culture.
+
+---
+
+# Status quo is broken
+
+<div class="columns-2">
+
+<div class="card">
+<h4>How it works today</h4>
+
 - Discovery via Instagram DMs
 - WhatsApp chains for quotes
 - No verified reviews
-- Deposit to private cards = trust risk
+- Deposits to private cards = trust risk
 - Customer juggles 5–10 vendors
-- No Kazakh-language platform
-- Traditions ignored by global tools
+- No platform supports Kazakh first-class
+- Global tools ignore traditions
+</div>
 
-**Market**
-- KZ events sector ≈ **\$1.5B/year**
-- Fragmented: Instagram, fl.kz, weddingsalon.kz
-- No platform owns full journey
+<div class="card tint">
+<h4>Market size</h4>
+
+<div class="lead-stat">$1.5<span class="unit">B</span></div>
+
+KZ events sector per year — fragmented across Instagram, fl.kz, weddingsalon.kz. **No platform owns the full journey.**
+</div>
 
 </div>
 
 ---
 
-# Solution at a Glance
+<!-- _class: section -->
+
+<div class="num">02</div>
+
+# The Solution
+
+## Three clients, one platform. AI-first. Bilingual KZ / RU + EN.
+
+---
+
+# Qonaqzhai at a glance
 
 ```
                 Customer                          Vendor
                    │                                │
                    ▼                                ▼
         ┌──────────────────────────────────────────────┐
-        │  AI Planner  │  Search   │  Reviews          │
-        │  (Claude)    │           │                   │
-        │  Booking     │  Calendar │  Analytics        │
-        │  Payment     │  Chat     │  Dashboard        │
-        │  (PayBox)    │  (WS)     │                   │
+        │  AI Planner    Search       Reviews          │
+        │  (Claude)                                    │
+        │  Booking       Calendar     Analytics        │
+        │  Payment       Chat         Dashboard        │
+        │  (PayBox)      (WS)                          │
         └──────────────────────────────────────────────┘
                               │
                               ▼
                          Qonaqzhai
-                  Web · iOS · Android
+                  Web  ·  iOS  ·  Android
 ```
 
-One platform, three clients. KZ / RU / EN trilingual. AI-first.
+<div class="columns-3">
+<div><span class="pill brand">Trilingual KZ / RU / EN</span></div>
+<div><span class="pill brand">AI event planner</span></div>
+<div><span class="pill brand">PayBox · KZT-native</span></div>
+</div>
 
 ---
 
-# Numbers
+# By the numbers
 
-<div class="stat"><span class="n">5</span><span class="l">Go services</span></div>
-<div class="stat"><span class="n">4</span><span class="l">PostgreSQL DBs</span></div>
-<div class="stat"><span class="n">16</span><span class="l">gRPC methods</span></div>
-<div class="stat"><span class="n">68</span><span class="l">HTTP endpoints</span></div>
-<div class="stat"><span class="n">16</span><span class="l">DB tables</span></div>
+<div class="stat-grid">
+  <div class="stat"><span class="n">5</span><span class="l">Go services</span></div>
+  <div class="stat"><span class="n">4</span><span class="l">Postgres DBs</span></div>
+  <div class="stat"><span class="n">16</span><span class="l">gRPC methods</span></div>
+  <div class="stat"><span class="n">68</span><span class="l">HTTP endpoints</span></div>
+  <div class="stat"><span class="n">16</span><span class="l">DB tables</span></div>
+</div>
 
-<div class="stat"><span class="n">13</span><span class="l">Mobile features</span></div>
-<div class="stat"><span class="n">16</span><span class="l">Web routes</span></div>
-<div class="stat"><span class="n">2,033</span><span class="l">Go test LOC</span></div>
-<div class="stat"><span class="n">12</span><span class="l">Playwright specs</span></div>
-<div class="stat"><span class="n">3</span><span class="l">Languages</span></div>
+<div class="stat-grid">
+  <div class="stat"><span class="n">13</span><span class="l">Mobile features</span></div>
+  <div class="stat"><span class="n">16</span><span class="l">Web routes</span></div>
+  <div class="stat"><span class="n">2,033</span><span class="l">Go test LOC</span></div>
+  <div class="stat"><span class="n">12</span><span class="l">E2E specs</span></div>
+  <div class="stat"><span class="n">3</span><span class="l">Languages</span></div>
+</div>
 
 ---
 
-# Stack
+<!-- _class: section -->
 
-<div class="columns">
+<div class="num">03</div>
 
-**Backend**
-<span class="pill">Go 1.24</span> <span class="pill">gRPC</span> <span class="pill">Postgres</span>
-- 5 microservices: gateway / auth / core / payment / realtime
-- Protobuf contracts inter-service
-- HTTP/JSON at edge
-- JWT, PayBox PSP
+# The Stack
 
-**Web**
-<span class="pill">Next.js 16</span> <span class="pill">React 19</span> <span class="pill">FSD</span>
-- App Router, Cache Components, PPR
-- Tailwind v4 · Playwright E2E
+## Picked layer by layer against measured 2025-2026 industry data.
 
-**Mobile**
-<span class="pill">Flutter 3.24</span> <span class="pill">Riverpod</span> <span class="pill">MVVM</span>
-- Impeller engine · go_router
-- Dio + auth interceptor
-- Firebase Messaging
+---
 
-**AI**
-<span class="pill">Claude Sonnet 4.6</span> <span class="pill">MCP</span>
-- Tool-use event planner
-- Agentic dev workflow
+# Technology decisions
+
+<div class="columns-2">
+
+<div class="card">
+<h4>Backend</h4>
+
+<span class="pill">Go 1.24</span> <span class="pill brand">gRPC</span> <span class="pill">Postgres 14</span>
+
+5 microservices · gateway / auth / core / payment / realtime
+Protobuf contracts inter-service · HTTP/JSON at edge
+JWT · PayBox PSP
+</div>
+
+<div class="card">
+<h4>Web</h4>
+
+<span class="pill">Next.js 16</span> <span class="pill brand">React 19</span> <span class="pill">FSD</span>
+
+App Router · Cache Components · Partial pre-rendering
+Tailwind v4 · Playwright E2E
+</div>
+
+<div class="card">
+<h4>Mobile</h4>
+
+<span class="pill">Flutter 3.24</span> <span class="pill brand">Riverpod</span> <span class="pill">MVVM</span>
+
+Impeller engine · go_router · Dio + auth interceptor
+Firebase Messaging · Secure storage
+</div>
+
+<div class="card tint">
+<h4>AI Layer</h4>
+
+<span class="pill brand">Claude Sonnet 4.6</span> <span class="pill">MCP</span>
+
+Tool-use event planner
+Agentic dev workflow with MCP servers
+</div>
 
 </div>
 
 ---
 
-# Domain Model
+<!-- _class: section -->
+
+<div class="num">04</div>
+
+# Architecture
+
+## Domain-driven · service-isolated · contract-first.
+
+---
+
+# Domain model — four bounded contexts
 
 ```
 ┌──────────┐   ┌─────────────────────────┐   ┌──────────┐   ┌──────────┐
@@ -210,12 +583,14 @@ One platform, three clients. KZ / RU / EN trilingual. AI-first.
 └──────────┘   └─────────────────────────┘   └──────────┘   └──────────┘
 ```
 
-**Booking lifecycle**: `pending → accepted → completed → paid`
-**branches**: `declined`, `cancelled` — explicit state machine in `core/usecase/booking/`
+**Booking lifecycle** — `pending → accepted → completed → paid`
+Branches — `declined` · `cancelled`. Explicit state machine in `core/usecase/booking/`.
 
 ---
 
-# Backend — Five Go Microservices
+<!-- _class: dark -->
+
+# Backend topology
 
 ```
 ┌──────────┐
@@ -224,7 +599,7 @@ One platform, three clients. KZ / RU / EN trilingual. AI-first.
      │ HTTP
 ┌────▼──────────────────────────────────────────────────┐
 │                  gateway :8080                        │
-│  verifies JWT once (auth gRPC), routes by prefix      │
+│   verifies JWT once · routes by prefix                │
 └──┬──────────┬───────────────┬──────────────┬─────────┘
    │          │               │              │
    ▼          ▼               ▼              ▼
@@ -238,11 +613,11 @@ One platform, three clients. KZ / RU / EN trilingual. AI-first.
 └───────┘ └────────┘  └──────────┘ └─────────────┘
 ```
 
-One DB per service · gRPC inter-service · HTTP at edge
+**One DB per service** · **gRPC inter-service** · **HTTP at edge**
 
 ---
 
-# Service-to-Service Contracts (gRPC)
+# Service contracts — 16 gRPC methods
 
 ```
 core ─────► auth      GetUser · GetUsersBatch · VerifyToken
@@ -253,15 +628,18 @@ realtime ─► auth      GetUsersBatch            (peer-name enrich)
 gateway ──► auth      VerifyToken              (once per request)
 ```
 
-**Payment saga (synchronous)**
+<div class="card tint">
+<h4>Payment saga — synchronous</h4>
 
 `core.booking.Pay` → `payment.Charge` → `core.MarkBookingPaid`
 
-Diploma scale — synchronous wins on simplicity. Async event bus (NATS / Kafka) is the production migration path.
+Diploma scale — synchronous wins on simplicity.
+Production migration path — event bus (NATS / Kafka).
+</div>
 
 ---
 
-# Clean Architecture per Service
+# Clean Architecture per service
 
 ```
 backend/services/core/internal/
@@ -269,38 +647,61 @@ backend/services/core/internal/
 ├── ports/          Interfaces — VendorRepo, PaymentClient, Notifier
 ├── usecase/        Business logic — vendor/, booking/, review/, photo/
 └── adapter/
-    ├── http/       chi router, JSON marshalling, middleware
+    ├── http/       chi router · JSON marshalling · middleware
     ├── grpc/       gRPC server impl (core.proto)
     ├── grpcclient/ Outbound to auth, payment, realtime
     ├── repo/       PostgreSQL (sqlx)
     └── push/       FCM HTTP v1 sender
 ```
 
-Layers depend inward only · `adapter → usecase → domain`
-**Dependency Inversion** keeps usecase testable — table-driven Go tests stub the ports.
+Layers depend inward only — `adapter → usecase → domain`. **Dependency Inversion** keeps usecase pure and testable. Table-driven Go tests stub the ports.
 
 ---
 
 # Web — Feature-Sliced Design
 
+<div class="columns-2">
+
+<div>
+
 ```
 frontend/src/
-├── app/        Routes (App Router) — vendors, bookings, threads, admin
-├── features/   ai-chat · auth · booking-flow · messaging · reviews
-│               services · theme · vendor-search
-├── entities/   Domain types shared across features
+├── app/        Routes — vendors, bookings,
+│               threads, admin
+├── features/   ai-chat · auth · booking-flow
+│               messaging · reviews · services
+│               theme · vendor-search
+├── entities/   Shared domain types
 ├── widgets/    Composed UI blocks
-└── shared/     UI kit · API client · i18n dictionary · hooks
+└── shared/     UI kit · API · i18n · hooks
 ```
 
-**Why FSD?** Strict horizontal isolation between features. Dependency rule:
-`shared → entities → features → widgets → app`
+</div>
 
-**Next.js 16 features used** — Cache Components with `"use cache"`, partial pre-rendering for vendor lists, React Server Components for vendor detail.
+<div>
+
+<div class="card">
+<h4>Why FSD</h4>
+
+Strict horizontal isolation. Dependency rule:
+`shared → entities → features → widgets → app`
+</div>
+
+<div class="card tint" style="margin-top:14px">
+<h4>Next.js 16 features used</h4>
+
+- Cache Components with `"use cache"`
+- Partial pre-rendering on vendor lists
+- React Server Components on vendor detail
+</div>
+
+</div>
+
+</div>
 
 ---
 
-# Mobile — Flutter, Riverpod, Clean Arch
+# Mobile — Flutter · Riverpod · Clean Arch
 
 ```
 mobile/lib/
@@ -310,41 +711,44 @@ mobile/lib/
 │                 notifications · vendor_self · admin · onboarding
 │                 settings
 │   └── <feature>/
-│       ├── data/         DTOs + datasources + repository impl
-│       ├── domain/       Entities + abstract repo + use cases
-│       └── presentation/ ViewModels (Riverpod) + screens
+│       ├── data/         DTOs · datasources · repository impl
+│       ├── domain/       Entities · abstract repo · use cases
+│       └── presentation/ ViewModels (Riverpod) · screens
 ```
 
-**Riverpod** compile-safe DI · no `BuildContext`
-**go_router** declarative nav · deep-link ready
-**Dio + interceptor** auto JWT refresh on 401
-**flutter_secure_storage** Keychain / Keystore
+<div class="columns-3">
+  <div><span class="pill brand">Riverpod — compile-safe DI</span></div>
+  <div><span class="pill brand">go_router — deep links</span></div>
+  <div><span class="pill brand">Dio — auto JWT refresh</span></div>
+</div>
 
 ---
 
-# Data Model
+# Data model — 16 tables, 4 databases
 
-| DB | Tables | Highlights |
+| Database | Tables | Highlights |
 |---|---|---|
-| `auth-db` | `users`, `refresh_tokens`, `password_reset_tokens` | role enum, hashed tokens |
-| `core-db` | `vendors`, `services`, `photos`, `bookings`, `reviews`, `notifications`, `fcm_tokens` | full-text GIN, rating aggregation, BYTEA photo blobs |
-| `payment-db` | `cards`, `payments` | last4 + brand; PAN never persisted |
-| `realtime-db` | `threads`, `thread_messages` | one thread per booking, append-only |
+| `auth-db` | `users`, `refresh_tokens`, `password_reset_tokens` | role enum · hashed tokens |
+| `core-db` | `vendors`, `services`, `photos`, `bookings`, `reviews`, `notifications`, `fcm_tokens` | full-text GIN · rating aggregation · BYTEA blobs |
+| `payment-db` | `cards`, `payments` | last4 + brand · PAN never persisted |
+| `realtime-db` | `threads`, `thread_messages` | one thread per booking · append-only |
 
 **No cross-service foreign keys.** `core.bookings.customer_id` is a plain UUID — `auth-svc` owns the actual `users` row. Cross-refs resolved via batched gRPC `auth.GetUsersBatch`.
 
 ---
 
-# Real-time Chat (WebSocket)
+<!-- _class: dark -->
+
+# Real-time chat — WebSocket hub
 
 ```
 mobile ──WS──► gateway :8080 ──upgrade──► realtime :8084
                                                 │
                                                 ▼
                                         ┌────────────┐
-                                        │ Hub        │
+                                        │   Hub      │
                                         │ per-user   │
-                                        │ channels   │
+                                        │  channels  │
                                         └─────┬──────┘
                                               │
                                               ▼
@@ -352,32 +756,47 @@ mobile ──WS──► gateway :8080 ──upgrade──► realtime :8084
                                     threads + thread_messages
 ```
 
-- One thread per booking (`UNIQUE booking_id`)
-- Hub fans out + persists immediately
-- Auth at WS upgrade — gateway verifies JWT before upgrade
-- Push fallback when peer offline — FCM deep-link `/threads/<id>`
+One thread per booking · Hub fans out and persists · JWT verified at upgrade · FCM deep-link fallback when peer offline
 
 ---
 
-# Stack Justification — Comparative
+<!-- _class: section -->
 
-| Layer | Choice | Alternative | Why |
+<div class="num">05</div>
+
+# Why This Stack
+
+## Every choice backed by 2025–2026 industry data.
+
+---
+
+# Stack justification — comparative
+
+| Layer | Choice | Alternative | Why we picked it |
 |---|---|---|---|
-| Backend | **Go 1.24** | Node.js · Java | ~2.6× CPU-bound · gRPC tooling |
-| Inter-svc | **gRPC + Protobuf** | REST/JSON | 5–10× throughput · 70–90% smaller payloads |
-| Web | **Next.js 16 + React 19** | Remix · SvelteKit | Cache Components + PPR stable v16 |
+| Backend | **Go 1.24** | Node.js · Java | ~2.6× CPU-bound · mature gRPC tooling |
+| Inter-svc | **gRPC + Protobuf** | REST / JSON | 5–10× throughput · 70–90% smaller payloads |
+| Web | **Next.js 16 + React 19** | Remix · SvelteKit | Cache Components + PPR stable in v16 |
 | Web arch | **Feature-Sliced Design** | Atomic · flat | Hard horizontal isolation |
 | Mobile | **Flutter 3.24 Impeller** | React Native | 46% vs 35% share · 60–120 fps |
 | Mobile state | **Riverpod** | Bloc · Provider | Compile-safe DI · no `BuildContext` |
-| DB | **Postgres per service** | Shared DB | Service autonomy · independent scaling |
+| Database | **Postgres per service** | Shared DB | Service autonomy · independent scaling |
 | AI | **Claude API + MCP** | OpenAI raw | MCP is cross-vendor standard (Linux Foundation) |
 | E2E | **Playwright** | Cypress | Parallel cross-browser · TS-native |
 
-Every choice backed by 2025–2026 industry data.
+---
+
+<!-- _class: section -->
+
+<div class="num">06</div>
+
+# Competitive Landscape
+
+## Where Qonaqzhai sits among global · CIS · Kazakh players.
 
 ---
 
-# Competitive Landscape
+# Direct competitor matrix
 
 | Platform | Region | Model | AI | Mobile | KZ Traditions |
 |---|---|---|---|---|---|
@@ -392,29 +811,47 @@ Every choice backed by 2025–2026 industry data.
 
 ---
 
-# Qonaqzhai Differentiators
+# What competitors miss — what we built
 
-<div class="columns">
+<div class="columns-2">
 
-**What competitors miss**
-- Kazakh first-class language
-- Local PayBox + KZT
-- AI planner with tool use
+<div class="card">
+<h4>Gaps we fill</h4>
+
+- Kazakh-first UX (KZ / RU / EN equal)
+- Local PayBox · KZT-native
+- AI planner with real **tool use**
 - Mobile-native, not web-first
-- Tradition bundles (тұсаукесер · беташар · шашу)
+- Tradition bundles — тұсаукесер · беташар · шашу
+</div>
 
-**Inspiration ported in**
+<div class="card tint">
+<h4>Inspiration ported in</h4>
+
 - Peerspace visual-first listings
-- GigSalad freemium for vendors
-- Knot budget tracker
+- GigSalad freemium tier for vendors
+- The Knot budget tracker
 - Eventbrite promoted slots
 - Peerspace escrow with milestone release
+</div>
 
 </div>
 
 ---
 
-# Signature Feature — AI Planner with Tool Use
+<!-- _class: section -->
+
+<div class="num">07</div>
+
+# Signature Feature
+
+## AI Event Planner with tool use.
+
+---
+
+<!-- _class: dark -->
+
+# Claude calls real backend tools
 
 ```
 User: "Plan corporate event for 50 in Astana, 20 Aug, budget 1.5M ₸"
@@ -425,22 +862,33 @@ User: "Plan corporate event for 50 in Astana, 20 Aug, budget 1.5M ₸"
         ┌────────────┬────────┴────────┬─────────────┐
         ▼            ▼                 ▼             ▼
   search_vendors  check_availability  draft_booking  estimate_total
-  (core gRPC)     (core gRPC)         (core gRPC)    (local calc)
+   (core gRPC)     (core gRPC)         (core gRPC)    (local calc)
                               │
                               ▼
-                   Structured plan in chat
+                    Structured plan in chat
         • Venue × 1            180 k ₸
         • Catering × 50        900 k ₸
         • Photographer × 1     200 k ₸
         • Music DJ × 1         150 k ₸
-        Total: 1.43 M ₸      [Book all] [Customize]
+        ─────────────────────────────────
+        Total: 1.43 M ₸     [Book all]  [Customize]
 ```
 
 Anthropic Messages API · `tools` parameter · JSON schemas · SSE streaming from `core` service.
 
 ---
 
-# Security — Defense in Depth
+<!-- _class: section -->
+
+<div class="num">08</div>
+
+# Security & Quality
+
+## Defense in depth · table-driven tests · E2E gate.
+
+---
+
+# Security model — defense in depth
 
 | Layer | Mechanism |
 |---|---|
@@ -457,102 +905,145 @@ Anthropic Messages API · `tools` parameter · JSON schemas · SSE streaming fro
 
 ---
 
-# Testing & Quality
+# Testing & quality
 
 | Component | Files | LOC | Approach |
 |---|---|---|---|
-| Auth service | 1 | 386 | Signup, login, refresh, password reset |
-| Core service | 4 | 1,007 | Vendor CRUD, booking state machine, review aggregation |
-| Payment service | 2 | 436 | Card validation, charge / refund, PSP mock |
-| Realtime service | 1 | 204 | Thread ensure, message send, WS connection |
+| Auth service | 1 | 386 | Signup · login · refresh · password reset |
+| Core service | 4 | 1,007 | Vendor CRUD · booking state machine · review aggregation |
+| Payment service | 2 | 436 | Card validation · charge · refund · PSP mock |
+| Realtime service | 1 | 204 | Thread ensure · message send · WS connection |
 | **Backend total** | **8** | **2,033** | Table-driven Go tests · `-race` enabled |
-| Frontend E2E | 12 specs | ~800 | Playwright — auth, booking, chat, admin, vendor |
+| Frontend E2E | 12 | ~800 | Playwright — auth · booking · chat · admin · vendor |
 | Mobile | smoke | growing | Riverpod `ProviderContainer` mocks |
 
-CI gate — backend tests + Playwright E2E must pass before merge.
+**CI gate** — backend tests + Playwright E2E must pass before merge.
 
 ---
 
-# Agentic Engineering & MCP
+<!-- _class: section -->
 
-## How this diploma was built
+<div class="num">09</div>
 
-**MCP servers used in development**
+# Agentic Engineering
+
+## MCP, Claude, and how this diploma was actually built.
+
+---
+
+# How this diploma was built
+
+<div class="columns-2">
+
+<div class="card">
+<h4>MCP servers used in development</h4>
+
 - **GitHub MCP** — branch / PR / issue automation
-- **Filesystem MCP** — repo-wide refactors with safety checks
-- **Postgres MCP** — schema introspection during migrations
-- **Context7 MCP** — latest Next.js 16 + Riverpod docs
-- **Exa / WebSearch** — competitor research, benchmark data
+- **Filesystem MCP** — repo-wide refactors
+- **Postgres MCP** — schema introspection
+- **Context7 MCP** — Next.js 16 + Riverpod docs
+- **Exa / WebSearch** — competitor research
+</div>
 
-**Why this matters in 2026**
-- Anthropic donated MCP to the **Linux Foundation Agentic AI Foundation** (2025)
-- **10K+ MCP servers** live · **97M+ SDK installs**
-- Stack Overflow 2025: **84%** of developers use AI coding tools
-- IDC: **\$36.2B** AI dev-tool market by end-2026
+<div class="card tint">
+<h4>Why this matters in 2026</h4>
+
+- MCP donated to **Linux Foundation Agentic AI Foundation** (2025)
+- **10K+** MCP servers live · **97M+** SDK installs
+- Stack Overflow 2025 — **84%** of developers use AI tools
+- IDC — **$36.2B** AI dev-tool market by end-2026
+</div>
+
+</div>
 
 This diploma mirrors how engineering is actually done today.
 
 ---
 
-# Live Demo Flow (8 min)
+<!-- _class: section -->
 
-1. **Localization** (30s) — Open mobile, switch KZ → RU → EN
-2. **AI Planner** (2 min) — *"Plan corporate event for 50 in Astana, 20 Aug, 1.5M ₸"* → Claude returns 4-vendor plan with reasoning
-3. **Booking + Calendar** (1 min) — Tap venue, view availability, confirm Aug 20
-4. **Payment** (1 min) — PayBox test card → push notification → tap → deep-link into booking
-5. **Vendor side** (1 min) — Log in as vendor, see new booking in analytics, revenue chart updates
-6. **Admin moderation** (30s) — Web admin moderates flagged review
-7. **Architecture trace** (1 min) — `docker compose logs` — saga `core → payment.Charge → core.MarkBookingPaid`
-8. **Q & A** (1 min)
+<div class="num">10</div>
+
+# Demo & Roadmap
+
+## What you'll see today, and what ships next.
+
+---
+
+# Live demo — 8 minutes
+
+<div class="timeline"><div class="num">1</div><div><strong>Localization</strong> · 30s · Open mobile · switch KZ → RU → EN</div></div>
+<div class="timeline"><div class="num">2</div><div><strong>AI Planner</strong> · 2 min · <em>"Plan corporate event for 50 in Astana, 20 Aug, 1.5M ₸"</em> · Claude returns 4-vendor plan with reasoning</div></div>
+<div class="timeline"><div class="num">3</div><div><strong>Booking + Calendar</strong> · 1 min · Tap venue · view availability · confirm Aug 20</div></div>
+<div class="timeline"><div class="num">4</div><div><strong>Payment</strong> · 1 min · PayBox test card · push notification · deep-link into booking</div></div>
+<div class="timeline"><div class="num">5</div><div><strong>Vendor side</strong> · 1 min · Log in as vendor · see new booking in analytics · revenue chart updates</div></div>
+<div class="timeline"><div class="num">6</div><div><strong>Admin moderation</strong> · 30s · Web admin moderates flagged review</div></div>
+<div class="timeline"><div class="num">7</div><div><strong>Architecture trace</strong> · 1 min · <code>docker compose logs</code> — saga <code>core → payment.Charge → core.MarkBookingPaid</code></div></div>
+<div class="timeline"><div class="num">8</div><div><strong>Q & A</strong> · 1 min</div></div>
 
 ---
 
 # Roadmap
 
-<div class="columns">
+<div class="columns-3">
 
-**Tier 1 — ships before defense**
+<div class="card">
+<h4>Tier 1 — ships before defense</h4>
+
 - AI event planner with tool use
 - Vendor analytics dashboard
 - KZ / RU / EN i18n completion
 - Push notifications with deep-links
-- Chat polish (typing · read receipts)
+- Chat polish — typing · read receipts
+</div>
 
-**Tier 2 — next iteration**
-- Smart vendor recommendations (embeddings)
+<div class="card tint">
+<h4>Tier 2 — next iteration</h4>
+
+- Smart vendor recommendations
 - Dynamic pricing (peak / off-peak)
 - Google Calendar sync
 - Referral · promo codes
 - Verified-booking review badge
+</div>
+
+<div class="card dark">
+<h4>Tier 3 — research</h4>
+
+- Escrow with milestone release
+- Voice input for AI planner
+- ML matching via embeddings
+- KYC via egov.kz public API
+- AI-generated event runbook
+</div>
 
 </div>
 
-**Tier 3 — research** — escrow with milestone release · voice input · ML matching · KYC via egov.kz · AI-generated minute-by-minute event runbook
-
 ---
 
-# Lessons Learned
+# Lessons learned — honest retrospective
 
 | What worked | What I would change |
 |---|---|
-| One DB per service — clear ownership | Synchronous payment saga is fragile; should publish events (NATS / Kafka) |
-| Riverpod for Flutter — fewer rebuilds | Started with hand-rolled DTOs; should generate from OpenAPI from day 1 |
-| FSD on web — features stay isolated | Tailwind v4 + Next.js 16 still rough; some hydration warnings remain |
-| Claude + MCP — 2–3× productivity | Need stricter prompt discipline; early sessions drifted scope |
-| Per-service Go modules — independent CI | Workspace `replace` directives are subtle; broke CI twice |
-| gRPC for internal — no API drift | Browser debugging painful; we keep REST at the gateway for a reason |
+| One DB per service — clear ownership | Synchronous payment saga is fragile · publish events instead (NATS / Kafka) |
+| Riverpod for Flutter — fewer rebuilds | Hand-rolled DTOs · should generate from OpenAPI from day 1 |
+| FSD on web — features stay isolated | Tailwind v4 + Next.js 16 still rough · hydration warnings remain |
+| Claude + MCP — 2–3× productivity | Need stricter prompt discipline · early sessions drifted scope |
+| Per-service Go modules — independent CI | Workspace `replace` directives are subtle · broke CI twice |
+| gRPC for internal — no API drift | Browser debugging painful · we keep REST at the gateway for a reason |
 
 ---
 
 <!-- _class: lead -->
 <!-- _paginate: false -->
-<!-- _header: '' -->
 
-# Thank you.
+<span class="kicker" >Thank you</span>
 
-## Questions?
+# Questions?
 
-**Repo** · github.com/Bahaidahar/diploma
-**Architecture deep-dive** · `presentation/research/code-map.md`
-**Comparative analysis** · `presentation/research/competitors.md`
-**Stack justification** · `presentation/research/stack-justification.md`
+## Repo · github.com/Bahaidahar/diploma
+## Architecture deep-dive · presentation/research/code-map.md
+## Stack justification · presentation/research/stack-justification.md
+## Comparative analysis · presentation/research/competitors.md
+
+### Bahaidahar · Astana IT University · May 2026
