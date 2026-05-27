@@ -7,10 +7,13 @@ All artifacts for the diploma defense, generated 2026-05-28.
 ```
 presentation/
 ├── README.md                      this file
-├── diploma.md                     22-slide deck (English)
-├── diploma.html                   HTML render of diploma.md
-├── diploma.pdf                    print-ready PDF (22 slides ≈ 25 pp)
-├── style.css                      print styling (A4, 18mm margins)
+├── slides.md                      Marp slide deck (English, 22 slides 16:9)
+├── slides.pdf                     print-ready slide deck
+├── slides.pptx                    PowerPoint / Keynote
+├── slides.html                    in-browser presentation
+├── diploma.md                     long-form doc version (same content)
+├── diploma.pdf / .html            doc-format render
+├── style.css                      A4 styling for the doc version
 └── research/
     ├── competitors.md             comparative analysis (~1,050 words)
     ├── stack-justification.md     stack rationale w/ 2025–26 sources (~1,400 words)
@@ -18,30 +21,33 @@ presentation/
     └── features-roadmap.md        feature ideas + demo flow
 ```
 
-## Regenerate PDF
+## Regenerate slides (Marp — 16:9 deck)
+
+`slides.md` is the real presentation. `diploma.md` is the long-form doc version.
 
 ```bash
 cd presentation
 
-# 1. MD → HTML
-pandoc diploma.md -o diploma.html \
-  --standalone \
-  --metadata title="Qonaqzhai — Diploma Defense" \
-  --toc --toc-depth=1 \
-  -c style.css
+# PDF — print or upload
+npx @marp-team/marp-cli@latest slides.md --pdf --allow-local-files -o slides.pdf
 
-# 2. HTML → PDF (Chrome headless, no LaTeX needed)
-"/Applications/Google Chrome.app/Contents/MacOS/Google Chrome" \
-  --headless --disable-gpu --no-pdf-header-footer \
-  --print-to-pdf=diploma.pdf \
-  "file://$PWD/diploma.html"
+# PPTX — open in Keynote / PowerPoint
+npx @marp-team/marp-cli@latest slides.md --pptx --allow-local-files -o slides.pptx
+
+# HTML — live present in browser (arrow keys)
+npx @marp-team/marp-cli@latest slides.md --html --allow-local-files -o slides.html
+
+# Live preview while editing
+npx @marp-team/marp-cli@latest -s .
 ```
 
-Alternative if LaTeX is installed (sharper typography):
+## Long-form doc fallback (Markdown → PDF)
 
 ```bash
-brew install --cask basictex
-pandoc diploma.md -o diploma.pdf --pdf-engine=xelatex -V geometry:margin=2cm
+pandoc diploma.md -o diploma.html --standalone -c style.css --toc
+"/Applications/Google Chrome.app/Contents/MacOS/Google Chrome" \
+  --headless --disable-gpu --no-pdf-header-footer \
+  --print-to-pdf=diploma.pdf "file://$PWD/diploma.html"
 ```
 
 ## Slide outline (22)
