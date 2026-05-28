@@ -1,0 +1,144 @@
+{
+    "metrics": {
+        "http_req_blocked": {
+            "med": 0.005,
+            "max": 2.131,
+            "p(90)": 0.012,
+            "p(95)": 0.027,
+            "avg": 0.025999999999999916,
+            "min": 0.002
+        },
+        "http_req_connecting": {
+            "avg": 0.013995008319467553,
+            "min": 0,
+            "med": 0,
+            "max": 2.061,
+            "p(90)": 0,
+            "p(95)": 0
+        },
+        "http_req_duration": {
+            "p(90)": 3.592,
+            "p(95)": 6.354,
+            "avg": 2.385362728785358,
+            "min": 0.828,
+            "med": 1.563,
+            "max": 86.13
+        },
+        "checks": {
+            "passes": 600,
+            "fails": 0,
+            "value": 1
+        },
+        "http_req_tls_handshaking": {
+            "min": 0,
+            "med": 0,
+            "max": 0,
+            "p(90)": 0,
+            "p(95)": 0,
+            "avg": 0
+        },
+        "http_req_failed": {
+            "passes": 0,
+            "fails": 601,
+            "thresholds": {
+                "rate<0.02": false
+            },
+            "value": 0
+        },
+        "http_reqs": {
+            "count": 601,
+            "rate": 19.973910948262255
+        },
+        "http_req_duration{expected_response:true}": {
+            "max": 86.13,
+            "p(90)": 3.592,
+            "p(95)": 6.354,
+            "avg": 2.385362728785358,
+            "min": 0.828,
+            "med": 1.563
+        },
+        "http_req_receiving": {
+            "p(90)": 0.097,
+            "p(95)": 0.124,
+            "avg": 0.06167886855241266,
+            "min": 0.023,
+            "med": 0.049,
+            "max": 0.992
+        },
+        "http_req_waiting": {
+            "med": 1.474,
+            "max": 86.003,
+            "p(90)": 3.381,
+            "p(95)": 6.247,
+            "avg": 2.2931281198003353,
+            "min": 0.791
+        },
+        "iteration_duration": {
+            "avg": 2.5344086899999985,
+            "min": 0.953375,
+            "med": 1.7982710000000002,
+            "max": 38.901375,
+            "p(90)": 4.095104200000001,
+            "p(95)": 6.751633949999995
+        },
+        "vus": {
+            "value": 0,
+            "min": 0,
+            "max": 0
+        },
+        "iterations": {
+            "count": 600,
+            "rate": 19.94067648744984
+        },
+        "http_req_sending": {
+            "avg": 0.0305557404326123,
+            "min": 0.013,
+            "med": 0.025,
+            "max": 0.198,
+            "p(90)": 0.049,
+            "p(95)": 0.058
+        },
+        "data_received": {
+            "count": 349186,
+            "rate": 11605.008433244431
+        },
+        "http_req_duration{name:/api/chat}": {
+            "p(95)": 6.2038999999999955,
+            "avg": 2.2457883333333335,
+            "min": 0.828,
+            "med": 1.5605,
+            "max": 38.738,
+            "p(90)": 3.5695000000000006,
+            "thresholds": {
+                "p(95)<400": false
+            }
+        },
+        "vus_max": {
+            "max": 25,
+            "value": 25,
+            "min": 25
+        },
+        "data_sent": {
+            "count": 298999,
+            "rate": 9937.07054845169
+        }
+    },
+    "setup_data": {
+        "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI1NzI3MjJkMS03ZmE4LTQ0Y2YtOGMzNy04MTJhMDAzYzJkN2MiLCJlbWFpbCI6ImN1c3RvbWVyMUBkZW1vLmt6Iiwicm9sZSI6ImN1c3RvbWVyIiwic3RhdHVzIjoiYWN0aXZlIiwiaXNzIjoicW9uYXF6aGFpIiwiZXhwIjoxNzc5OTY5OTMwLCJpYXQiOjE3Nzk5NjkwMzB9.cjgFgtkgFW4sHc8Q7sPjtDaLGHuKOy7zx5C6Hj7kcsA"
+    },
+    "root_group": {
+        "name": "",
+        "path": "",
+        "id": "d41d8cd98f00b204e9800998ecf8427e",
+        "groups": {},
+        "checks": {
+                "chat 2xx": {
+                    "fails": 0,
+                    "name": "chat 2xx",
+                    "path": "::chat 2xx",
+                    "id": "264d590843e14b099ac862bdb147859f",
+                    "passes": 600
+                }
+            }
+    }
+}

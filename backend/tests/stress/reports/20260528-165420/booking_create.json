@@ -1,0 +1,146 @@
+{
+    "root_group": {
+        "groups": {},
+        "checks": {
+                "create booking 2xx": {
+                    "id": "1f527a97ab474ef6be9ce40ab1ffe366",
+                    "passes": 600,
+                    "fails": 0,
+                    "name": "create booking 2xx",
+                    "path": "::create booking 2xx"
+                }
+            },
+        "name": "",
+        "path": "",
+        "id": "d41d8cd98f00b204e9800998ecf8427e"
+    },
+    "metrics": {
+        "iterations": {
+            "count": 600,
+            "rate": 19.93927692604941
+        },
+        "http_req_connecting": {
+            "max": 0.534,
+            "p(90)": 0,
+            "p(95)": 0.1956999999999945,
+            "avg": 0.01828571428571429,
+            "min": 0,
+            "med": 0
+        },
+        "data_sent": {
+            "rate": 11299.687930376831,
+            "count": 340023
+        },
+        "vus_max": {
+            "min": 30,
+            "max": 30,
+            "value": 30
+        },
+        "vus": {
+            "value": 1,
+            "min": 0,
+            "max": 1
+        },
+        "http_req_waiting": {
+            "p(90)": 15.6448,
+            "p(95)": 17.218899999999998,
+            "avg": 9.819548172757468,
+            "min": 3.721,
+            "med": 8.3955,
+            "max": 81.78
+        },
+        "checks": {
+            "fails": 0,
+            "passes": 600,
+            "value": 1
+        },
+        "http_req_blocked": {
+            "avg": 0.036377076411960335,
+            "min": 0.003,
+            "med": 0.008,
+            "max": 2.716,
+            "p(90)": 0.019,
+            "p(95)": 0.27429999999999966
+        },
+        "data_received": {
+            "count": 349637,
+            "rate": 11619.181610988562
+        },
+        "http_req_failed": {
+            "passes": 0,
+            "fails": 602,
+            "thresholds": {
+                "rate<0.02": false
+            },
+            "value": 0
+        },
+        "http_reqs": {
+            "count": 602,
+            "rate": 20.005741182469574
+        },
+        "http_req_receiving": {
+            "p(95)": 0.147,
+            "avg": 0.0730963455149501,
+            "min": 0.018,
+            "med": 0.064,
+            "max": 0.372,
+            "p(90)": 0.119
+        },
+        "http_req_duration{name:/api/bookings}": {
+            "p(90)": 15.739600000000001,
+            "p(95)": 17.271699999999996,
+            "avg": 9.826454999999997,
+            "min": 3.756,
+            "med": 8.504999999999999,
+            "max": 33.937,
+            "thresholds": {
+                "p(95)<300": false,
+                "p(99)<600": false
+            }
+        },
+        "http_req_duration": {
+            "min": 3.756,
+            "med": 8.504999999999999,
+            "max": 81.979,
+            "p(90)": 15.768400000000002,
+            "p(95)": 17.3203,
+            "avg": 9.936752491694353
+        },
+        "http_req_tls_handshaking": {
+            "med": 0,
+            "max": 0,
+            "p(90)": 0,
+            "p(95)": 0,
+            "avg": 0,
+            "min": 0
+        },
+        "http_req_sending": {
+            "med": 0.039,
+            "max": 0.268,
+            "p(90)": 0.07,
+            "p(95)": 0.085,
+            "avg": 0.04410797342192688,
+            "min": 0.01
+        },
+        "iteration_duration": {
+            "med": 8.8969795,
+            "max": 34.309791,
+            "p(90)": 16.2827458,
+            "p(95)": 17.67275835,
+            "avg": 10.186126336666666,
+            "min": 3.858292
+        },
+        "http_req_duration{expected_response:true}": {
+            "p(90)": 15.768400000000002,
+            "p(95)": 17.3203,
+            "avg": 9.936752491694353,
+            "min": 3.756,
+            "med": 8.504999999999999,
+            "max": 81.979
+        }
+    },
+    "setup_data": {
+        "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI1NzI3MjJkMS03ZmE4LTQ0Y2YtOGMzNy04MTJhMDAzYzJkN2MiLCJlbWFpbCI6ImN1c3RvbWVyMUBkZW1vLmt6Iiwicm9sZSI6ImN1c3RvbWVyIiwic3RhdHVzIjoiYWN0aXZlIiwiaXNzIjoicW9uYXF6aGFpIiwiZXhwIjoxNzc5OTcwMjI0LCJpYXQiOjE3Nzk5NjkzMjR9.fldM0n3tfzzQ44-Zp5v_V8rzQ_4gFQiXMP_7BPQZ8_s",
+        "vendorId": "2237de2a-266c-45bc-b8b5-4c465bb88767"
+    }
+}

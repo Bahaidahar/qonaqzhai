@@ -1,0 +1,148 @@
+
+         /\      Grafana   /‾‾/  
+    /\  /  \     |\  __   /  /   
+   /  \/    \    | |/ /  /   ‾‾\ 
+  /          \   |   (  |  (‾)  |
+ / __________ \  |_|\_\  \_____/ 
+
+
+     execution: local
+        script: /Users/bahtiyarelik/Developer/diploma/backend/tests/stress/scenarios/vendors_search.js
+        output: -
+
+     scenarios: (100.00%) 1 scenario, 80 max VUs, 1m0s max duration (incl. graceful stop):
+              * catalog: 60.00 iterations/s for 30s (maxVUs: 40-80, gracefulStop: 30s)
+
+
+running (0m01.0s), 00/40 VUs, 60 complete and 0 interrupted iterations
+catalog   [   3% ] 00/40 VUs  01.0s/30s  60.00 iters/s
+
+running (0m02.0s), 00/40 VUs, 120 complete and 0 interrupted iterations
+catalog   [   7% ] 00/40 VUs  02.0s/30s  60.00 iters/s
+
+running (0m03.0s), 00/40 VUs, 180 complete and 0 interrupted iterations
+catalog   [  10% ] 00/40 VUs  03.0s/30s  60.00 iters/s
+
+running (0m04.0s), 00/40 VUs, 240 complete and 0 interrupted iterations
+catalog   [  13% ] 00/40 VUs  04.0s/30s  60.00 iters/s
+
+running (0m05.0s), 00/40 VUs, 300 complete and 0 interrupted iterations
+catalog   [  17% ] 00/40 VUs  05.0s/30s  60.00 iters/s
+
+running (0m06.0s), 00/40 VUs, 360 complete and 0 interrupted iterations
+catalog   [  20% ] 00/40 VUs  06.0s/30s  60.00 iters/s
+
+running (0m07.0s), 00/40 VUs, 420 complete and 0 interrupted iterations
+catalog   [  23% ] 00/40 VUs  07.0s/30s  60.00 iters/s
+
+running (0m08.0s), 00/40 VUs, 480 complete and 0 interrupted iterations
+catalog   [  27% ] 00/40 VUs  08.0s/30s  60.00 iters/s
+
+running (0m09.0s), 00/40 VUs, 540 complete and 0 interrupted iterations
+catalog   [  30% ] 00/40 VUs  09.0s/30s  60.00 iters/s
+
+running (0m10.0s), 00/40 VUs, 600 complete and 0 interrupted iterations
+catalog   [  33% ] 00/40 VUs  10.0s/30s  60.00 iters/s
+
+running (0m11.0s), 00/40 VUs, 660 complete and 0 interrupted iterations
+catalog   [  37% ] 00/40 VUs  11.0s/30s  60.00 iters/s
+
+running (0m12.0s), 00/40 VUs, 720 complete and 0 interrupted iterations
+catalog   [  40% ] 00/40 VUs  12.0s/30s  60.00 iters/s
+
+running (0m13.0s), 00/40 VUs, 780 complete and 0 interrupted iterations
+catalog   [  43% ] 00/40 VUs  13.0s/30s  60.00 iters/s
+
+running (0m14.0s), 00/40 VUs, 840 complete and 0 interrupted iterations
+catalog   [  47% ] 00/40 VUs  14.0s/30s  60.00 iters/s
+
+running (0m15.0s), 00/40 VUs, 900 complete and 0 interrupted iterations
+catalog   [  50% ] 00/40 VUs  15.0s/30s  60.00 iters/s
+
+running (0m16.0s), 00/40 VUs, 960 complete and 0 interrupted iterations
+catalog   [  53% ] 00/40 VUs  16.0s/30s  60.00 iters/s
+
+running (0m17.0s), 00/40 VUs, 1020 complete and 0 interrupted iterations
+catalog   [  57% ] 00/40 VUs  17.0s/30s  60.00 iters/s
+
+running (0m18.0s), 00/40 VUs, 1080 complete and 0 interrupted iterations
+catalog   [  60% ] 00/40 VUs  18.0s/30s  60.00 iters/s
+
+running (0m19.0s), 00/40 VUs, 1140 complete and 0 interrupted iterations
+catalog   [  63% ] 00/40 VUs  19.0s/30s  60.00 iters/s
+
+running (0m20.0s), 00/40 VUs, 1200 complete and 0 interrupted iterations
+catalog   [  67% ] 00/40 VUs  20.0s/30s  60.00 iters/s
+
+running (0m21.0s), 00/40 VUs, 1260 complete and 0 interrupted iterations
+catalog   [  70% ] 00/40 VUs  21.0s/30s  60.00 iters/s
+
+running (0m22.0s), 00/40 VUs, 1320 complete and 0 interrupted iterations
+catalog   [  73% ] 00/40 VUs  22.0s/30s  60.00 iters/s
+
+running (0m23.0s), 00/40 VUs, 1380 complete and 0 interrupted iterations
+catalog   [  77% ] 00/40 VUs  23.0s/30s  60.00 iters/s
+
+running (0m24.0s), 00/40 VUs, 1440 complete and 0 interrupted iterations
+catalog   [  80% ] 00/40 VUs  24.0s/30s  60.00 iters/s
+
+running (0m25.0s), 00/40 VUs, 1500 complete and 0 interrupted iterations
+catalog   [  83% ] 00/40 VUs  25.0s/30s  60.00 iters/s
+
+running (0m26.0s), 00/40 VUs, 1560 complete and 0 interrupted iterations
+catalog   [  87% ] 00/40 VUs  26.0s/30s  60.00 iters/s
+
+running (0m27.0s), 00/40 VUs, 1620 complete and 0 interrupted iterations
+catalog   [  90% ] 00/40 VUs  27.0s/30s  60.00 iters/s
+
+running (0m28.0s), 00/40 VUs, 1680 complete and 0 interrupted iterations
+catalog   [  93% ] 00/40 VUs  28.0s/30s  60.00 iters/s
+
+running (0m29.0s), 00/40 VUs, 1740 complete and 0 interrupted iterations
+catalog   [  97% ] 00/40 VUs  29.0s/30s  60.00 iters/s
+
+running (0m30.0s), 00/40 VUs, 1800 complete and 0 interrupted iterations
+catalog   [ 100% ] 00/40 VUs  30.0s/30s  60.00 iters/s
+
+
+  █ THRESHOLDS 
+
+    http_req_duration{name:/api/vendors}
+    ✓ 'p(95)<200' p(95)=7.72ms
+    ✓ 'p(99)<400' p(99)=10.28ms
+
+    http_req_failed
+    ✗ 'rate<0.01' rate=46.75%
+
+
+  █ TOTAL RESULTS 
+
+    checks_total.......: 1801   60.030718/s
+    checks_succeeded...: 53.24% 959 out of 1801
+    checks_failed......: 46.75% 842 out of 1801
+
+    ✗ search 2xx
+      ↳  53% — ✓ 959 / ✗ 842
+
+    HTTP
+    http_req_duration..............: avg=2.99ms min=287µs    med=1.98ms max=14.65ms p(90)=6.86ms p(95)=7.72ms
+      { expected_response:true }...: avg=4.71ms min=1.17ms   med=4.68ms max=14.65ms p(90)=7.69ms p(95)=8.64ms
+      { name:/api/vendors }........: avg=2.99ms min=287µs    med=1.98ms max=14.65ms p(90)=6.86ms p(95)=7.72ms
+    http_req_failed................: 46.75% 842 out of 1801
+    http_reqs......................: 1801   60.030718/s
+
+    EXECUTION
+    iteration_duration.............: avg=3.27ms min=345.25µs med=2.2ms  max=15.14ms p(90)=7.28ms p(95)=8.14ms
+    iterations.....................: 1801   60.030718/s
+    vus............................: 0      min=0           max=0 
+    vus_max........................: 40     min=40          max=40
+
+    NETWORK
+    data_received..................: 1.8 MB 59 kB/s
+    data_sent......................: 233 kB 7.8 kB/s
+
+
+
+
+running (0m30.0s), 00/40 VUs, 1801 complete and 0 interrupted iterations
+catalog ✓ [ 100% ] 00/40 VUs  30s  60.00 iters/s

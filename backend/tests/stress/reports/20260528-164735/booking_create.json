@@ -1,0 +1,146 @@
+{
+    "metrics": {
+        "http_req_receiving": {
+            "p(90)": 0.018,
+            "p(95)": 0.033,
+            "avg": 0.019435497511732062,
+            "min": 0.004,
+            "med": 0.009,
+            "max": 68.914
+        },
+        "iteration_duration": {
+            "p(95)": 1.199708,
+            "avg": 0.4555661321003839,
+            "min": 0.061291,
+            "med": 0.304,
+            "max": 110.213959,
+            "p(90)": 0.868917
+        },
+        "data_received": {
+            "count": 967722661,
+            "rate": 16104323.16647413
+        },
+        "http_req_blocked": {
+            "avg": 0.001934875909576693,
+            "min": 0,
+            "med": 0.001,
+            "max": 27.736,
+            "p(90)": 0.002,
+            "p(95)": 0.002
+        },
+        "http_req_duration": {
+            "avg": 0.37403625441833127,
+            "min": 0.036,
+            "med": 0.241,
+            "max": 93.82,
+            "p(90)": 0.758,
+            "p(95)": 1.048
+        },
+        "http_reqs": {
+            "count": 2913438,
+            "rate": 48483.87763184359
+        },
+        "data_sent": {
+            "count": 1648132505,
+            "rate": 27427340.033830766
+        },
+        "http_req_sending": {
+            "avg": 0.007464162271777295,
+            "min": 0.001,
+            "med": 0.004,
+            "max": 52.524,
+            "p(90)": 0.006,
+            "p(95)": 0.009
+        },
+        "checks": {
+            "fails": 2911578,
+            "passes": 1858,
+            "value": 0.0006377349631157162
+        },
+        "http_req_duration{name:/api/bookings}": {
+            "max": 93.82,
+            "p(90)": 0.758,
+            "p(95)": 1.048,
+            "avg": 0.37400669450093804,
+            "min": 0.036,
+            "med": 0.241,
+            "thresholds": {
+                "p(95)<600": false,
+                "p(99)<1200": false
+            }
+        },
+        "vus": {
+            "min": 1,
+            "max": 39,
+            "value": 1
+        },
+        "http_req_failed": {
+            "passes": 2911578,
+            "fails": 1860,
+            "thresholds": {
+                "rate<0.02": true
+            },
+            "value": 0.9993615790004798
+        },
+        "vus_max": {
+            "value": 40,
+            "min": 40,
+            "max": 40
+        },
+        "iterations": {
+            "count": 2913436,
+            "rate": 48483.84434891282
+        },
+        "http_req_duration{expected_response:true}": {
+            "max": 81.288,
+            "p(90)": 8.9493,
+            "p(95)": 12.568399999999999,
+            "avg": 6.546883333333333,
+            "min": 2.504,
+            "med": 5.234999999999999
+        },
+        "http_req_connecting": {
+            "avg": 0.000003738881692351099,
+            "min": 0,
+            "med": 0,
+            "max": 0.699,
+            "p(90)": 0,
+            "p(95)": 0
+        },
+        "http_req_tls_handshaking": {
+            "avg": 0,
+            "min": 0,
+            "med": 0,
+            "max": 0,
+            "p(90)": 0,
+            "p(95)": 0
+        },
+        "http_req_waiting": {
+            "avg": 0.34713659463492497,
+            "min": 0.027,
+            "med": 0.221,
+            "max": 93.809,
+            "p(90)": 0.722,
+            "p(95)": 0.998
+        }
+    },
+    "setup_data": {
+        "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI1NzI3MjJkMS03ZmE4LTQ0Y2YtOGMzNy04MTJhMDAzYzJkN2MiLCJlbWFpbCI6ImN1c3RvbWVyMUBkZW1vLmt6Iiwicm9sZSI6ImN1c3RvbWVyIiwic3RhdHVzIjoiYWN0aXZlIiwiaXNzIjoicW9uYXF6aGFpIiwiZXhwIjoxNzc5OTY5ODY5LCJpYXQiOjE3Nzk5Njg5Njl9.A6wLC5-oX5CKPPcnaKmVTV_fJzcOvVyLKUOrMTLs55s",
+        "vendorId": "2237de2a-266c-45bc-b8b5-4c465bb88767"
+    },
+    "root_group": {
+        "name": "",
+        "path": "",
+        "id": "d41d8cd98f00b204e9800998ecf8427e",
+        "groups": {},
+        "checks": {
+                "create booking 2xx": {
+                    "path": "::create booking 2xx",
+                    "id": "1f527a97ab474ef6be9ce40ab1ffe366",
+                    "passes": 1858,
+                    "fails": 2911578,
+                    "name": "create booking 2xx"
+                }
+            }
+    }
+}

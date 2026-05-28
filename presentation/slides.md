@@ -511,7 +511,33 @@ Authorization: Bearer eyJ…
 
 ---
 
-<div class="eyebrow">17 — Coverage vs the rest</div>
+<div class="eyebrow">17 — Stress tests</div>
+
+# Backend under load — k6, live Postgres, no mocks.
+
+<div class="kpi-row">
+<div class="kpi"><div class="num">20</div><div class="lbl">rps booking create · 0 % fail</div></div>
+<div class="kpi"><div class="num">17 ms</div><div class="lbl">booking p95</div></div>
+<div class="kpi"><div class="num">80 ms</div><div class="lbl">login p95 (bcrypt 12)</div></div>
+<div class="kpi"><div class="num">30 rps</div><div class="lbl">per-IP saturation cap</div></div>
+</div>
+
+| Scenario | Rate | p95 | Result | Bottleneck |
+|---|---|---|---|---|
+| `chat_burst` | 20 rps | 4.9 ms | ✅ 0 % fail | Stub handler — gateway forward only |
+| `booking_create` | 20 rps | 17.3 ms | ✅ 0 % fail | Postgres insert + gRPC EnsureThread |
+| `login_throughput` | 15 rps | 80.6 ms | ✅ 0 % fail | Bcrypt verify (cost factor 12) |
+| `vendors_search` | 60 rps offered | 7.7 ms | ⚠ 47 % limited | Core per-IP limiter (30 rps cap) |
+| `mixed` | 80 rps offered | 7.9 ms | ⚠ 40 % limited | Gateway 100 + core 30 spillover |
+| `saturation` 10 → 400 rps | absorbs 30 rps | 5.9 ms | Confirms published cap | |
+
+<div class="subtitle" style="margin-top:8px">
+Per-IP token buckets do their job — 100 / 30 / 20 rps at gateway / core / auth. Production fleet behind a CDN spreads across thousands of source IPs; aggregate ceiling tracks Postgres, not the limiters.
+</div>
+
+---
+
+<div class="eyebrow">18 — Coverage vs the rest</div>
 
 # Nobody else publishes tests. We do.
 
@@ -530,7 +556,7 @@ Behavioural coverage is our marketing budget. Anyone can run <code>maestro test 
 
 ---
 
-<div class="eyebrow">18 — Roadmap</div>
+<div class="eyebrow">19 — Roadmap</div>
 
 # What's next.
 
@@ -574,7 +600,7 @@ Behavioural coverage is our marketing budget. Anyone can run <code>maestro test 
 <!-- _class: lead -->
 <!-- _paginate: false -->
 
-<div class="eyebrow">19 — Thanks</div>
+<div class="eyebrow">20 — Thanks</div>
 
 # Built for KZ,<br/><span class="accent">tested like infrastructure.</span>
 
