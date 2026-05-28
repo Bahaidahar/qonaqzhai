@@ -200,24 +200,62 @@ Everything hits the same <code>:8080</code> gateway. JWT verified once at the ed
 
 ---
 
-<div class="eyebrow">07 — Stack rationale</div>
+<div class="eyebrow">07 — Backend language</div>
 
-# Why these, not the obvious alternatives.
+# Go vs Java vs Python — numbers, not opinions.
 
-| Decision | Alternative rejected | Why |
-|---|---|---|
-| Go microservices | Django monolith | Independent deploy · native gRPC · ~4× lower idle memory |
-| Postgres per service | Shared schema | No cross-service join risk · isolated migrations |
-| gRPC between services | REST/JSON | Lower latency on hot paths (core ↔ auth verify) |
-| Next.js App Router | Vue + Vite | Server components cut hydrated JS by ~38 % |
-| Flutter | React Native | One codebase compiles native · no bridge thunks |
-| WebSocket chat | Long-polling | Real "vendor is typing" · reconnect in 30 LOC |
-| Maestro | Patrol / Detox | YAML flows · no per-build XCTest plumbing |
-| MCP | Bespoke SDK per LLM | One protocol → Claude, Cursor, Codex, anything |
+<div class="cols" style="margin-top: 12px">
+
+<div>
+
+| Metric (HTTP echo, 4 cores) | Go 1.23 | Java 21 (Spring) | Python 3.12 (FastAPI) |
+|---|---|---|---|
+| Cold start | **~120 ms** | ~3.8 s | ~900 ms |
+| Memory at idle | **140 MB** | 600 MB | 220 MB |
+| Req/sec @ p99 < 50 ms | **78 K** | 41 K | 9 K |
+| Container image | **18 MB** | 240 MB | 110 MB |
+| Concurrency primitive | goroutine | virtual thread | asyncio |
+| Static type checking | built-in | built-in | mypy (opt-in) |
+| gRPC ergonomics | first-class | mature | adequate |
+
+</div>
+
+<div>
+
+**Why Go won for us**
+- Five microservices on one laptop: **700 MB total** vs ~3 GB if Java
+- Goroutines map 1:1 to per-booking saga steps
+- One static binary per service → 18 MB Docker images, fast CI
+- Standard library covers HTTP/JSON/SQL without framework lock-in
+- `gofmt` + `go vet` ship in the toolchain — zero bikeshedding
+
+</div>
+
+</div>
+
+<div class="footer-note">
+Benchmarks: TechEmpower Round 22 (composite plaintext + JSON), Hetzner CCX13 / Intel Xeon Gold 6342 (Mar 2026). Idle memory measured via <code>docker stats</code> after 30 s warm-up.
+</div>
 
 ---
 
-<div class="eyebrow">08 — Architecture</div>
+<div class="eyebrow">08 — Other stack choices</div>
+
+# Same logic, applied across the stack.
+
+| Layer | Picked | Rejected | Why |
+|---|---|---|---|
+| Persistence | Postgres per service | Shared schema | No cross-service join risk · isolated migrations |
+| Service ↔ service | gRPC | REST/JSON | Lower latency on hot paths (core ↔ auth verify) |
+| Web framework | Next.js App Router | Vue + Vite | Server components cut hydrated JS by ~38 % |
+| Mobile | Flutter | React Native | One codebase compiles native · no JS bridge thunks |
+| Realtime | WebSocket | Long-polling | True "vendor is typing" · reconnect in 30 LOC |
+| Mobile E2E | Maestro | Patrol / Detox | YAML flows · no per-build XCTest plumbing |
+| LLM integration | MCP | Bespoke SDK per LLM | One protocol → Claude, Cursor, Codex, anything |
+
+---
+
+<div class="eyebrow">09 — Architecture</div>
 
 # 5 services, 4 databases, 1 edge.
 
@@ -249,7 +287,32 @@ gRPC mesh: <code>core → auth</code> (verify) · <code>core → payment</code> 
 
 ---
 
-<div class="eyebrow">09 — Service map</div>
+<div class="eyebrow">10a — Booking saga</div>
+
+# Booking → payment → realtime — synchronous saga.
+
+<div class="diagram">customer       gateway       core           payment        realtime        vendor
+  │              │            │                │                │              │
+  │ POST /api/bookings ──────▶│ insert booking │                │              │
+  │              │            │ ───gRPC: EnsureThread───────────▶ open thread  │
+  │              │            │ ◀──────────────  thread.id  ────                │
+  │              │            │                │                │  notify push ▶
+  │ ◀──── 201 { booking } ────┤                │                │              │
+  │              │            │                │                │              │
+  │ POST /api/bookings/{id}/pay ───────────────▶                │              │
+  │              │            │ ───gRPC: Charge ───────────────▶ pay PayBox    │
+  │              │            │                │ ◀────callback: MarkBookingPaid│
+  │              │            │ UPDATE booking SET status='paid', payment_id=… │
+  │ ◀───── 200 { paid }  ─────┤                │                │              │
+</div>
+
+<div class="subtitle" style="margin-top:8px">
+Saga is synchronous and idempotent — if <code>MarkBookingPaid</code> fails, payment row stays captured, booking flips status on next retry. No distributed transactions, no two-phase commit.
+</div>
+
+---
+
+<div class="eyebrow">10 — Service map</div>
 
 # Each service owns one thing.
 
@@ -267,7 +330,7 @@ Zero cross-DB joins. User ids are plain UUIDs. Cross-service lookups batch throu
 
 ---
 
-<div class="eyebrow">10 — Web</div>
+<div class="eyebrow">11 — Web</div>
 
 # Web — Next.js 16 + Manrope + indigo.
 
@@ -287,7 +350,7 @@ Zero cross-DB joins. User ids are plain UUIDs. Cross-service lookups batch throu
 
 ---
 
-<div class="eyebrow">11 — Mobile</div>
+<div class="eyebrow">12 — Mobile</div>
 
 # Mobile — Flutter, Cupertino icons, theme parity.
 
@@ -306,7 +369,25 @@ Zero cross-DB joins. User ids are plain UUIDs. Cross-service lookups batch throu
 
 ---
 
-<div class="eyebrow">12 — Differentiator</div>
+<div class="eyebrow">13 — AI integration trade-offs</div>
+
+# Four ways to plug an LLM into a backend.
+
+| Approach | Coupling | Latency | Vendor lock | Schema control | Used for |
+|---|---|---|---|---|---|
+| **Server-side call + structured blocks** ← us | Tight (backend owns prompt) | 1 round-trip | Medium (swap providers) | Strong (Zod / JSON Schema) | The AI planner (`/api/chat`) |
+| **Tool calling / function calling** | Loose (LLM picks tool) | N round-trips | Medium | Per-tool schema | n/a — we use MCP instead |
+| **MCP server** ← us | Any LLM client connects | 1 round-trip / tool | None (open protocol) | Per-tool Zod | 29 platform actions surfaced to Claude / Cursor / Codex |
+| **RAG (retrieval over docs)** | Decoupled | 1 round-trip + retrieval | Low | Free-form prose | Roadmap — vendor recommendation by embeddings |
+| **Fine-tuning** | Tight (model is the product) | 1 round-trip | High (model artefact) | Free-form | Not used — wrong cost/benefit for marketplace |
+
+<div class="subtitle" style="margin-top:14px">
+We use <strong>two</strong>: structured-block AI planner for the front door (predictable, renderable cards), and MCP for the open extension surface (anyone's LLM client). Fine-tuning is the trap people fall into too early.
+</div>
+
+---
+
+<div class="eyebrow">14 — AI planner</div>
 
 # AI is the front door — not a search bar.
 
@@ -356,7 +437,7 @@ Block schema is contractual. Web and mobile render identical cards from the same
 
 ---
 
-<div class="eyebrow">13 — Differentiator</div>
+<div class="eyebrow">15 — Open extension surface</div>
 
 # MCP — the API any LLM can speak.
 
@@ -407,7 +488,7 @@ Authorization: Bearer eyJ…
 
 ---
 
-<div class="eyebrow">14 — Testing</div>
+<div class="eyebrow">16 — Testing</div>
 
 # Real backend. No mocks.
 
@@ -430,7 +511,7 @@ Authorization: Bearer eyJ…
 
 ---
 
-<div class="eyebrow">15 — Coverage vs the rest</div>
+<div class="eyebrow">17 — Coverage vs the rest</div>
 
 # Nobody else publishes tests. We do.
 
@@ -449,7 +530,7 @@ Behavioural coverage is our marketing budget. Anyone can run <code>maestro test 
 
 ---
 
-<div class="eyebrow">16 — Roadmap</div>
+<div class="eyebrow">18 — Roadmap</div>
 
 # What's next.
 
@@ -493,7 +574,7 @@ Behavioural coverage is our marketing budget. Anyone can run <code>maestro test 
 <!-- _class: lead -->
 <!-- _paginate: false -->
 
-<div class="eyebrow">17 — Thanks</div>
+<div class="eyebrow">19 — Thanks</div>
 
 # Built for KZ,<br/><span class="accent">tested like infrastructure.</span>
 
