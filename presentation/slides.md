@@ -68,22 +68,22 @@ Three clients (web + mobile + MCP), four Go microservices, one bill of materials
 
 <br/>
 
-**Sources:** Bureau of National Statistics (BNS RK 2024 demographic yearbook); Halyk Finance retail consumption brief Q3-2024; Kaspi Marketplace investor letter 2024; in-house survey of 38 vendors (Almaty, Astana, Shymkent), Mar 2026.
+**Sources:** Bureau of National Statistics (BNS RK 2024 demographic yearbook); Halyk Finance retail consumption brief Q3-2024; Kaspi Marketplace investor letter 2024; in-house survey of 38 vendors on Instagram, 2GIS and toi.kz (Almaty, Astana, Shymkent), Mar 2026.
 
 ---
 
 <div class="eyebrow">03 — Who's already in the field</div>
 
-# Competitive landscape — and what's missing
+# Competitive landscape — what people use today
 
 | Player | Geo | Coverage | Booking flow | AI planner | Native mobile | Realtime chat |
 |---|---|---|---|---|---|---|
-| **Tamada.kz** | KZ | Photo + tamada | Phone callback | <span class="tag tag-no">no</span> | <span class="tag tag-no">no</span> | <span class="tag tag-no">no</span> |
-| **Wedy.kz** | KZ | Wedding only | Form → email | <span class="tag tag-no">no</span> | <span class="tag tag-no">no</span> | <span class="tag tag-no">no</span> |
-| **Sallem.kz** | KZ | Venue rentals | Calendar slot | <span class="tag tag-no">no</span> | <span class="tag tag-no">no</span> | <span class="tag tag-no">no</span> |
-| **Instagram + WhatsApp** | KZ | Everything | DM | <span class="tag tag-no">no</span> | n/a | DM |
+| **Instagram + WhatsApp** | KZ | Everything | DM | <span class="tag tag-no">no</span> | n/a | DM (slow) |
+| **2GIS** | KZ | Catalog (phones) | Phone callback | <span class="tag tag-no">no</span> | <span class="tag tag-ok">yes</span> | <span class="tag tag-no">no</span> |
+| **toi.kz** | KZ | Wedding portal | Form → contact | <span class="tag tag-no">no</span> | <span class="tag tag-no">no</span> | <span class="tag tag-no">no</span> |
 | **The Knot** (US) | US | Wedding | Quote engine | <span class="tag tag-no">no</span> | <span class="tag tag-ok">yes</span> | <span class="tag tag-no">no</span> |
-| **Bash** (US) | US | Venue + service | Direct book | <span class="tag tag-ok">limited</span> | <span class="tag tag-ok">yes</span> | <span class="tag tag-no">no</span> |
+| **WeddingWire** (US) | US | Wedding | Quote engine | <span class="tag tag-no">no</span> | <span class="tag tag-ok">yes</span> | <span class="tag tag-no">no</span> |
+| **Eventbrite** | global | Tickets (not service) | Direct book | <span class="tag tag-no">no</span> | <span class="tag tag-ok">yes</span> | <span class="tag tag-no">no</span> |
 | **qonaqzhai** | **KZ** | **All categories** | **Direct + escrow** | <span class="tag tag-ok">**yes**</span> | <span class="tag tag-ok">**yes**</span> | <span class="tag tag-ok">**WS realtime**</span> |
 
 ---
@@ -92,15 +92,15 @@ Three clients (web + mobile + MCP), four Go microservices, one bill of materials
 
 # Feature matrix
 
-| Feature | Tamada.kz | Wedy.kz | Sallem.kz | The Knot | **qonaqzhai** |
+| Feature | Instagram+WA | 2GIS | toi.kz | The Knot | **qonaqzhai** |
 |---|---|---|---|---|---|
-| Public vendor catalog | ⚪ | ⚪ | ⚪ | ✅ | ✅ |
-| Native iOS / Android | ❌ | ❌ | ❌ | ✅ | ✅ Flutter |
-| 3 languages (kk / ru / en) | ⚪ | ⚪ | ❌ | ❌ | ✅ |
+| Public vendor catalog | ⚪ feed | ✅ | ✅ | ✅ | ✅ |
+| Native iOS / Android | ❌ | ✅ | ❌ | ✅ | ✅ Flutter |
+| 3 languages (kk / ru / en) | n/a | ⚪ ru/kk | ⚪ ru | ❌ | ✅ all 3 |
 | AI conversational planner | ❌ | ❌ | ❌ | ❌ | ✅ Gemini |
-| Vendor self-service | ⚪ | ❌ | ⚪ | ✅ | ✅ |
-| Realtime customer ↔ vendor chat | ❌ | ❌ | ❌ | ❌ | ✅ WebSocket |
-| Escrow-style payment hold | ❌ | ❌ | ❌ | ❌ | ✅ Saga |
+| Vendor self-service portal | ❌ | ⚪ paid claim | ⚪ form | ✅ | ✅ |
+| Realtime customer ↔ vendor chat | ⚪ DM | ❌ | ❌ | ❌ | ✅ WebSocket |
+| Escrow-style payment hold | ❌ | ❌ | ❌ | ❌ | ✅ saga |
 | Programmatic API (MCP) | ❌ | ❌ | ❌ | ❌ | ✅ 29 tools |
 | E2E test coverage published | ❌ | ❌ | ❌ | ❌ | ✅ 39 + 12 |
 
@@ -513,10 +513,10 @@ Authorization: Bearer eyJ…
 
 # Nobody else publishes their tests. We do.
 
-| Test signal | Tamada.kz | Wedy.kz | Sallem.kz | The Knot | **qonaqzhai** |
+| Test signal | Instagram+WA | 2GIS | toi.kz | The Knot | **qonaqzhai** |
 |---|---|---|---|---|---|
 | Public CI badge | ❌ | ❌ | ❌ | ❌ | ✅ |
-| End-to-end suite checked in | ❌ | ❌ | ❌ | ❌ | ✅ |
+| End-to-end suite checked in | n/a | ❌ | ❌ | ❌ | ✅ |
 | Cross-role assertions | ❌ | ❌ | ❌ | ❌ | ✅ |
 | Realtime / WebSocket coverage | ❌ | ❌ | ❌ | ❌ | ✅ |
 | Mobile UI flows checked in | ❌ | ❌ | ❌ | ❌ | ✅ |

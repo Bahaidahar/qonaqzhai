@@ -57,13 +57,13 @@ Three clients (web + mobile + MCP), four Go microservices, one bill of materials
 <div class="kpi"><div class="num">68 %</div><div class="lbl">vendors on Instagram only</div></div>
 </div>
 <br />
-<p><strong>Sources:</strong> Bureau of National Statistics (BNS RK 2024 demographic yearbook); Halyk Finance retail consumption brief Q3-2024; Kaspi Marketplace investor letter 2024; in-house survey of 38 vendors (Almaty, Astana, Shymkent), Mar 2026.</p>
+<p><strong>Sources:</strong> Bureau of National Statistics (BNS RK 2024 demographic yearbook); Halyk Finance retail consumption brief Q3-2024; Kaspi Marketplace investor letter 2024; in-house survey of 38 vendors on Instagram, 2GIS and toi.kz (Almaty, Astana, Shymkent), Mar 2026.</p>
 </section>
 </foreignObject></svg><svg data-marpit-svg="" viewBox="0 0 1280 720"><foreignObject width="1280" height="720"><section id="4" data-paginate="true" data-background-color="#ffffff" data-theme="default" data-style="@import url(&quot;./style.css&quot;);
 " lang="C" data-marpit-pagination="4" style="--paginate:true;--background-color:#ffffff;--theme:default;--style:@import url(&quot;./style.css&quot;);
 ;background-color:#ffffff;background-image:none;" data-marpit-pagination-total="18" data-size="16:9">
 <div class="eyebrow">03 — Who's already in the field</div>
-<h1 id="competitive-landscape--and-whats-missing">Competitive landscape — and what's missing</h1>
+<h1 id="competitive-landscape--what-people-use-today">Competitive landscape — what people use today</h1>
 <table>
 <thead>
 <tr>
@@ -78,40 +78,31 @@ Three clients (web + mobile + MCP), four Go microservices, one bill of materials
 </thead>
 <tbody>
 <tr>
-<td><strong>Tamada.kz</strong></td>
-<td>KZ</td>
-<td>Photo + tamada</td>
-<td>Phone callback</td>
-<td><span class="tag tag-no">no</span></td>
-<td><span class="tag tag-no">no</span></td>
-<td><span class="tag tag-no">no</span></td>
-</tr>
-<tr>
-<td><strong>Wedy.kz</strong></td>
-<td>KZ</td>
-<td>Wedding only</td>
-<td>Form → email</td>
-<td><span class="tag tag-no">no</span></td>
-<td><span class="tag tag-no">no</span></td>
-<td><span class="tag tag-no">no</span></td>
-</tr>
-<tr>
-<td><strong>Sallem.kz</strong></td>
-<td>KZ</td>
-<td>Venue rentals</td>
-<td>Calendar slot</td>
-<td><span class="tag tag-no">no</span></td>
-<td><span class="tag tag-no">no</span></td>
-<td><span class="tag tag-no">no</span></td>
-</tr>
-<tr>
 <td><strong>Instagram + WhatsApp</strong></td>
 <td>KZ</td>
 <td>Everything</td>
 <td>DM</td>
 <td><span class="tag tag-no">no</span></td>
 <td>n/a</td>
-<td>DM</td>
+<td>DM (slow)</td>
+</tr>
+<tr>
+<td><strong>2GIS</strong></td>
+<td>KZ</td>
+<td>Catalog (phones)</td>
+<td>Phone callback</td>
+<td><span class="tag tag-no">no</span></td>
+<td><span class="tag tag-ok">yes</span></td>
+<td><span class="tag tag-no">no</span></td>
+</tr>
+<tr>
+<td><strong>toi.kz</strong></td>
+<td>KZ</td>
+<td>Wedding portal</td>
+<td>Form → contact</td>
+<td><span class="tag tag-no">no</span></td>
+<td><span class="tag tag-no">no</span></td>
+<td><span class="tag tag-no">no</span></td>
 </tr>
 <tr>
 <td><strong>The Knot</strong> (US)</td>
@@ -123,11 +114,20 @@ Three clients (web + mobile + MCP), four Go microservices, one bill of materials
 <td><span class="tag tag-no">no</span></td>
 </tr>
 <tr>
-<td><strong>Bash</strong> (US)</td>
+<td><strong>WeddingWire</strong> (US)</td>
 <td>US</td>
-<td>Venue + service</td>
+<td>Wedding</td>
+<td>Quote engine</td>
+<td><span class="tag tag-no">no</span></td>
+<td><span class="tag tag-ok">yes</span></td>
+<td><span class="tag tag-no">no</span></td>
+</tr>
+<tr>
+<td><strong>Eventbrite</strong></td>
+<td>global</td>
+<td>Tickets (not service)</td>
 <td>Direct book</td>
-<td><span class="tag tag-ok">limited</span></td>
+<td><span class="tag tag-no">no</span></td>
 <td><span class="tag tag-ok">yes</span></td>
 <td><span class="tag tag-no">no</span></td>
 </tr>
@@ -152,9 +152,9 @@ Three clients (web + mobile + MCP), four Go microservices, one bill of materials
 <thead>
 <tr>
 <th>Feature</th>
-<th>Tamada.kz</th>
-<th>Wedy.kz</th>
-<th>Sallem.kz</th>
+<th>Instagram+WA</th>
+<th>2GIS</th>
+<th>toi.kz</th>
 <th>The Knot</th>
 <th><strong>qonaqzhai</strong></th>
 </tr>
@@ -162,27 +162,27 @@ Three clients (web + mobile + MCP), four Go microservices, one bill of materials
 <tbody>
 <tr>
 <td>Public vendor catalog</td>
-<td><img class="emoji" draggable="false" alt="⚪" src="https://cdn.jsdelivr.net/gh/jdecked/twemoji@17.0.2/assets/svg/26aa.svg" data-marp-twemoji=""/></td>
-<td><img class="emoji" draggable="false" alt="⚪" src="https://cdn.jsdelivr.net/gh/jdecked/twemoji@17.0.2/assets/svg/26aa.svg" data-marp-twemoji=""/></td>
-<td><img class="emoji" draggable="false" alt="⚪" src="https://cdn.jsdelivr.net/gh/jdecked/twemoji@17.0.2/assets/svg/26aa.svg" data-marp-twemoji=""/></td>
+<td><img class="emoji" draggable="false" alt="⚪" src="https://cdn.jsdelivr.net/gh/jdecked/twemoji@17.0.2/assets/svg/26aa.svg" data-marp-twemoji=""/> feed</td>
+<td><img class="emoji" draggable="false" alt="✅" src="https://cdn.jsdelivr.net/gh/jdecked/twemoji@17.0.2/assets/svg/2705.svg" data-marp-twemoji=""/></td>
+<td><img class="emoji" draggable="false" alt="✅" src="https://cdn.jsdelivr.net/gh/jdecked/twemoji@17.0.2/assets/svg/2705.svg" data-marp-twemoji=""/></td>
 <td><img class="emoji" draggable="false" alt="✅" src="https://cdn.jsdelivr.net/gh/jdecked/twemoji@17.0.2/assets/svg/2705.svg" data-marp-twemoji=""/></td>
 <td><img class="emoji" draggable="false" alt="✅" src="https://cdn.jsdelivr.net/gh/jdecked/twemoji@17.0.2/assets/svg/2705.svg" data-marp-twemoji=""/></td>
 </tr>
 <tr>
 <td>Native iOS / Android</td>
 <td><img class="emoji" draggable="false" alt="❌" src="https://cdn.jsdelivr.net/gh/jdecked/twemoji@17.0.2/assets/svg/274c.svg" data-marp-twemoji=""/></td>
-<td><img class="emoji" draggable="false" alt="❌" src="https://cdn.jsdelivr.net/gh/jdecked/twemoji@17.0.2/assets/svg/274c.svg" data-marp-twemoji=""/></td>
+<td><img class="emoji" draggable="false" alt="✅" src="https://cdn.jsdelivr.net/gh/jdecked/twemoji@17.0.2/assets/svg/2705.svg" data-marp-twemoji=""/></td>
 <td><img class="emoji" draggable="false" alt="❌" src="https://cdn.jsdelivr.net/gh/jdecked/twemoji@17.0.2/assets/svg/274c.svg" data-marp-twemoji=""/></td>
 <td><img class="emoji" draggable="false" alt="✅" src="https://cdn.jsdelivr.net/gh/jdecked/twemoji@17.0.2/assets/svg/2705.svg" data-marp-twemoji=""/></td>
 <td><img class="emoji" draggable="false" alt="✅" src="https://cdn.jsdelivr.net/gh/jdecked/twemoji@17.0.2/assets/svg/2705.svg" data-marp-twemoji=""/> Flutter</td>
 </tr>
 <tr>
 <td>3 languages (kk / ru / en)</td>
-<td><img class="emoji" draggable="false" alt="⚪" src="https://cdn.jsdelivr.net/gh/jdecked/twemoji@17.0.2/assets/svg/26aa.svg" data-marp-twemoji=""/></td>
-<td><img class="emoji" draggable="false" alt="⚪" src="https://cdn.jsdelivr.net/gh/jdecked/twemoji@17.0.2/assets/svg/26aa.svg" data-marp-twemoji=""/></td>
+<td>n/a</td>
+<td><img class="emoji" draggable="false" alt="⚪" src="https://cdn.jsdelivr.net/gh/jdecked/twemoji@17.0.2/assets/svg/26aa.svg" data-marp-twemoji=""/> ru/kk</td>
+<td><img class="emoji" draggable="false" alt="⚪" src="https://cdn.jsdelivr.net/gh/jdecked/twemoji@17.0.2/assets/svg/26aa.svg" data-marp-twemoji=""/> ru</td>
 <td><img class="emoji" draggable="false" alt="❌" src="https://cdn.jsdelivr.net/gh/jdecked/twemoji@17.0.2/assets/svg/274c.svg" data-marp-twemoji=""/></td>
-<td><img class="emoji" draggable="false" alt="❌" src="https://cdn.jsdelivr.net/gh/jdecked/twemoji@17.0.2/assets/svg/274c.svg" data-marp-twemoji=""/></td>
-<td><img class="emoji" draggable="false" alt="✅" src="https://cdn.jsdelivr.net/gh/jdecked/twemoji@17.0.2/assets/svg/2705.svg" data-marp-twemoji=""/></td>
+<td><img class="emoji" draggable="false" alt="✅" src="https://cdn.jsdelivr.net/gh/jdecked/twemoji@17.0.2/assets/svg/2705.svg" data-marp-twemoji=""/> all 3</td>
 </tr>
 <tr>
 <td>AI conversational planner</td>
@@ -193,16 +193,16 @@ Three clients (web + mobile + MCP), four Go microservices, one bill of materials
 <td><img class="emoji" draggable="false" alt="✅" src="https://cdn.jsdelivr.net/gh/jdecked/twemoji@17.0.2/assets/svg/2705.svg" data-marp-twemoji=""/> Gemini</td>
 </tr>
 <tr>
-<td>Vendor self-service</td>
-<td><img class="emoji" draggable="false" alt="⚪" src="https://cdn.jsdelivr.net/gh/jdecked/twemoji@17.0.2/assets/svg/26aa.svg" data-marp-twemoji=""/></td>
+<td>Vendor self-service portal</td>
 <td><img class="emoji" draggable="false" alt="❌" src="https://cdn.jsdelivr.net/gh/jdecked/twemoji@17.0.2/assets/svg/274c.svg" data-marp-twemoji=""/></td>
-<td><img class="emoji" draggable="false" alt="⚪" src="https://cdn.jsdelivr.net/gh/jdecked/twemoji@17.0.2/assets/svg/26aa.svg" data-marp-twemoji=""/></td>
+<td><img class="emoji" draggable="false" alt="⚪" src="https://cdn.jsdelivr.net/gh/jdecked/twemoji@17.0.2/assets/svg/26aa.svg" data-marp-twemoji=""/> paid claim</td>
+<td><img class="emoji" draggable="false" alt="⚪" src="https://cdn.jsdelivr.net/gh/jdecked/twemoji@17.0.2/assets/svg/26aa.svg" data-marp-twemoji=""/> form</td>
 <td><img class="emoji" draggable="false" alt="✅" src="https://cdn.jsdelivr.net/gh/jdecked/twemoji@17.0.2/assets/svg/2705.svg" data-marp-twemoji=""/></td>
 <td><img class="emoji" draggable="false" alt="✅" src="https://cdn.jsdelivr.net/gh/jdecked/twemoji@17.0.2/assets/svg/2705.svg" data-marp-twemoji=""/></td>
 </tr>
 <tr>
 <td>Realtime customer <img class="emoji" draggable="false" alt="↔" src="https://cdn.jsdelivr.net/gh/jdecked/twemoji@17.0.2/assets/svg/2194.svg" data-marp-twemoji=""/> vendor chat</td>
-<td><img class="emoji" draggable="false" alt="❌" src="https://cdn.jsdelivr.net/gh/jdecked/twemoji@17.0.2/assets/svg/274c.svg" data-marp-twemoji=""/></td>
+<td><img class="emoji" draggable="false" alt="⚪" src="https://cdn.jsdelivr.net/gh/jdecked/twemoji@17.0.2/assets/svg/26aa.svg" data-marp-twemoji=""/> DM</td>
 <td><img class="emoji" draggable="false" alt="❌" src="https://cdn.jsdelivr.net/gh/jdecked/twemoji@17.0.2/assets/svg/274c.svg" data-marp-twemoji=""/></td>
 <td><img class="emoji" draggable="false" alt="❌" src="https://cdn.jsdelivr.net/gh/jdecked/twemoji@17.0.2/assets/svg/274c.svg" data-marp-twemoji=""/></td>
 <td><img class="emoji" draggable="false" alt="❌" src="https://cdn.jsdelivr.net/gh/jdecked/twemoji@17.0.2/assets/svg/274c.svg" data-marp-twemoji=""/></td>
@@ -214,7 +214,7 @@ Three clients (web + mobile + MCP), four Go microservices, one bill of materials
 <td><img class="emoji" draggable="false" alt="❌" src="https://cdn.jsdelivr.net/gh/jdecked/twemoji@17.0.2/assets/svg/274c.svg" data-marp-twemoji=""/></td>
 <td><img class="emoji" draggable="false" alt="❌" src="https://cdn.jsdelivr.net/gh/jdecked/twemoji@17.0.2/assets/svg/274c.svg" data-marp-twemoji=""/></td>
 <td><img class="emoji" draggable="false" alt="❌" src="https://cdn.jsdelivr.net/gh/jdecked/twemoji@17.0.2/assets/svg/274c.svg" data-marp-twemoji=""/></td>
-<td><img class="emoji" draggable="false" alt="✅" src="https://cdn.jsdelivr.net/gh/jdecked/twemoji@17.0.2/assets/svg/2705.svg" data-marp-twemoji=""/> Saga</td>
+<td><img class="emoji" draggable="false" alt="✅" src="https://cdn.jsdelivr.net/gh/jdecked/twemoji@17.0.2/assets/svg/2705.svg" data-marp-twemoji=""/> saga</td>
 </tr>
 <tr>
 <td>Programmatic API (MCP)</td>
@@ -693,9 +693,9 @@ Authorization: Bearer eyJ…</p>
 <thead>
 <tr>
 <th>Test signal</th>
-<th>Tamada.kz</th>
-<th>Wedy.kz</th>
-<th>Sallem.kz</th>
+<th>Instagram+WA</th>
+<th>2GIS</th>
+<th>toi.kz</th>
 <th>The Knot</th>
 <th><strong>qonaqzhai</strong></th>
 </tr>
@@ -711,7 +711,7 @@ Authorization: Bearer eyJ…</p>
 </tr>
 <tr>
 <td>End-to-end suite checked in</td>
-<td><img class="emoji" draggable="false" alt="❌" src="https://cdn.jsdelivr.net/gh/jdecked/twemoji@17.0.2/assets/svg/274c.svg" data-marp-twemoji=""/></td>
+<td>n/a</td>
 <td><img class="emoji" draggable="false" alt="❌" src="https://cdn.jsdelivr.net/gh/jdecked/twemoji@17.0.2/assets/svg/274c.svg" data-marp-twemoji=""/></td>
 <td><img class="emoji" draggable="false" alt="❌" src="https://cdn.jsdelivr.net/gh/jdecked/twemoji@17.0.2/assets/svg/274c.svg" data-marp-twemoji=""/></td>
 <td><img class="emoji" draggable="false" alt="❌" src="https://cdn.jsdelivr.net/gh/jdecked/twemoji@17.0.2/assets/svg/274c.svg" data-marp-twemoji=""/></td>
