@@ -27,29 +27,29 @@ Three clients (web + mobile + MCP), four Go microservices, one bill of materials
 
 <div class="eyebrow">01 — The problem</div>
 
-# Booking **any event** in Kazakhstan — wedding, toi, birthday, corporate — takes <span style="color:var(--primary)">14+ calls</span> and an Instagram DM chain.
+# Booking any event in KZ — toi, wedding, birthday, corporate — takes <span style="color:var(--primary)">14+ calls</span> and an Instagram DM chain.
 
 <div class="cols">
 
 <div>
 
-**Customer side** — for the whole calendar of events
-- Toi · betashar · kelin tusіru · weddings · birthdays · corporate parties · graduations · baby showers
-- Vendors live on Instagram, WhatsApp, 2GIS — no price transparency
+**Customer side**
+- Vendors scattered across Instagram, WhatsApp, 2GIS
+- No price transparency, no portable reputation
 - Comparisons happen via screenshots in group chats
-- Cancellations slip because there is no booking record
-- AI planning assistance is locked to enterprise tools
+- Cancellations slip — no booking record exists
+- AI planning is locked to enterprise tools
 
 </div>
 
 <div>
 
-**Vendor side** — same business, multiple event types
-- Bookings scattered across 4 messengers
-- Payment is cash or Kaspi link, no escrow
-- Reviews live in word-of-mouth, no portable reputation
-- Free Instagram reach flattening since 2024
-- No way to fill weekday gaps between weekend weddings
+**Vendor side**
+- Bookings live across 4 messengers
+- Payment is cash or Kaspi link — no escrow
+- Reviews stuck in word-of-mouth
+- Instagram organic reach down since 2024
+- No way to fill weekday gaps
 
 </div>
 
