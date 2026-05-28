@@ -1,0 +1,15 @@
+appId: com.example.qonaqzhaiMobile
+---
+- runFlow: skip_onboarding.yaml
+- tapOn:
+    id: "demo-demo_acc_customer"
+- extendedWaitUntil:
+    visible:
+      text: "customer1@demo.kz"
+    timeout: 5000
+- tapOn:
+    id: "login-submit"
+- extendedWaitUntil:
+    visible:
+      text: "^AI$|.*Vendors.*|.*Подрядчики.*|.*Жеткізушілер.*"
+    timeout: 20000

@@ -71,6 +71,10 @@ func run(log *slog.Logger) error {
 		{Prefix: "/api/me/vendor", Target: coreURL},
 		{Prefix: "/api/me", Target: authURL},
 
+		// Admin endpoints live across auth (users) and core (vendors/stats).
+		// Match the user-management subtree to auth before the /api catch-all.
+		{Prefix: "/api/admin/users", Target: authURL},
+
 		// Catch-all: vendors, bookings, photos, reviews, notifications,
 		// admin endpoints → core.
 		{Prefix: "/api", Target: coreURL},

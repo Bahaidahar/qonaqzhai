@@ -67,6 +67,7 @@ func run(log *slog.Logger) error {
 	reviews := repo.NewReviewRepo(db, id)
 	notifications := repo.NewNotificationRepo(db, id)
 	fcmTokens := repo.NewFCMTokenRepo(db, id)
+	services := repo.NewServiceRepo(db, id)
 
 	vendorSvc := vendor.New(vendor.Deps{Vendors: vendors, Reviews: reviews})
 	reviewSvc := review.New(review.Deps{Reviews: reviews, Bookings: bookings, Vendors: vendors, Logger: log})
@@ -108,6 +109,7 @@ func run(log *slog.Logger) error {
 	handler := &corehttp.Handler{
 		Vendors: vendorSvc, Bookings: bookingSvc, Reviews: reviewSvc,
 		Photos: photoSvc, Notifications: notifSvc, Admin: adminSvc,
+		Services: services,
 	}
 
 	httpSrv := &http.Server{

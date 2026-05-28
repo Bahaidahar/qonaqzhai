@@ -1,0 +1,63 @@
+appId: com.example.qonaqzhaiMobile
+name: QA sweep — every tab loads for customer and vendor
+tags:
+  - smoke
+  - sweep
+---
+# customer
+- launchApp:
+    clearState: true
+    clearKeychain: true
+- runFlow: helpers/login_customer.yaml
+- assertVisible:
+    text: "^AI$"
+- tapOn:
+    text: ".*Vendors.*|.*Подрядчики.*|.*Жеткізушілер.*"
+- extendedWaitUntil:
+    visible:
+      text: ".*Vendors.*|.*Подрядчики.*|.*Жеткізушілер.*"
+    timeout: 5000
+- tapOn:
+    text: ".*Bookings.*|.*Брони.*|.*Тапсырыстар.*|.*Тапсырыс.*"
+- extendedWaitUntil:
+    visible:
+      text: ".*Bookings.*|.*Брони.*|.*Тапсырыстар.*|.*Тапсырыс.*"
+    timeout: 5000
+- tapOn:
+    text: ".*Chats.*|.*Чаты.*|.*Чаттар.*"
+- extendedWaitUntil:
+    visible:
+      text: ".*Chats.*|.*Чаты.*|.*Чаттар.*"
+    timeout: 5000
+- tapOn:
+    text: ".*Settings.*|.*Настройки.*|.*Параметрлер.*"
+- extendedWaitUntil:
+    visible:
+      text: ".*Settings.*|.*Настройки.*|.*Параметрлер.*"
+    timeout: 5000
+
+# vendor
+- launchApp:
+    clearState: true
+    clearKeychain: true
+- runFlow: helpers/login_vendor.yaml
+- assertVisible:
+    text: ".*My profile.*|.*Vendor profile.*|.*Мой профиль.*|.*Менің профилім.*|.*Профиль подрядчика.*"
+- tapOn:
+    text: ".*Bookings.*|.*Брони.*|.*Тапсырыстар.*|.*Тапсырыс.*"
+- extendedWaitUntil:
+    visible:
+      text: ".*Booking inbox.*|.*Bookings.*"
+    timeout: 5000
+- tapOn:
+    text: ".*Inbox.*|.*Уведомления.*|.*Хабарландырулар.*"
+- extendedWaitUntil:
+    visible:
+      text: ".*Inbox.*|.*Уведомления.*|.*Хабарландырулар.*"
+    timeout: 5000
+- tapOn:
+    text: ".*Settings.*|.*Настройки.*|.*Параметрлер.*"
+- extendedWaitUntil:
+    visible:
+      text: ".*Settings.*|.*Настройки.*|.*Параметрлер.*"
+    timeout: 5000

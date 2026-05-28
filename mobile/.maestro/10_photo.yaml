@@ -1,0 +1,19 @@
+appId: com.example.qonaqzhaiMobile
+name: Vendor profile loads with the basics section visible
+tags:
+  - vendor
+  - photo
+---
+- launchApp:
+    clearState: true
+    clearKeychain: true
+- runFlow: helpers/login_vendor.yaml
+- extendedWaitUntil:
+    visible:
+      text: ".*My profile.*|.*Vendor profile.*|.*Profile.*"
+    timeout: 8000
+- swipe:
+    direction: UP
+- swipe:
+    direction: UP
+- takeScreenshot: vendor-profile

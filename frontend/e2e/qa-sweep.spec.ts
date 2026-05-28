@@ -61,7 +61,7 @@ test.beforeAll(async () => {
   });
   if (loginRes.ok) {
     const body = (await loginRes.json()) as { token: string };
-    await fetch("http://localhost:8080/api/vendor", {
+    await fetch("http://localhost:8080/api/me/vendor", {
       method: "POST",
       headers: {
         "content-type": "application/json",

@@ -1,6 +1,7 @@
 import 'package:dio/dio.dart';
 
 import '../../../../core/network/api_endpoints.dart';
+import '../../domain/entities/service.dart';
 import '../../domain/entities/vendor.dart';
 import '../../domain/repositories/vendor_repository.dart';
 
@@ -62,5 +63,28 @@ class VendorRepositoryImpl implements VendorRepository {
       options: Options(extra: {'requiresAuth': false}),
     );
     return _fromJson(res.data as Map<String, dynamic>);
+  }
+
+  @override
+  Future<List<VendorService>> services(String vendorId) async {
+    final res = await _dio.get(
+      ApiEndpoints.vendorPublicServices(vendorId),
+      options: Options(extra: {'requiresAuth': false}),
+    );
+    final data = res.data;
+    final items = data is Map<String, dynamic>
+        ? (data['items'] as List?) ?? const []
+        : (data as List?) ?? const [];
+    return items
+        .whereType<Map<String, dynamic>>()
+        .map((j) => VendorService(
+              id: j['id'] as String,
+              vendorId: (j['vendorId'] as String?) ?? vendorId,
+              name: (j['name'] as String?) ?? '',
+              description: (j['description'] as String?) ?? '',
+              price: (j['price'] as num?)?.toInt() ?? 0,
+              unit: (j['unit'] as String?) ?? 'fixed',
+            ))
+        .toList();
   }
 }

@@ -1,0 +1,15 @@
+appId: com.example.qonaqzhaiMobile
+name: Vendor opens the notifications inbox tab
+tags:
+  - notifications
+---
+- launchApp:
+    clearState: true
+    clearKeychain: true
+- runFlow: helpers/login_vendor.yaml
+- tapOn:
+    text: ".*Inbox.*|.*Уведомления.*|.*Хабарландырулар.*"
+- extendedWaitUntil:
+    visible:
+      text: "Notifications|Уведомления|Хабарландырулар|No notifications"
+    timeout: 5000

@@ -2,12 +2,14 @@
 package http
 
 import (
+	"errors"
 	"io"
 	"net/http"
 	"strconv"
 	"strings"
 
 	pkgauth "qonaqzhai-backend/pkg/auth"
+	"qonaqzhai-backend/pkg/errs"
 	"qonaqzhai-backend/pkg/httpx"
 
 	"qonaqzhai-backend/services/core/internal/domain"
@@ -28,6 +30,7 @@ type Handler struct {
 	Photos        *photo.Service
 	Notifications *notification.Service
 	Admin         *admin.Service
+	Services      ports.ServiceRepo
 }
 
 func (h *Handler) Health(w http.ResponseWriter, _ *http.Request) {
@@ -156,7 +159,7 @@ func (h *Handler) ListMyBookings(w http.ResponseWriter, r *http.Request) {
 		httpx.HandleError(w, err)
 		return
 	}
-	httpx.WriteJSON(w, http.StatusOK, bs)
+	httpx.WriteJSON(w, http.StatusOK, map[string]any{"items": bs})
 }
 
 // readPage extracts limit + offset query params with sane defaults.
@@ -245,16 +248,16 @@ func (h *Handler) ListReviews(w http.ResponseWriter, r *http.Request) {
 		httpx.HandleError(w, err)
 		return
 	}
-	httpx.WriteJSON(w, http.StatusOK, rv)
+	httpx.WriteJSON(w, http.StatusOK, map[string]any{"items": rv})
 }
 
 // --- photos ---
 
 func (h *Handler) UploadPhoto(w http.ResponseWriter, r *http.Request) {
 	uid, _ := pkgauth.UserIDFrom(r.Context())
-	data, err := io.ReadAll(http.MaxBytesReader(w, r.Body, domain.MaxPhotoSize+1024))
+	data, err := readPhotoBody(w, r)
 	if err != nil {
-		httpx.WriteError(w, http.StatusBadRequest, "read body")
+		httpx.WriteError(w, http.StatusBadRequest, err.Error())
 		return
 	}
 	p, err := h.Photos.Upload(r.Context(), uid, data)
@@ -263,6 +266,26 @@ func (h *Handler) UploadPhoto(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	httpx.WriteJSON(w, http.StatusCreated, p)
+}
+
+// readPhotoBody returns the photo bytes regardless of whether the request is
+// multipart/form-data (web clients) or a raw image body (mobile / curl). The
+// multipart branch reads the "photo" form field; the raw branch reads r.Body.
+func readPhotoBody(w http.ResponseWriter, r *http.Request) ([]byte, error) {
+	const cap = domain.MaxPhotoSize + 1024
+	ct := r.Header.Get("Content-Type")
+	if strings.HasPrefix(ct, "multipart/form-data") {
+		if err := r.ParseMultipartForm(cap); err != nil {
+			return nil, err
+		}
+		f, _, err := r.FormFile("photo")
+		if err != nil {
+			return nil, err
+		}
+		defer f.Close()
+		return io.ReadAll(io.LimitReader(f, cap))
+	}
+	return io.ReadAll(http.MaxBytesReader(w, r.Body, cap))
 }
 
 func (h *Handler) ServePhoto(w http.ResponseWriter, r *http.Request) {
@@ -296,7 +319,7 @@ func (h *Handler) ListNotifications(w http.ResponseWriter, r *http.Request) {
 		httpx.HandleError(w, err)
 		return
 	}
-	httpx.WriteJSON(w, http.StatusOK, ns)
+	httpx.WriteJSON(w, http.StatusOK, map[string]any{"items": ns})
 }
 
 func (h *Handler) RegisterFCM(w http.ResponseWriter, r *http.Request) {
@@ -326,4 +349,195 @@ func (h *Handler) AdminStats(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	httpx.WriteJSON(w, http.StatusOK, st)
+}
+
+// Chart endpoints. Implementations are stubbed empty arrays — admin dashboard
+// renders a "no data yet" placeholder when items are empty. Real aggregates
+// can be wired through h.Admin once analytics queries are designed.
+func (h *Handler) AdminStatsBookings(w http.ResponseWriter, _ *http.Request) {
+	httpx.WriteJSON(w, http.StatusOK, map[string]any{"items": []any{}})
+}
+
+func (h *Handler) AdminStatsCategories(w http.ResponseWriter, _ *http.Request) {
+	httpx.WriteJSON(w, http.StatusOK, map[string]any{"items": []any{}})
+}
+
+func (h *Handler) AdminStatsFunnel(w http.ResponseWriter, _ *http.Request) {
+	httpx.WriteJSON(w, http.StatusOK, map[string]any{"items": []any{}})
+}
+
+// --- vendor services ---
+
+// servicesForVendor resolves the calling user's vendor id (errors → 0 items).
+func (h *Handler) servicesForCallingVendor(r *http.Request) (string, error) {
+	uid, _ := pkgauth.UserIDFrom(r.Context())
+	v, err := h.Vendors.FindByUserID(r.Context(), uid)
+	if err != nil {
+		return "", err
+	}
+	return v.ID, nil
+}
+
+func (h *Handler) ListMyServices(w http.ResponseWriter, r *http.Request) {
+	vendorID, err := h.servicesForCallingVendor(r)
+	if err != nil {
+		// vendor has no profile yet — treat as empty list rather than 404
+		if errors.Is(err, errs.ErrNotFound) {
+			httpx.WriteJSON(w, http.StatusOK, map[string]any{"items": []any{}})
+			return
+		}
+		httpx.HandleError(w, err)
+		return
+	}
+	items, err := h.Services.ListByVendor(r.Context(), vendorID)
+	if err != nil {
+		httpx.HandleError(w, err)
+		return
+	}
+	httpx.WriteJSON(w, http.StatusOK, map[string]any{"items": items})
+}
+
+type serviceReq struct {
+	Name        string  `json:"name"`
+	Description string  `json:"description"`
+	Price       int64   `json:"price"`
+	Unit        string  `json:"unit"`
+	IsActive    *bool   `json:"isActive"`
+}
+
+func (h *Handler) AddMyService(w http.ResponseWriter, r *http.Request) {
+	vendorID, err := h.servicesForCallingVendor(r)
+	if err != nil {
+		httpx.HandleError(w, err)
+		return
+	}
+	var req serviceReq
+	if err := httpx.ReadJSON(r, &req); err != nil {
+		httpx.WriteError(w, http.StatusBadRequest, "invalid json")
+		return
+	}
+	active := true
+	if req.IsActive != nil {
+		active = *req.IsActive
+	}
+	created, err := h.Services.Create(r.Context(), &domain.Service{
+		VendorID:    vendorID,
+		Name:        req.Name,
+		Description: req.Description,
+		Price:       req.Price,
+		Unit:        domain.ServiceUnit(req.Unit),
+		IsActive:    active,
+	})
+	if err != nil {
+		httpx.HandleError(w, err)
+		return
+	}
+	httpx.WriteJSON(w, http.StatusCreated, created)
+}
+
+func (h *Handler) UpdateMyService(w http.ResponseWriter, r *http.Request) {
+	id := r.PathValue("id")
+	var req serviceReq
+	if err := httpx.ReadJSON(r, &req); err != nil {
+		httpx.WriteError(w, http.StatusBadRequest, "invalid json")
+		return
+	}
+	updated, err := h.Services.Update(r.Context(), id, domain.ServiceInput{
+		Name:        req.Name,
+		Description: req.Description,
+		Price:       req.Price,
+		Unit:        domain.ServiceUnit(req.Unit),
+		IsActive:    req.IsActive,
+	})
+	if err != nil {
+		httpx.HandleError(w, err)
+		return
+	}
+	httpx.WriteJSON(w, http.StatusOK, updated)
+}
+
+func (h *Handler) DeleteMyService(w http.ResponseWriter, r *http.Request) {
+	id := r.PathValue("id")
+	if err := h.Services.Delete(r.Context(), id); err != nil {
+		httpx.HandleError(w, err)
+		return
+	}
+	w.WriteHeader(http.StatusNoContent)
+}
+
+func (h *Handler) ListVendorServices(w http.ResponseWriter, r *http.Request) {
+	vendorID := r.PathValue("vendorId")
+	items, err := h.Services.ListByVendor(r.Context(), vendorID)
+	if err != nil {
+		httpx.HandleError(w, err)
+		return
+	}
+	httpx.WriteJSON(w, http.StatusOK, map[string]any{"items": items})
+}
+
+// --- AI chat stub ---
+
+// ChatStub returns a canned event-planning skeleton. The UI is built against
+// `{ chatId, message: { id, role, text, blocks } }` and renders block cards;
+// returning realistic-shape data here keeps the mobile + web flows alive
+// while the real Gemini integration is still pending on the backend.
+func (h *Handler) ChatStub(w http.ResponseWriter, r *http.Request) {
+	var req struct {
+		Message string  `json:"message"`
+		ChatID  *string `json:"chatId"`
+	}
+	if err := httpx.ReadJSON(r, &req); err != nil {
+		httpx.WriteError(w, http.StatusBadRequest, "invalid json")
+		return
+	}
+	chatID := ""
+	if req.ChatID != nil {
+		chatID = *req.ChatID
+	}
+	if chatID == "" {
+		chatID = "stub-" + strconv.FormatInt(int64(len(req.Message)), 10)
+	}
+	httpx.WriteJSON(w, http.StatusOK, map[string]any{
+		"chatId": chatID,
+		"message": map[string]any{
+			"id":   "stub-reply",
+			"role": "ai",
+			"text": "Got it — here's a draft plan. Plug in a real LLM in /api/chat to replace this stub.",
+			"blocks": []map[string]any{
+				{
+					"type": "plan",
+					"data": map[string]any{
+						"title":     "Draft event plan",
+						"eventType": "event",
+						"city":      "Almaty",
+						"guests":    100,
+						"budget":    3000000,
+					},
+				},
+			},
+		},
+	})
+}
+
+func (h *Handler) ChatsList(w http.ResponseWriter, _ *http.Request) {
+	httpx.WriteJSON(w, http.StatusOK, map[string]any{"items": []any{}})
+}
+
+func (h *Handler) ChatGet(w http.ResponseWriter, r *http.Request) {
+	httpx.WriteJSON(w, http.StatusOK, map[string]any{
+		"id":       r.PathValue("id"),
+		"title":    "Stub chat",
+		"messages": []any{},
+	})
+}
+
+func (h *Handler) ChatDelete(w http.ResponseWriter, _ *http.Request) {
+	w.WriteHeader(http.StatusNoContent)
+}
+
+func (h *Handler) ChatRename(w http.ResponseWriter, r *http.Request) {
+	httpx.WriteJSON(w, http.StatusOK, map[string]any{
+		"id":    r.PathValue("id"),
+		"title": "Renamed",
+	})
 }

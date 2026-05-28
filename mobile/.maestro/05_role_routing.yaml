@@ -1,0 +1,28 @@
+appId: com.example.qonaqzhaiMobile
+name: Bottom-nav layout differs between customer and vendor
+tags:
+  - role-routing
+---
+# --- customer: AI chat + Vendors + Bookings + Chats + Settings ---
+- launchApp:
+    clearState: true
+    clearKeychain: true
+- runFlow: helpers/login_customer.yaml
+- assertVisible:
+    text: ".*Vendors.*|.*Подрядчики.*|.*Жеткізушілер.*"
+- assertVisible:
+    text: ".*Chats.*|.*Чаты.*|.*Чаттар.*"
+- assertNotVisible:
+    text: ".*My profile.*|.*Мой профиль.*|.*Менің профилім.*"
+
+# --- vendor: My profile + Bookings + Chats + Inbox + Settings ---
+- launchApp:
+    clearState: true
+    clearKeychain: true
+- runFlow: helpers/login_vendor.yaml
+- assertVisible:
+    text: ".*My profile.*|.*Vendor profile.*|.*Мой профиль.*|.*Менің профилім.*|.*Профиль подрядчика.*"
+- assertVisible:
+    text: ".*Inbox.*|.*Уведомления.*|.*Хабарландырулар.*"
+- assertNotVisible:
+    text: ".*Vendors.*|.*Подрядчики.*|.*Жеткізушілер.*"

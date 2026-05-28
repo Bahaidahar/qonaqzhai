@@ -1,0 +1,18 @@
+appId: com.example.qonaqzhaiMobile
+---
+- runFlow: skip_onboarding.yaml
+- tapOn:
+    id: "demo-demo_acc_vendor"
+# Wait for the demo-card to populate the email + password controllers and
+# the rebuild to land before submitting. Without this the submit tap can
+# fire on an empty form and 401, leaving us stuck on the login screen.
+- extendedWaitUntil:
+    visible:
+      text: "vendor1@demo.kz"
+    timeout: 5000
+- tapOn:
+    id: "login-submit"
+- extendedWaitUntil:
+    visible:
+      text: ".*My profile.*|.*Vendor profile.*|.*Мой профиль.*|.*Менің профилім.*"
+    timeout: 20000

@@ -1,0 +1,11 @@
+appId: com.example.qonaqzhaiMobile
+name: Customer lands on AI chat
+tags:
+  - chat
+---
+- launchApp:
+    clearState: true
+    clearKeychain: true
+- runFlow: helpers/login_customer.yaml
+- assertVisible:
+    text: "^AI$"

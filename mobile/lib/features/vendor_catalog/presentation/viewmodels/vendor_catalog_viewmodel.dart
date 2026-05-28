@@ -2,11 +2,18 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/network/dio_client.dart';
 import '../../data/repositories/vendor_repository_impl.dart';
+import '../../domain/entities/service.dart';
 import '../../domain/entities/vendor.dart';
 import '../../domain/repositories/vendor_repository.dart';
 
 final vendorRepositoryProvider = Provider<VendorRepository>((ref) {
   return VendorRepositoryImpl(ref.watch(dioProvider));
+});
+
+/// Public vendor services list — used by the customer-facing detail page.
+final vendorServicesProvider =
+    FutureProvider.family<List<VendorService>, String>((ref, id) {
+  return ref.watch(vendorRepositoryProvider).services(id);
 });
 
 class VendorCatalogState {

@@ -25,6 +25,9 @@ func Mux(h *Handler, mw *pkgauth.Middleware, log *slog.Logger) http.Handler {
 	mux.HandleFunc("POST /api/reset-password", h.ResetPassword)
 	mux.Handle("GET /api/me", mw.Required(http.HandlerFunc(h.Me)))
 
+	mux.Handle("GET /api/admin/users", mw.RequireRole("admin")(http.HandlerFunc(h.AdminListUsers)))
+	mux.Handle("PATCH /api/admin/users/{id}", mw.RequireRole("admin")(http.HandlerFunc(h.AdminSetUserStatus)))
+
 	withLimits := rl.PerIP()(mux)
 	withRecover := httpx.Recover(log)(withLimits)
 	return httpx.AccessLog(log)(withRecover)

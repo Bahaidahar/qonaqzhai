@@ -8,6 +8,7 @@ abstract class BookingRepository {
     required int guestCount,
     String? note,
     int? amount,
+    String? serviceId,
   });
   Future<Booking> updateStatus(String id, String status);
   Future<String> startPayment(String bookingId);

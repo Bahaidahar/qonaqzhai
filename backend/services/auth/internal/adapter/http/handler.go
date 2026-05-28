@@ -9,6 +9,7 @@ import (
 	"qonaqzhai-backend/pkg/httpx"
 
 	"qonaqzhai-backend/services/auth/internal/domain"
+	"qonaqzhai-backend/services/auth/internal/ports"
 	"qonaqzhai-backend/services/auth/internal/usecase"
 )
 
@@ -150,4 +151,48 @@ func (h *Handler) Me(w http.ResponseWriter, r *http.Request) {
 // Health is a trivial liveness probe.
 func (h *Handler) Health(w http.ResponseWriter, _ *http.Request) {
 	httpx.WriteJSON(w, http.StatusOK, map[string]string{"status": "ok", "svc": "auth"})
+}
+
+func (h *Handler) AdminListUsers(w http.ResponseWriter, r *http.Request) {
+	q := r.URL.Query()
+	limit, _ := strconvAtoi(q.Get("limit"))
+	offset, _ := strconvAtoi(q.Get("offset"))
+	users, err := h.svc.ListUsersForAdmin(r.Context(), ports.ListUsersOpts{
+		Limit:  limit,
+		Offset: offset,
+		Role:   q.Get("role"),
+	})
+	if err != nil {
+		httpx.HandleError(w, err)
+		return
+	}
+	httpx.WriteJSON(w, http.StatusOK, map[string]any{"items": users})
+}
+
+func (h *Handler) AdminSetUserStatus(w http.ResponseWriter, r *http.Request) {
+	id := r.PathValue("id")
+	var req struct {
+		Status string `json:"status"`
+	}
+	if err := httpx.ReadJSON(r, &req); err != nil {
+		httpx.WriteError(w, http.StatusBadRequest, "invalid json")
+		return
+	}
+	u, err := h.svc.SetUserStatus(r.Context(), id, domain.UserStatus(req.Status))
+	if err != nil {
+		httpx.HandleError(w, err)
+		return
+	}
+	httpx.WriteJSON(w, http.StatusOK, u)
+}
+
+func strconvAtoi(s string) (int, error) {
+	n := 0
+	for _, c := range s {
+		if c < '0' || c > '9' {
+			return 0, nil
+		}
+		n = n*10 + int(c-'0')
+	}
+	return n, nil
 }

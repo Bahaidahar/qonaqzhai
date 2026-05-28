@@ -4,6 +4,7 @@ package booking
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 
 	"qonaqzhai-backend/pkg/errs"
@@ -209,10 +210,15 @@ func (s *Service) ListForCustomer(ctx context.Context, customerID string, p port
 	return s.d.Bookings.ListForCustomer(ctx, customerID, p)
 }
 
-// ListForVendor returns paginated bookings against vendorID.
+// ListForVendor returns paginated bookings against vendorID. A vendor user
+// without a vendor profile yet returns an empty list rather than 404 — the
+// vendor inbox is a valid page to visit before publishing a profile.
 func (s *Service) ListForVendor(ctx context.Context, vendorUserID string, p ports.Page) ([]*domain.Booking, error) {
 	v, err := s.d.Vendors.FindByUserID(ctx, vendorUserID)
 	if err != nil {
+		if errors.Is(err, errs.ErrNotFound) {
+			return nil, nil
+		}
 		return nil, err
 	}
 	return s.d.Bookings.ListForVendor(ctx, v.ID, p)

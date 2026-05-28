@@ -1,0 +1,16 @@
+appId: com.example.qonaqzhaiMobile
+name: Vendor sees the seeded pending booking
+tags:
+  - booking
+  - cross-role
+---
+- launchApp:
+    clearState: true
+    clearKeychain: true
+- runFlow: helpers/login_vendor.yaml
+- tapOn:
+    text: ".*Bookings.*|.*Брони.*|.*Тапсырыстар.*|.*Тапсырыс.*"
+- extendedWaitUntil:
+    visible:
+      text: ".*pending.*|.*accepted.*|.*Booking inbox.*"
+    timeout: 10000

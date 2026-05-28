@@ -64,6 +64,22 @@ export async function adminLogin(page: Page): Promise<void> {
 }
 
 export async function approveVendorByEmail(email: string): Promise<void> {
+  // Re-login as the vendor user to fetch their vendor.id via /api/me/vendor.
+  // (Core has no admin-side vendor list endpoint exposed over HTTP.)
+  const vLoginRes = await fetch(`${BACKEND}/api/login`, {
+    method: "POST",
+    headers: { "content-type": "application/json" },
+    body: JSON.stringify({ email, password: "password123" }),
+  });
+  if (!vLoginRes.ok) throw new Error(`vendor login failed for ${email}`);
+  const vAuth = (await vLoginRes.json()) as { token: string };
+
+  const myRes = await fetch(`${BACKEND}/api/me/vendor`, {
+    headers: { authorization: `Bearer ${vAuth.token}` },
+  });
+  if (!myRes.ok) throw new Error(`/api/me/vendor failed: ${myRes.status}`);
+  const vendor = (await myRes.json()) as { id: string };
+
   const adminRes = await fetch(`${BACKEND}/api/login`, {
     method: "POST",
     headers: { "content-type": "application/json" },
@@ -74,29 +90,18 @@ export async function approveVendorByEmail(email: string): Promise<void> {
   });
   const admin = (await adminRes.json()) as { token: string };
 
-  const listRes = await fetch(`${BACKEND}/api/admin/users`, {
-    headers: { authorization: `Bearer ${admin.token}` },
-  });
-  const list = (await listRes.json()) as { items: { id: string; email: string }[] };
-  const user = list.items.find((u) => u.email === email);
-  if (!user) throw new Error(`user ${email} not found`);
-
-  // find vendor by user
-  const vendorsRes = await fetch(`${BACKEND}/api/vendors?status=`, {
-    headers: { authorization: `Bearer ${admin.token}` },
-  });
-  const vendors = (await vendorsRes.json()) as {
-    items: { id: string; userId: string }[] | null;
-  };
-  const vendor = vendors.items?.find((v) => v.userId === user.id);
-  if (!vendor) throw new Error(`vendor for ${email} not found`);
-
-  await fetch(`${BACKEND}/api/admin/vendors/${vendor.id}`, {
-    method: "PATCH",
-    headers: {
-      "content-type": "application/json",
-      authorization: `Bearer ${admin.token}`,
-    },
-    body: JSON.stringify({ status: "approved" }),
-  });
+  const approveRes = await fetch(
+    `${BACKEND}/api/admin/vendors/${vendor.id}/status`,
+    {
+      method: "PATCH",
+      headers: {
+        "content-type": "application/json",
+        authorization: `Bearer ${admin.token}`,
+      },
+      body: JSON.stringify({ status: "approved" }),
+    }
+  );
+  if (!approveRes.ok) {
+    throw new Error(`approve failed: ${approveRes.status}`);
+  }
 }

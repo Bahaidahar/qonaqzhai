@@ -33,7 +33,7 @@ func (h *Handler) ListThreads(w http.ResponseWriter, r *http.Request) {
 		httpx.HandleError(w, err)
 		return
 	}
-	httpx.WriteJSON(w, http.StatusOK, summaries)
+	httpx.WriteJSON(w, http.StatusOK, map[string]any{"items": summaries})
 }
 
 func (h *Handler) GetThread(w http.ResponseWriter, r *http.Request) {

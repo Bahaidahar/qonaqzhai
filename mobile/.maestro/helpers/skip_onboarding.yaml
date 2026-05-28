@@ -1,0 +1,15 @@
+appId: com.example.qonaqzhaiMobile
+---
+# Pick English on the first onboarding slide so every downstream assertion can
+# rely on English copy, then tap Skip to land on the login screen. The wait
+# uses the login email field's stable Semantics id rather than a localised
+# "Sign in" string because the simulator's default locale flips between runs.
+- tapOn:
+    text: "English"
+    optional: true
+- tapOn:
+    text: "Skip|Пропустить|Өткізіп жіберу"
+- extendedWaitUntil:
+    visible:
+      id: "login-email"
+    timeout: 10000

@@ -1,0 +1,10 @@
+appId: com.example.qonaqzhaiMobile
+name: Fixed customer logs in through the UI
+tags:
+  - smoke
+  - auth
+---
+- launchApp:
+    clearState: true
+    clearKeychain: true
+- runFlow: helpers/login_customer.yaml

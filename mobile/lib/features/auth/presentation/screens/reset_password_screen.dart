@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:google_fonts/google_fonts.dart';
 
+import '../../../../core/i18n/i18n.dart';
+import '../../../../core/theme/app_theme.dart';
+import '../../../../core/ui/ui.dart';
 import '../viewmodels/auth_viewmodel.dart';
 
 class ResetPasswordScreen extends ConsumerStatefulWidget {
@@ -14,7 +18,8 @@ class ResetPasswordScreen extends ConsumerStatefulWidget {
 }
 
 class _ResetPasswordScreenState extends ConsumerState<ResetPasswordScreen> {
-  late final TextEditingController _token = TextEditingController(text: widget.initialToken ?? '');
+  late final TextEditingController _token =
+      TextEditingController(text: widget.initialToken ?? '');
   final _password = TextEditingController();
   bool _busy = false;
 
@@ -35,7 +40,7 @@ class _ResetPasswordScreenState extends ConsumerState<ResetPasswordScreen> {
     setState(() => _busy = false);
     if (ok) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Password updated. Please sign in.')),
+        SnackBar(content: Text(tr(ref, 'reset_done'))),
       );
       context.go('/login');
     }
@@ -44,40 +49,89 @@ class _ResetPasswordScreenState extends ConsumerState<ResetPasswordScreen> {
   @override
   Widget build(BuildContext context) {
     final state = ref.watch(authViewModelProvider);
+    final p = AppPalette.of(context);
+
     return Scaffold(
-      appBar: AppBar(title: const Text('Reset password')),
-      body: Padding(
-        padding: const EdgeInsets.all(20),
+      appBar: AppBar(),
+      body: SafeArea(
         child: ListView(
+          padding: const EdgeInsets.fromLTRB(24, 8, 24, 24),
           children: [
-            TextField(
-              controller: _token,
-              decoration: const InputDecoration(labelText: 'Reset token'),
+            AppPageHeader(
+              title: tr(ref, 'reset_title'),
+              subtitle: 'Paste the token from the email and set a new password.',
             ),
-            const SizedBox(height: 12),
-            TextField(
-              controller: _password,
-              obscureText: true,
-              decoration: const InputDecoration(labelText: 'New password'),
+            const SizedBox(height: 24),
+            _LabeledField(
+              label: tr(ref, 'reset_token'),
+              child: TextField(controller: _token),
             ),
-            const SizedBox(height: 20),
+            const SizedBox(height: 14),
+            _LabeledField(
+              label: tr(ref, 'reset_new_password'),
+              child: TextField(controller: _password, obscureText: true),
+            ),
             if (state.error != null) ...[
-              Text(state.error!, style: const TextStyle(color: Colors.red)),
-              const SizedBox(height: 12),
+              const SizedBox(height: 14),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                decoration: BoxDecoration(
+                  color: p.destructive.withValues(alpha: 0.08),
+                  borderRadius: BorderRadius.circular(10),
+                  border: Border.all(color: p.destructive.withValues(alpha: 0.3)),
+                ),
+                child: Text(state.error!,
+                    style: GoogleFonts.manrope(fontSize: 12, color: p.destructive)),
+              ),
             ],
+            const SizedBox(height: 22),
             FilledButton(
               onPressed: _busy ? null : _submit,
               child: _busy
-                  ? const SizedBox(width: 16, height: 16, child: CircularProgressIndicator(strokeWidth: 2))
-                  : const Text('Reset password'),
+                  ? const SizedBox(
+                      width: 18,
+                      height: 18,
+                      child: CircularProgressIndicator(
+                          strokeWidth: 2, color: Colors.white),
+                    )
+                  : Text(tr(ref, 'reset_btn')),
             ),
-            TextButton(
-              onPressed: () => context.go('/login'),
-              child: const Text('Back to sign in'),
+            const SizedBox(height: 6),
+            Center(
+              child: TextButton(
+                onPressed: () => context.go('/login'),
+                child: Text(tr(ref, 'common_back')),
+              ),
             ),
           ],
         ),
       ),
+    );
+  }
+}
+
+class _LabeledField extends StatelessWidget {
+  const _LabeledField({required this.label, required this.child});
+  final String label;
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    final p = AppPalette.of(context);
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          label,
+          style: GoogleFonts.manrope(
+            fontSize: 12.5,
+            fontWeight: FontWeight.w600,
+            color: p.fg,
+          ),
+        ),
+        const SizedBox(height: 6),
+        child,
+      ],
     );
   }
 }

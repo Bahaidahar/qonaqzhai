@@ -36,6 +36,7 @@ class BookingRepositoryImpl implements BookingRepository {
     required int guestCount,
     String? note,
     int? amount,
+    String? serviceId,
   }) async {
     final res = await _dio.post(ApiEndpoints.bookings, data: {
       'vendorId': vendorId,
@@ -43,6 +44,7 @@ class BookingRepositoryImpl implements BookingRepository {
       'guestCount': guestCount,
       if (note != null) 'note': note,
       if (amount != null) 'amount': amount,
+      if (serviceId != null) 'serviceId': serviceId,
     });
     return _fromJson(res.data as Map<String, dynamic>);
   }

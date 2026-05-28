@@ -1,0 +1,14 @@
+appId: com.example.qonaqzhaiMobile
+name: Onboarding lets the user dismiss it and reach the login screen
+tags:
+  - smoke
+---
+- launchApp:
+    clearState: true
+    clearKeychain: true
+- tapOn:
+    text: "Пропустить|Skip|Өткізіп жіберу"
+- extendedWaitUntil:
+    visible:
+      id: "login-email"
+    timeout: 10000

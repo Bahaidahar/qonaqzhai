@@ -1,0 +1,38 @@
+appId: com.example.qonaqzhaiMobile
+---
+# iOS keyboard reuses the same window between focus changes, but Maestro
+# starts typing while the input animation is still running and the first
+# characters land in limbo. The fixes that work in practice:
+#  1. tap the empty space between fields first → keyboard collapses
+#  2. tap the target field → keyboard reopens slowly
+#  3. waitForAnimationToEnd → finish the slide-in
+#  4. type a single throwaway char and erase it → guaranteed focused
+#  5. type the real value
+- runFlow: skip_onboarding.yaml
+
+- tapOn:
+    id: "login-email"
+- waitForAnimationToEnd:
+    timeout: 2500
+- eraseText: 64
+- inputText: "x"
+- eraseText: 1
+- inputText: ${EMAIL}
+
+- tapOn:
+    point: "50%,30%"          # tap label area to drop focus
+- tapOn:
+    id: "login-password"
+- waitForAnimationToEnd:
+    timeout: 2500
+- eraseText: 64
+- inputText: "x"
+- eraseText: 1
+- inputText: ${PASSWORD}
+
+- tapOn:
+    id: "login-submit"
+- extendedWaitUntil:
+    visible:
+      text: "^AI$|.*My profile.*|Мой профиль|Vendor profile|Профиль подрядчика"
+    timeout: 15000

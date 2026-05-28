@@ -1,0 +1,25 @@
+appId: com.example.qonaqzhaiMobile
+name: Settings page shows Account / Appearance / Signout
+tags:
+  - settings
+---
+- launchApp:
+    clearState: true
+    clearKeychain: true
+- runFlow: helpers/login_customer.yaml
+- tapOn:
+    text: ".*Settings.*|.*Настройки.*|.*Параметрлер.*"
+- extendedWaitUntil:
+    visible:
+      text: "ACCOUNT|/ ACCOUNT|Аккаунт"
+    timeout: 5000
+- scrollUntilVisible:
+    element:
+      text: "Sign out|Выйти|Шығу"
+    direction: DOWN
+- tapOn:
+    text: "Sign out|Выйти|Шығу"
+- extendedWaitUntil:
+    visible:
+      id: "login-email"
+    timeout: 5000

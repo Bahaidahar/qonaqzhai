@@ -1,0 +1,22 @@
+appId: com.example.qonaqzhaiMobile
+name: Customer browses the seeded vendor and opens its detail screen
+tags:
+  - booking
+  - cross-role
+---
+- launchApp:
+    clearState: true
+    clearKeychain: true
+- runFlow: helpers/login_customer.yaml
+- tapOn:
+    text: ".*Vendors.*|.*Подрядчики.*|.*Жеткізушілер.*"
+- extendedWaitUntil:
+    visible:
+      text: ".*Rixos.*|.*Maestro Studio.*"
+    timeout: 10000
+- tapOn:
+    text: ".*Rixos.*|.*Maestro Studio.*"
+- extendedWaitUntil:
+    visible:
+      text: ".*Book now.*|.*Demo vendor.*|.*ABOUT.*|.*from 5.*"
+    timeout: 8000

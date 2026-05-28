@@ -1,0 +1,11 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<testsuites>
+  <testsuite name="Test Suite" device="8DKJUWCQ4HCM89XO" tests="1" failures="1" time="3.0">
+    <testcase id="Onboarding swipes through to the login screen" name="Onboarding swipes through to the login screen" classname="Onboarding swipes through to the login screen" time="3.0" status="ERROR">
+      <properties>
+        <property name="tags" value="smoke"/>
+      </properties>
+      <failure>Unable to launch app com.example.qonaqzhaiMobile</failure>
+    </testcase>
+  </testsuite>
+</testsuites>

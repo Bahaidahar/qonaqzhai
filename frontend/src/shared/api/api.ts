@@ -83,7 +83,7 @@ async function refreshTokens(): Promise<boolean> {
   const rt = getRefreshToken();
   if (!rt) return false;
   try {
-    const res = await fetch(`${API_BASE}/api/auth/refresh`, {
+    const res = await fetch(`${API_BASE}/api/refresh`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ refreshToken: rt }),
@@ -189,7 +189,7 @@ export const api = {
     const rt = getRefreshToken();
     if (!rt) return null;
     try {
-      const res = await request<AuthResponse>("/api/auth/refresh", {
+      const res = await request<AuthResponse>("/api/refresh", {
         method: "POST",
         body: JSON.stringify({ refreshToken: rt }),
       });
@@ -204,7 +204,7 @@ export const api = {
     const rt = getRefreshToken();
     if (rt) {
       try {
-        await request<void>("/api/auth/logout", {
+        await request<void>("/api/logout", {
           method: "POST",
           body: JSON.stringify({ refreshToken: rt }),
         });
@@ -216,13 +216,13 @@ export const api = {
     setRefreshToken(null);
   },
   forgotPassword(email: string): Promise<{ status: string }> {
-    return request<{ status: string }>("/api/auth/forgot-password", {
+    return request<{ status: string }>("/api/forgot-password", {
       method: "POST",
       body: JSON.stringify({ email }),
     });
   },
   resetPassword(token: string, newPassword: string): Promise<{ status: string }> {
-    return request<{ status: string }>("/api/auth/reset-password", {
+    return request<{ status: string }>("/api/reset-password", {
       method: "POST",
       body: JSON.stringify({ token, newPassword }),
     });
@@ -240,7 +240,7 @@ export const api = {
 
   // vendor (self)
   vendorMine(): Promise<Vendor> {
-    return request<Vendor>("/api/vendor", { auth: true });
+    return request<Vendor>("/api/me/vendor", { auth: true });
   },
   vendorUpsert(body: {
     name: string;
@@ -249,7 +249,7 @@ export const api = {
     description: string;
     priceFrom: number;
   }): Promise<Vendor> {
-    return request<Vendor>("/api/vendor", {
+    return request<Vendor>("/api/me/vendor", {
       method: "POST",
       body: JSON.stringify(body),
       auth: true,
@@ -260,7 +260,7 @@ export const api = {
     fd.append("photo", file);
     const token = getToken();
     if (!token) throw new ApiError(401, "no token");
-    const res = await fetch(`${API_BASE}/api/vendor/photos`, {
+    const res = await fetch(`${API_BASE}/api/me/vendor/photos`, {
       method: "POST",
       body: fd,
       headers: { Authorization: `Bearer ${token}` },
@@ -277,7 +277,7 @@ export const api = {
     return body as Photo;
   },
   deletePhoto(id: string): Promise<void> {
-    return request<void>(`/api/vendor/photos/${id}`, {
+    return request<void>(`/api/me/vendor/photos/${id}`, {
       method: "DELETE",
       auth: true,
     });
@@ -439,7 +439,7 @@ export const api = {
     return request<VendorSearchResult>("/api/vendors?status=", { auth: true });
   },
   adminUpdateVendor(id: string, status: Vendor["status"]): Promise<Vendor> {
-    return request<Vendor>(`/api/admin/vendors/${id}`, {
+    return request<Vendor>(`/api/admin/vendors/${id}/status`, {
       method: "PATCH",
       body: JSON.stringify({ status }),
       auth: true,

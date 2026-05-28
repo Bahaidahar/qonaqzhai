@@ -1,0 +1,15 @@
+appId: com.example.qonaqzhaiMobile
+name: Customer opens their bookings list
+tags:
+  - booking
+---
+- launchApp:
+    clearState: true
+    clearKeychain: true
+- runFlow: helpers/login_customer.yaml
+- tapOn:
+    text: ".*Bookings.*|.*Брони.*|.*Тапсырыс.*"
+- extendedWaitUntil:
+    visible:
+      text: ".*Bookings.*|.*Брони.*|.*Тапсырыс.*"
+    timeout: 5000

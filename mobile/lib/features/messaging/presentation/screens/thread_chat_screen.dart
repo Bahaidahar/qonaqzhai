@@ -1,12 +1,15 @@
 import 'dart:async';
 import 'dart:convert';
 
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
 
 import '../../../../core/network/api_endpoints.dart';
 import '../../../../core/network/token_store.dart';
+import '../../../../core/theme/app_theme.dart';
 import '../../../auth/presentation/viewmodels/auth_viewmodel.dart';
 import '../../domain/entities/thread.dart';
 import '../viewmodels/thread_viewmodel.dart';
@@ -59,10 +62,8 @@ class _ThreadChatScreenState extends ConsumerState<ThreadChatScreen> {
   Future<void> _connectSocket() async {
     final token = await TokenStore().readAccess();
     if (token == null) return;
-    final url = ApiEndpoints.baseUrl
-            .replaceFirst(RegExp(r'^http'), 'ws') +
-        '/api/ws?token=' +
-        Uri.encodeQueryComponent(token);
+    final wsBase = ApiEndpoints.baseUrl.replaceFirst(RegExp(r'^http'), 'ws');
+    final url = '$wsBase/api/ws?token=${Uri.encodeQueryComponent(token)}';
     try {
       _channel = WebSocketChannel.connect(Uri.parse(url));
       setState(() => _connected = true);
@@ -133,70 +134,137 @@ class _ThreadChatScreenState extends ConsumerState<ThreadChatScreen> {
   @override
   Widget build(BuildContext context) {
     final me = ref.watch(authViewModelProvider).user?.id;
+    final p = AppPalette.of(context);
     if (_loading) {
-      return const Scaffold(body: Center(child: CircularProgressIndicator()));
+      return Scaffold(body: Center(child: CupertinoActivityIndicator(color: p.mutedFg)));
     }
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Conversation'),
+        title: Text('Conversation',
+            style: GoogleFonts.manrope(fontWeight: FontWeight.w700, fontSize: 17)),
         actions: [
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16),
             child: Center(
-              child: Text(
-                _connected ? '● live' : '○ offline',
-                style: TextStyle(
-                  fontSize: 11,
-                  color: _connected ? Colors.green : Colors.grey,
-                ),
-              ),
-            ),
-          ),
-        ],
-      ),
-      body: Column(
-        children: [
-          Expanded(
-            child: ListView.builder(
-              controller: _scroll,
-              padding: const EdgeInsets.all(12),
-              itemCount: _messages.length,
-              itemBuilder: (_, i) => _bubble(_messages[i], mine: _messages[i].senderId == me),
-            ),
-          ),
-          SafeArea(
-            child: Padding(
-              padding: const EdgeInsets.all(8),
               child: Row(
                 children: [
-                  Expanded(
-                    child: TextField(
-                      controller: _draft,
-                      decoration: const InputDecoration(hintText: 'Message…'),
-                      onSubmitted: (_) => _send(),
+                  Container(
+                    width: 8,
+                    height: 8,
+                    decoration: BoxDecoration(
+                      color: _connected ? const Color(0xFF34C759) : p.mutedFg,
+                      shape: BoxShape.circle,
                     ),
                   ),
-                  IconButton(icon: const Icon(Icons.send), onPressed: _send),
+                  const SizedBox(width: 6),
+                  Text(
+                    _connected ? 'live' : 'offline',
+                    style: GoogleFonts.manrope(
+                      fontSize: 11,
+                      color: p.mutedFg,
+                      fontWeight: FontWeight.w600,
+                      letterSpacing: 0.4,
+                    ),
+                  ),
                 ],
               ),
             ),
           ),
         ],
       ),
+      body: SafeArea(
+        child: Column(
+          children: [
+            Expanded(
+              child: ListView.builder(
+                controller: _scroll,
+                padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
+                itemCount: _messages.length,
+                itemBuilder: (_, i) =>
+                    _bubble(_messages[i], mine: _messages[i].senderId == me),
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(12, 4, 12, 12),
+              child: Container(
+                padding: const EdgeInsets.fromLTRB(6, 6, 6, 6),
+                decoration: BoxDecoration(
+                  color: p.card,
+                  borderRadius: BorderRadius.circular(18),
+                  border: Border.all(color: p.border),
+                ),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
+                    Expanded(
+                      child: TextField(
+                        controller: _draft,
+                        style: GoogleFonts.manrope(fontSize: 14, color: p.fg),
+                        decoration: InputDecoration(
+                          filled: false,
+                          hintText: 'Message…',
+                          hintStyle:
+                              GoogleFonts.manrope(fontSize: 14, color: p.mutedFg),
+                          border: InputBorder.none,
+                          enabledBorder: InputBorder.none,
+                          focusedBorder: InputBorder.none,
+                          contentPadding: const EdgeInsets.symmetric(
+                              horizontal: 12, vertical: 12),
+                        ),
+                        onSubmitted: (_) => _send(),
+                      ),
+                    ),
+                    SizedBox(
+                      width: 38,
+                      height: 38,
+                      child: Material(
+                        color: p.primary,
+                        shape: const CircleBorder(),
+                        child: InkWell(
+                          customBorder: const CircleBorder(),
+                          onTap: _send,
+                          child: Icon(
+                            CupertinoIcons.arrow_up,
+                            size: 18,
+                            color: p.onPrimary,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 
   Widget _bubble(ThreadMessage m, {required bool mine}) {
+    final p = AppPalette.of(context);
     return Align(
       alignment: mine ? Alignment.centerRight : Alignment.centerLeft,
-      child: Container(
-        margin: const EdgeInsets.symmetric(vertical: 4),
-        padding: const EdgeInsets.all(10),
-        decoration: BoxDecoration(
-          color: mine ? Colors.indigo[100] : Colors.grey[200],
-          borderRadius: BorderRadius.circular(12),
+      child: ConstrainedBox(
+        constraints: BoxConstraints(
+            maxWidth: MediaQuery.of(context).size.width * 0.82),
+        child: Container(
+          margin: const EdgeInsets.symmetric(vertical: 4),
+          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+          decoration: BoxDecoration(
+            color: mine ? p.primary : p.card,
+            borderRadius: BorderRadius.circular(16),
+            border: mine ? null : Border.all(color: p.border),
+          ),
+          child: Text(
+            m.text,
+            style: GoogleFonts.manrope(
+              fontSize: 14,
+              color: mine ? p.onPrimary : p.fg,
+              height: 1.45,
+            ),
+          ),
         ),
-        child: Text(m.text),
       ),
     );
   }

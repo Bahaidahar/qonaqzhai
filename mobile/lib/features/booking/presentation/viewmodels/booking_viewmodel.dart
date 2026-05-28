@@ -46,6 +46,12 @@ class BookingsViewModel extends StateNotifier<BookingsState> {
     await refresh();
   }
 
+  /// Vendor-side moderation. `status` is `'accepted'` or `'declined'`.
+  Future<void> setStatus(String id, String status) async {
+    await _repo.updateStatus(id, status);
+    await refresh();
+  }
+
   Future<String> startPayment(String id) => _repo.startPayment(id);
 }
 

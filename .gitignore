@@ -62,3 +62,13 @@ mobile/GoogleService-Info.plist
 
 # ---- OS ----
 Thumbs.db
+
+# Local-only tooling state + stray binaries
+.claude/
+backend/core
+backend/auth
+backend/gateway
+backend/payment
+backend/realtime
+mcp/qonaqzhai-mcp/node_modules/
+mcp/qonaqzhai-mcp/dist/
