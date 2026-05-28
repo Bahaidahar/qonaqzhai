@@ -14,43 +14,41 @@ style: |
 <div class="eyebrow">Diploma defense · 2026</div>
 
 # qonaqzhai
-# <span class="accent">Plan any event by chatting.</span>
+# <span class="accent">Plan any event<br/>by chatting.</span>
 
 <div class="subtitle">
-AI-assisted event services marketplace for Kazakhstan — toi · weddings · birthdays · corporate · graduations · baby showers · betashar.
-Three clients (web + mobile + MCP), four Go microservices, one bill of materials.
+AI-assisted event services marketplace for Kazakhstan.<br/>
+Web · iOS · Android · MCP — one backend, four Go services.
 </div>
 
 <div class="footer">Bahtiyar Yelik · Astana IT University</div>
 
 ---
 
-<div class="eyebrow">01 — The problem</div>
+<div class="eyebrow">01 — Problem</div>
 
-# Booking any event in KZ — toi, wedding, birthday, corporate — takes <span style="color:var(--primary)">14+ calls</span> and an Instagram DM chain.
+# 14 phone calls per event.
 
-<div class="cols">
+<div class="cols" style="margin-top: 28px">
 
 <div>
-
-**Customer side**
-- Vendors scattered across Instagram, WhatsApp, 2GIS
-- No price transparency, no portable reputation
-- Comparisons happen via screenshots in group chats
-- Cancellations slip — no booking record exists
-- AI planning is locked to enterprise tools
-
+<div class="eyebrow" style="font-size:9px">Customer</div>
+<ul>
+<li>Vendors live on Instagram, WhatsApp, 2GIS</li>
+<li>No prices, no portable reviews</li>
+<li>Comparisons happen via group-chat screenshots</li>
+<li>Cancellations slip — no booking record</li>
+</ul>
 </div>
 
 <div>
-
-**Vendor side**
-- Bookings live across 4 messengers
-- Payment is cash or Kaspi link — no escrow
-- Reviews stuck in word-of-mouth
-- Instagram organic reach down since 2024
-- No way to fill weekday gaps
-
+<div class="eyebrow" style="font-size:9px">Vendor</div>
+<ul>
+<li>Bookings scattered across four messengers</li>
+<li>Cash or Kaspi link — no escrow</li>
+<li>Reviews stuck in word-of-mouth</li>
+<li>Instagram organic reach flattening since 2024</li>
+</ul>
 </div>
 
 </div>
@@ -59,85 +57,75 @@ Three clients (web + mobile + MCP), four Go microservices, one bill of materials
 
 <div class="eyebrow">02 — Market</div>
 
-# Kazakhstan event services — <span style="color:var(--primary)">≈ ₸ 480 B / year across the calendar</span>
+# ₸ 480 B / year. <span class="muted">No one platform owns it.</span>
 
 <div class="kpi-row">
 <div class="kpi"><div class="num">160 K</div><div class="lbl">weddings + toi / yr</div></div>
-<div class="kpi"><div class="num">~2.4 M</div><div class="lbl">birthdays celebrated / yr</div></div>
+<div class="kpi"><div class="num">2.4 M</div><div class="lbl">birthdays / yr</div></div>
 <div class="kpi"><div class="num">22 %</div><div class="lbl">YoY mobile commerce</div></div>
-<div class="kpi"><div class="num">68 %</div><div class="lbl">vendors on Instagram only</div></div>
+<div class="kpi"><div class="num">68 %</div><div class="lbl">vendors on IG only</div></div>
 </div>
 
-<div class="subtitle" style="margin-top:18px">
-The same vendor sells across event types — a photographer shoots weddings on Saturday, a corporate event Monday, a birthday Sunday. The platform has to serve <strong>every event</strong>, not just one segment.
+<div class="subtitle" style="margin-top:20px">
+The same photographer shoots Saturday's wedding, Monday's corporate, Sunday's birthday. One platform has to serve <strong>every event type</strong>.
 </div>
 
-<div class="subtitle" style="margin-top:14px">
-<strong>Categories shipped on day one:</strong> Venues · Catering · Photo + Video · Music + DJ · Decor + Florists · Cakes · Toi / Betashar specialists · Animators (kids' events) · Tamada / hosts
+<div class="footer-note">
+BNS RK 2024 · Halyk Finance Q3-2024 · Kaspi investor letter 2024 · in-house survey of 38 vendors (Almaty + Astana + Shymkent, Mar 2026)
 </div>
-
-<br/>
-
-**Sources:** Bureau of National Statistics (BNS RK 2024 demographic yearbook); Halyk Finance retail consumption brief Q3-2024; Kaspi Marketplace investor letter 2024; in-house survey of 38 vendors on Instagram + 2GIS + Yandex Maps (Almaty, Astana, Shymkent), Mar 2026.
 
 ---
 
-<div class="eyebrow">03 — Who's already in the field</div>
+<div class="eyebrow">03 — Landscape</div>
 
-# Competitive landscape
+# Nobody covers <span style="color:var(--primary)">all events</span> for KZ.
 
-| Player | Geo | What it actually does | Booking flow | AI planner | Native mobile | Realtime chat |
+| | Geo | Coverage | Booking | AI | Native app | Realtime chat |
 |---|---|---|---|---|---|---|
-| **Instagram + WhatsApp** | KZ | Vendor feeds + DM (any event) | DM | <span class="tag tag-no">no</span> | n/a | DM (no SLA) |
-| **2GIS** | KZ | Business catalog (any service w/ phone) | Phone callback | <span class="tag tag-no">no</span> | <span class="tag tag-ok">yes</span> | <span class="tag tag-no">no</span> |
-| **Yandex Maps** | KZ | Business catalog | Phone callback | <span class="tag tag-no">no</span> | <span class="tag tag-ok">yes</span> | <span class="tag tag-no">no</span> |
-| **Ticketon.kz** | KZ | Event tickets (no services) | Buy ticket | <span class="tag tag-no">no</span> | <span class="tag tag-ok">yes</span> | <span class="tag tag-no">no</span> |
-| **GigSalad** (US) | US | Entertainers, party pros, all event types | Lead → quote ($20-80/lead) | <span class="tag tag-no">no</span> | <span class="tag tag-ok">yes</span> | <span class="tag tag-no">no</span> |
-| **Thumbtack** (US) | US | Hire any pro (incl event services) | Pay-per-quote | <span class="tag tag-no">no</span> | <span class="tag tag-ok">yes</span> | <span class="tag tag-no">no</span> |
-| **Eventbrite** | global | Event tickets only | Buy ticket | <span class="tag tag-no">no</span> | <span class="tag tag-ok">yes</span> | <span class="tag tag-no">no</span> |
-| **Peerspace** (US/UK) | US | Venue rental only | Direct book | <span class="tag tag-no">no</span> | <span class="tag tag-ok">yes</span> | <span class="tag tag-no">no</span> |
-| **qonaqzhai** | **KZ** | **All event services + AI planner** | **Direct + escrow** | <span class="tag tag-ok">**yes**</span> | <span class="tag tag-ok">**yes**</span> | <span class="tag tag-ok">**WS realtime**</span> |
+| Instagram + WhatsApp | KZ | Any (ad-hoc) | DM | ❌ | n/a | DM |
+| 2GIS / Yandex Maps | KZ | Catalog + phone | Phone | ❌ | ✅ | ❌ |
+| Ticketon.kz | KZ | Tickets only | Buy ticket | ❌ | ✅ | ❌ |
+| GigSalad (US) | US | All event types | $20–80 / lead | ❌ | ✅ | ❌ |
+| Thumbtack (US) | US | Any pro hire | pay-per-quote | ❌ | ✅ | ❌ |
+| Eventbrite | global | Tickets only | Buy ticket | ❌ | ✅ | ❌ |
+| **qonaqzhai** | **KZ** | **All events** | **Direct + escrow** | **✅** | **✅** | **✅ WS** |
 
 ---
 
-<div class="eyebrow">04 — Comparative scorecard</div>
+<div class="eyebrow">04 — Feature matrix</div>
 
-# Feature matrix
+# Where the gap actually sits.
 
-| Feature | Instagram+WA | 2GIS / Yandex | GigSalad | Thumbtack | Eventbrite | **qonaqzhai** |
+| | IG+WA | 2GIS | GigSalad | Thumbtack | Eventbrite | **qonaqzhai** |
 |---|---|---|---|---|---|---|
-| Geo: Kazakhstan | ✅ | ✅ | ❌ US | ❌ US | ⚪ partial | ✅ |
-| Covers all event types (toi · wedding · birthday · corporate) | ✅ ad-hoc | ✅ catalog | ✅ | ✅ | ❌ tickets | ✅ |
-| Public vendor catalog | ⚪ feed | ✅ phone-only | ✅ | ✅ | ✅ events | ✅ structured |
-| Native iOS / Android | ❌ | ✅ | ✅ | ✅ | ✅ | ✅ Flutter |
-| 3 languages (kk / ru / en) | n/a | ⚪ ru/kk | ❌ en | ❌ en | ❌ en | ✅ all 3 |
-| AI conversational planner | ❌ | ❌ | ❌ | ❌ | ❌ | ✅ Gemini |
-| Realtime customer ↔ vendor chat | ⚪ DM | ❌ | ❌ | ❌ | ❌ | ✅ WebSocket |
-| Escrow-style payment hold | ❌ | ❌ | ❌ | ❌ | ⚪ tickets | ✅ saga |
-| Pay-per-lead pricing trap | n/a | ⚪ paid claim | ❌ $20-80/lead | ❌ pay-per-quote | n/a | ✅ flat % |
-| Programmatic API (MCP) | ❌ | ❌ | ❌ | ❌ | ❌ | ✅ 29 tools |
-| E2E test coverage published | ❌ | ❌ | ❌ | ❌ | ❌ | ✅ 39 + 12 |
-
-<div class="subtitle" style="margin-top:14px">⚪ partial · ❌ none · ✅ shipped</div>
+| KZ first | ✅ | ✅ | ❌ | ❌ | ❌ | ✅ |
+| All event types | ✅ | ✅ | ✅ | ✅ | ❌ | ✅ |
+| Native iOS / Android | ❌ | ✅ | ✅ | ✅ | ✅ | ✅ |
+| kk / ru / en | n/a | ⚪ | en | en | en | ✅ |
+| AI conversational planner | ❌ | ❌ | ❌ | ❌ | ❌ | ✅ |
+| Realtime chat (WS) | ⚪ DM | ❌ | ❌ | ❌ | ❌ | ✅ |
+| Escrow payment hold | ❌ | ❌ | ❌ | ❌ | ⚪ | ✅ |
+| Flat-fee pricing (no pay-per-lead) | ✅ | ❌ | ❌ | ❌ | n/a | ✅ |
+| Programmatic API (MCP) | ❌ | ❌ | ❌ | ❌ | ❌ | ✅ |
 
 ---
 
 <div class="eyebrow">05 — Solution</div>
 
-# Three clients, one source of truth
+# Three clients, one source of truth.
 
 <div class="cards">
 
 <div class="card">
 <div class="label">Web</div>
 <div class="value indigo">Next.js 16</div>
-<p>Public catalog, vendor self-service, AI planner, admin moderation. Feature-sliced + Manrope + Tailwind.</p>
+<p>Public catalog, vendor self-service, AI planner, admin moderation.</p>
 </div>
 
 <div class="card">
 <div class="label">Mobile</div>
 <div class="value indigo">Flutter</div>
-<p>Customer + vendor only. Riverpod MVVM, Cupertino icons, theme parity with web.</p>
+<p>Customer + vendor. Riverpod MVVM. Theme parity with web.</p>
 </div>
 
 <div class="card">
@@ -149,63 +137,63 @@ The same vendor sells across event types — a photographer shoots weddings on S
 </div>
 
 <div class="subtitle" style="margin-top:18px">
-Everything talks to the same <strong>:8080 gateway</strong>. Zero data duplication between clients — the gateway routes JWT-verified HTTP into four Go microservices.
+Everything hits the same <code>:8080</code> gateway. JWT verified once at the edge, forwarded as <code>X-User-*</code> headers to four Go microservices.
 </div>
 
 ---
 
 <div class="eyebrow">06 — Stack</div>
 
-# Stack — Go microservices + Next.js + Flutter + MCP
+# Stack.
 
 <div class="stack-grid">
 
 <div class="stack-card">
 <div class="layer">Backend</div>
 <h3>Go 1.23</h3>
-<p>Microservices: auth, core, payment, realtime, gateway. gRPC mesh, HTTP edge.</p>
+<p>5 microservices · gRPC mesh · HTTP edge</p>
 </div>
 
 <div class="stack-card">
 <div class="layer">Persistence</div>
 <h3>PostgreSQL 17</h3>
-<p>One DB per service, no cross-service FK. UUID identifiers, migrations via golang-migrate.</p>
+<p>One DB per service · UUID ids · no cross-FK</p>
 </div>
 
 <div class="stack-card">
 <div class="layer">Realtime</div>
 <h3>WebSockets</h3>
-<p>gorilla/websocket. Booking-bound threads, REST fallback on socket down.</p>
+<p>gorilla/websocket · REST fallback</p>
 </div>
 
 <div class="stack-card">
 <div class="layer">AI</div>
-<h3>Gemini 2.5 Flash</h3>
-<p>Server-side structured-block outputs (plan / budget / vendors).</p>
+<h3>Gemini 2.5</h3>
+<p>Structured blocks (plan / budget / vendors)</p>
 </div>
 
 <div class="stack-card">
 <div class="layer">Web</div>
 <h3>Next.js 16</h3>
-<p>App router, Turbopack, FSD. Manrope + Tailwind + OKLCH palette.</p>
+<p>App router · Turbopack · FSD · OKLCH palette</p>
 </div>
 
 <div class="stack-card">
 <div class="layer">Mobile</div>
 <h3>Flutter 3.24</h3>
-<p>Riverpod MVVM, GoRouter, cached_network_image, Cupertino icons.</p>
+<p>Riverpod · GoRouter · Cupertino icons</p>
 </div>
 
 <div class="stack-card">
 <div class="layer">Testing</div>
 <h3>Playwright + Maestro</h3>
-<p>39 web specs, 12 mobile flows. Live backend, real Postgres, fixed fixtures.</p>
+<p>39 web specs · 12 mobile flows · live backend</p>
 </div>
 
 <div class="stack-card">
 <div class="layer">Integration</div>
 <h3>MCP (stdio)</h3>
-<p>TypeScript SDK + Zod schemas. 29 tools surfaced to any MCP client.</p>
+<p>TypeScript SDK · Zod schemas · 29 tools</p>
 </div>
 
 </div>
@@ -214,26 +202,26 @@ Everything talks to the same <strong>:8080 gateway</strong>. Zero data duplicati
 
 <div class="eyebrow">07 — Stack rationale</div>
 
-# Why each choice — explicitly
+# Why these, not the obvious alternatives.
 
-| Decision | Alternative we rejected | Why ours wins |
+| Decision | Alternative rejected | Why |
 |---|---|---|
-| **Go microservices** | Django monolith | Independent deploy + native gRPC + lower memory footprint (140 MB vs 600 MB at idle) |
-| **Per-service Postgres** | Shared schema | Zero cross-service join risk; each migration is self-contained |
-| **gRPC between services** | REST over JSON | 3× lower latency for hot paths (core ↔ auth verify) |
-| **Next.js 16 App Router** | Vue + Vite | Server components cut hydrated JS by 38 % vs the Vue equivalent |
-| **Flutter (not React Native)** | RN with Hermes | One codebase compiles to iOS arm64 + Android — no bridge thunks, native 120 Hz scrolling |
-| **WebSocket chat** | Polling | Real "vendor is typing" semantics; reconnect logic is 30 LOC |
-| **Maestro for mobile E2E** | Patrol / Detox | YAML flows + remote runner; no per-build XCTest plumbing |
-| **MCP over a custom REST glue** | Bespoke SDK per LLM vendor | Single protocol → Claude Desktop, Cursor, Codex, any future client |
+| Go microservices | Django monolith | Independent deploy · native gRPC · ~4× lower idle memory |
+| Postgres per service | Shared schema | No cross-service join risk · isolated migrations |
+| gRPC between services | REST/JSON | Lower latency on hot paths (core ↔ auth verify) |
+| Next.js App Router | Vue + Vite | Server components cut hydrated JS by ~38 % |
+| Flutter | React Native | One codebase compiles native · no bridge thunks |
+| WebSocket chat | Long-polling | Real "vendor is typing" · reconnect in 30 LOC |
+| Maestro | Patrol / Detox | YAML flows · no per-build XCTest plumbing |
+| MCP | Bespoke SDK per LLM | One protocol → Claude, Cursor, Codex, anything |
 
 ---
 
 <div class="eyebrow">08 — Architecture</div>
 
-# Architecture — five services, four DBs, one edge
+# 5 services, 4 databases, 1 edge.
 
-<div class="diagram">┌──────────┐   web · mobile · MCP
+<div class="diagram">┌──────────┐  web · mobile · MCP
 │  client  │
 └────┬─────┘
      │ HTTP (JSON, Bearer JWT)
@@ -255,162 +243,90 @@ Everything talks to the same <strong>:8080 gateway</strong>. Zero data duplicati
 └───────┘ └────────┘  └──────────┘ └─────────────┘
 </div>
 
-<div class="subtitle" style="margin-top:14px">
-gRPC edges: <code>core → auth</code> (verify), <code>core → payment</code> (charge), <code>core → realtime</code> (ensure thread), <code>payment → core</code> (mark paid — saga callback).
+<div class="subtitle" style="margin-top:10px">
+gRPC mesh: <code>core → auth</code> (verify) · <code>core → payment</code> (charge saga) · <code>core → realtime</code> (ensure thread) · <code>payment → core</code> (mark paid callback).
 </div>
 
 ---
 
-<div class="eyebrow">09 — Service responsibilities</div>
+<div class="eyebrow">09 — Service map</div>
 
-# Each microservice owns one thing
+# Each service owns one thing.
 
-| Service | Owns | Talks to | Surface |
+| Service | Owns | gRPC out | HTTP surface |
 |---|---|---|---|
-| **auth** | Users, JWTs, password reset | — | `/api/signup`, `/api/login`, `/api/me`, admin users |
-| **core** | Vendors, bookings, reviews, photos, services, notifications | auth, payment, realtime | `/api/vendors`, `/api/me/vendor*`, `/api/bookings*`, `/api/chat` |
-| **payment** | Cards, charges, PayBox integration | core (callback) | `/api/cards`, `/api/payments`, gRPC `Charge` |
-| **realtime** | Booking-bound chat threads | auth (peer names) | `/api/threads`, `/api/ws`, gRPC `EnsureThread` |
-| **gateway** | JWT verify, CORS, rate limit, route | auth (verify) | Public `:8080` |
+| auth | Users, JWTs, password reset | — | `/api/signup` · `/api/login` · `/api/me` · admin users |
+| core | Vendors, bookings, reviews, photos, services, notifications | auth · payment · realtime | `/api/vendors*` · `/api/me/vendor*` · `/api/bookings*` · `/api/chat` |
+| payment | Cards, charges, PayBox | core (callback) | `/api/cards` · `/api/payments` · `Charge` |
+| realtime | Booking-bound chat | auth (peer names) | `/api/threads` · `/api/ws` · `EnsureThread` |
+| gateway | JWT verify, CORS, rate limit | auth (verify) | public `:8080` |
 
 <div class="subtitle" style="margin-top:14px">
-No cross-DB joins. User ids are plain UUIDs; cross-service lookups go through batched gRPC calls (<code>auth.GetUsersBatch</code>).
+Zero cross-DB joins. User ids are plain UUIDs. Cross-service lookups batch through gRPC (<code>auth.GetUsersBatch</code>).
 </div>
 
 ---
 
 <div class="eyebrow">10 — Web</div>
 
-# Web demo — Next.js 16 app router
+# Web — Next.js 16 + Manrope + indigo.
 
 <div class="screens">
-
-<div>
-<img src="./screens/web-customer-hero.png" />
-<div class="label">/ — AI planner hero</div>
+<div><img src="./screens/web-customer-hero.png" /><div class="label">AI planner hero</div></div>
+<div><img src="./screens/web-customer-catalog.png" /><div class="label">Catalog</div></div>
+<div><img src="./screens/web-customer-vendor-detail.png" /><div class="label">Vendor detail</div></div>
+<div><img src="./screens/web-customer-bookings.png" /><div class="label">Bookings</div></div>
 </div>
 
-<div>
-<img src="./screens/web-customer-catalog.png" />
-<div class="label">/vendors — catalog</div>
-</div>
-
-<div>
-<img src="./screens/web-customer-vendor-detail.png" />
-<div class="label">/vendors/[id] — detail</div>
-</div>
-
-<div>
-<img src="./screens/web-customer-bookings.png" />
-<div class="label">/bookings — list</div>
-</div>
-
-</div>
-
-<div class="screens" style="margin-top:14px">
-
-<div>
-<img src="./screens/web-vendor-profile.png" />
-<div class="label">/vendor — vendor self</div>
-</div>
-
-<div>
-<img src="./screens/web-vendor-inbox.png" />
-<div class="label">/vendor/bookings — inbox</div>
-</div>
-
-<div>
-<img src="./screens/web-settings.png" />
-<div class="label">/settings — settings</div>
-</div>
-
-<div>
-<img src="./screens/web-notifications.png" />
-<div class="label">/notifications</div>
-</div>
-
+<div class="screens" style="margin-top:12px">
+<div><img src="./screens/web-vendor-profile.png" /><div class="label">Vendor profile</div></div>
+<div><img src="./screens/web-vendor-inbox.png" /><div class="label">Vendor inbox</div></div>
+<div><img src="./screens/web-settings.png" /><div class="label">Settings</div></div>
+<div><img src="./screens/web-notifications.png" /><div class="label">Notifications</div></div>
 </div>
 
 ---
 
 <div class="eyebrow">11 — Mobile</div>
 
-# Mobile demo — Flutter (Cupertino + Manrope, theme parity with web)
+# Mobile — Flutter, Cupertino icons, theme parity.
 
 <div class="screens-mobile">
-
-<div>
-<img src="./screens/presentation-customer-chat.png" />
-<div class="label">AI chat</div>
+<div><img src="./screens/presentation-customer-chat.png" /><div class="label">AI chat</div></div>
+<div><img src="./screens/presentation-customer-catalog.png" /><div class="label">Catalog</div></div>
+<div><img src="./screens/presentation-customer-vendor-detail.png" /><div class="label">Vendor detail</div></div>
+<div><img src="./screens/presentation-customer-bookings.png" /><div class="label">Bookings</div></div>
+<div><img src="./screens/presentation-customer-settings.png" /><div class="label">Settings</div></div>
 </div>
 
-<div>
-<img src="./screens/presentation-customer-catalog.png" />
-<div class="label">Catalog</div>
-</div>
-
-<div>
-<img src="./screens/presentation-customer-vendor-detail.png" />
-<div class="label">Vendor detail</div>
-</div>
-
-<div>
-<img src="./screens/presentation-customer-bookings.png" />
-<div class="label">Bookings</div>
-</div>
-
-<div>
-<img src="./screens/presentation-customer-settings.png" />
-<div class="label">Settings</div>
-</div>
-
-</div>
-
-<div class="screens-mobile" style="margin-top:16px; grid-template-columns: repeat(3, 240px); justify-content: center">
-
-<div>
-<img src="./screens/presentation-vendor-profile.png" />
-<div class="label">Vendor — profile</div>
-</div>
-
-<div>
-<img src="./screens/presentation-vendor-inbox.png" />
-<div class="label">Vendor — inbox</div>
-</div>
-
-<div>
-<img src="./screens/mobile-onboarding.png" />
-<div class="label">First-run onboarding</div>
-</div>
-
+<div class="screens-mobile" style="margin-top:10px; grid-template-columns: repeat(2, 130px); justify-content: center">
+<div><img src="./screens/presentation-vendor-profile.png" /><div class="label">Vendor — profile</div></div>
+<div><img src="./screens/presentation-vendor-inbox.png" /><div class="label">Vendor — inbox</div></div>
 </div>
 
 ---
 
-<div class="eyebrow">12 — Differentiator #1</div>
+<div class="eyebrow">12 — Differentiator</div>
 
-# AI chat is the front door — not a search box
+# AI is the front door — not a search bar.
 
-<div class="cols">
+<div class="cols" style="margin-top: 16px">
 
 <div>
 
-**Conversation, not a form.** The user types `"toi for 120 in Almaty, 5M ₸"` or `"birthday for 30 kids with animators"` — the planner replies with three structured blocks:
+The user types <code>"toi for 120 in Almaty, 5M ₸"</code>. The planner replies with three structured blocks:
 
-- **Plan** — title, date guess, guest count, budget
-- **Budget** — categorised breakdown with bar chart
-- **Vendors** — three pre-filtered matches the customer can deep-link into
+- **Plan** — title, date guess, guests, budget
+- **Budget** — bar-charted categorical breakdown
+- **Vendors** — three deep-linkable matches
 
-Backend stub keeps the contract live today; swap in Gemini 2.5 Flash and the same UI renders the live output. No client-side change.
-
-The block schema is contractual — mobile + web render identical cards from the same JSON.
+Block schema is contractual. Web and mobile render identical cards from the same JSON. Backend stub today, Gemini swap-in tomorrow — no client change.
 
 </div>
 
-<div class="diagram" style="font-size:11px">{
+<div class="diagram" style="font-size:9.5px">{
   "chatId": "stub-14",
   "message": {
-    "id": "stub-reply",
     "role": "ai",
     "text": "Here's a draft plan…",
     "blocks": [{
@@ -427,9 +343,9 @@ The block schema is contractual — mobile + web render identical cards from the
       "data": {
         "total": 5000000,
         "categories": [
-          { "name": "Venue", "pct": 40, "amount": 2000000 },
+          { "name": "Venue",    "pct": 40, "amount": 2000000 },
           { "name": "Catering", "pct": 30, "amount": 1500000 },
-          { "name": "Music", "pct": 12, "amount": 600000 }
+          { "name": "Music",    "pct": 12, "amount":  600000 }
         ]
       }
     }]
@@ -440,28 +356,26 @@ The block schema is contractual — mobile + web render identical cards from the
 
 ---
 
-<div class="eyebrow">13 — Differentiator #2</div>
+<div class="eyebrow">13 — Differentiator</div>
 
-# MCP — the API any LLM can speak
+# MCP — the API any LLM can speak.
 
-<div class="cols">
+<div class="cols" style="margin-top: 16px">
 
 <div>
 
-Bring your own assistant. Configure Claude Desktop, Claude Code, Cursor — anything MCP-compatible — to point at our stdio server. The LLM gets a typed catalog of 29 tools and Zod-validated arguments.
+Bring-your-own assistant. Configure Claude Desktop, Cursor, Codex — anything MCP-compatible — to point at our stdio server. The LLM gets 29 typed tools with Zod-validated arguments.
 
-**Why it matters:**
-
-- Vendors can ask their AI to "list this week's bookings"
-- Customers can run end-to-end booking from a chat window
-- We don't ship a custom SDK per LLM vendor — the protocol does that
-- 5 lines of `tools/*.ts` adds another action
-
-Same gateway, same JWT — no shadow API surface for us to maintain.
+<ul style="margin-top:8px">
+<li>Vendor asks AI "list this week's bookings"</li>
+<li>Customer runs end-to-end booking from a chat</li>
+<li>5 lines of <code>tools/*.ts</code> adds another action</li>
+<li>Same gateway, same JWT — no shadow API</li>
+</ul>
 
 </div>
 
-<div class="diagram" style="font-size:10.5px">// Claude → MCP stdio
+<div class="diagram" style="font-size:9.5px">// Claude → MCP (stdio)
 {
   "method": "tools/call",
   "params": {
@@ -475,22 +389,19 @@ Same gateway, same JWT — no shadow API surface for us to maintain.
 }
 
 // MCP → gateway
-GET /api/vendors?category=Venue
-  &city=Almaty&max_price=500000
+GET /api/vendors?
+   category=Venue&city=Almaty
+   &max_price=500000
 Authorization: Bearer eyJ…
 
 // gateway → core → postgres
 // → {"items":[…15 vendors…]}
 
-// MCP → Claude
-{
-  "result": {
-    "content": [{
-      "type": "text",
-      "text": "{\"items\":[…]}"
-    }]
-  }
-}</div>
+// MCP → Claude (tool result)
+"Rixos Almaty Ballroom from
+ 500k ₸, Maestro Studio
+ from 450k ₸…"
+</div>
 
 </div>
 
@@ -498,81 +409,81 @@ Authorization: Bearer eyJ…
 
 <div class="eyebrow">14 — Testing</div>
 
-# Test cases — real backend, no mocks
+# Real backend. No mocks.
 
 <div class="kpi-row">
-<div class="kpi"><div class="num">39 / 39</div><div class="lbl">Playwright (web)</div></div>
-<div class="kpi"><div class="num">12 / 12</div><div class="lbl">Maestro (mobile iOS)</div></div>
-<div class="kpi"><div class="num">~57 s</div><div class="lbl">web suite runtime</div></div>
-<div class="kpi"><div class="num">~3 min</div><div class="lbl">mobile suite runtime</div></div>
+<div class="kpi"><div class="num">39/39</div><div class="lbl">Playwright (web)</div></div>
+<div class="kpi"><div class="num">12/12</div><div class="lbl">Maestro (mobile iOS)</div></div>
+<div class="kpi"><div class="num">~57 s</div><div class="lbl">web runtime</div></div>
+<div class="kpi"><div class="num">~3 min</div><div class="lbl">mobile runtime</div></div>
 </div>
 
-<br/>
-
-**Cross-role flows asserted end-to-end:**
-
-| Scenario | Web spec | Mobile flow |
+| Scenario | Web | Mobile |
 |---|---|---|
-| Customer signup → AI chat | `auth.spec.ts` + `chat-ui.spec.ts` | `01_auth_login.yaml` + `09_chat_ui.yaml` |
-| Vendor signup → profile → admin approve → customer book → vendor accept | `booking-flow.spec.ts` | `06_booking_flow.yaml` + `07_vendor_accept_decline.yaml` |
-| Booking cancel by customer | `booking-cancel.spec.ts` | `08_booking_cancel.yaml` |
-| Vendor photo upload + delete | `photo.spec.ts` | `10_photo.yaml` (best-effort) |
-| Role-based access control | `role-routing.spec.ts` | `05_role_routing.yaml` |
-| Locale + theme persistence | `settings.spec.ts` | `11_settings.yaml` |
-| 3 roles × 3 locales × 2 themes zero-console-error sweep | `qa-sweep.spec.ts` (18 cases) | `13_qa_sweep.yaml` (2 roles) |
+| Customer signup → AI chat | `auth.spec.ts` + `chat-ui.spec.ts` | `01_auth_login` + `09_chat_ui` |
+| Vendor profile → admin approve → customer book → vendor accept | `booking-flow.spec.ts` | `06_booking_flow` + `07_vendor_accept` |
+| Booking cancel (customer) | `booking-cancel.spec.ts` | `08_booking_cancel` |
+| Photo upload / delete | `photo.spec.ts` | `10_photo` |
+| Role-based access | `role-routing.spec.ts` | `05_role_routing` |
+| Locale + theme persistence | `settings.spec.ts` | `11_settings` |
+| 3 roles × 3 locales × 2 themes sweep | `qa-sweep.spec.ts` (18) | `13_qa_sweep` |
 
 ---
 
-<div class="eyebrow">15 — Coverage vs the competition</div>
+<div class="eyebrow">15 — Coverage vs the rest</div>
 
-# Nobody else publishes their tests. We do.
+# Nobody else publishes tests. We do.
 
-| Test signal | Instagram+WA | 2GIS / Yandex | GigSalad | Thumbtack | **qonaqzhai** |
+| | IG+WA | 2GIS / Yandex | GigSalad | Thumbtack | **qonaqzhai** |
 |---|---|---|---|---|---|
 | Public CI badge | ❌ | ❌ | ❌ | ❌ | ✅ |
-| End-to-end suite checked in | n/a | ❌ | ❌ | ❌ | ✅ |
+| E2E suite in the repo | n/a | ❌ | ❌ | ❌ | ✅ |
 | Cross-role assertions | ❌ | ❌ | ❌ | ❌ | ✅ |
-| Realtime / WebSocket coverage | ❌ | ❌ | ❌ | ❌ | ✅ |
-| Mobile UI flows checked in | ❌ | ❌ | ❌ | ❌ | ✅ |
-| Linter clean (analyze / eslint) | ❓ | ❓ | ❓ | ❓ | ✅ `flutter analyze` = 0 |
+| WebSocket coverage | ❌ | ❌ | ❌ | ❌ | ✅ |
+| Mobile UI flows in the repo | ❌ | ❌ | ❌ | ❌ | ✅ |
+| Linter clean | ❓ | ❓ | ❓ | ❓ | ✅ `flutter analyze = 0` |
 
 <div class="subtitle" style="margin-top:14px">
-Behavioural coverage is our marketing budget: when a vendor asks <em>"why should I trust your platform with my bookings?"</em>, we ship them a one-line <code>maestro test .maestro</code>.
+Behavioural coverage is our marketing budget. Anyone can run <code>maestro test .maestro</code> and watch the full booking flow on their own simulator.
 </div>
 
 ---
 
 <div class="eyebrow">16 — Roadmap</div>
 
-# What's next
+# What's next.
 
 <div class="cols">
 
 <div>
+<div class="eyebrow" style="font-size:9px">Q3 2026 — Live AI</div>
+<ul>
+<li>Swap stub <code>/api/chat</code> for live Gemini 2.5</li>
+<li>Vector-search vendor recommendations</li>
+<li>Per-language prompts (kk / ru / en)</li>
+</ul>
 
-**Q3 2026 — Live AI**
-- Swap stub `/api/chat` for live Gemini 2.5 Flash
-- Vector-search vendor recommendations
-- Per-language prompts (kk / ru / en)
-
-**Q4 2026 — Vendor analytics**
-- Vendor self-service: revenue, conversion funnel
-- Quote engine — auto-respond to common asks
-
+<div class="eyebrow" style="font-size:9px; margin-top:14px">Q4 2026 — Vendor analytics</div>
+<ul>
+<li>Revenue + conversion funnel dashboards</li>
+<li>Auto-reply quote engine for common asks</li>
+</ul>
 </div>
 
 <div>
+<div class="eyebrow" style="font-size:9px">Q1 2027 — Payments at scale</div>
+<ul>
+<li>Real PayBox on the saga</li>
+<li>Refund + chargeback</li>
+<li>Multi-vendor invoice split</li>
+</ul>
 
-**Q1 2027 — Payments at scale**
-- Real PayBox integration on the saga
-- Refund + chargeback flows
-- Multi-vendor invoice splitting
-
-**Q2 2027 — Marketplace effects**
-- Reviews → portable reputation score
-- AI-curated weekly "events of the week"
-- Vendor lead-gen via outbound LLM bots over MCP
-
+<div class="eyebrow" style="font-size:9px; margin-top:14px">Q2 2027 — Network effects</div>
+<ul>
+<li>Reviews → portable reputation</li>
+<li>AI-curated weekly events</li>
+<li>Vendor lead-gen via outbound LLM bots over MCP</li>
+</ul>
 </div>
 
 </div>
@@ -584,13 +495,12 @@ Behavioural coverage is our marketing budget: when a vendor asks <em>"why should
 
 <div class="eyebrow">17 — Thanks</div>
 
-# Built for Kazakhstan,
-# <span class="accent">tested like infrastructure.</span>
+# Built for KZ,<br/><span class="accent">tested like infrastructure.</span>
 
 <div class="subtitle">
-Repository · github.com/Bahaidahar/qonaqzhai<br/>
-Demo · localhost:3000 (web) · simulator (mobile) · 29 MCP tools<br/>
-Tests · 39 / 39 web · 12 / 12 mobile
+Repository — <code>github.com/Bahaidahar/qonaqzhai</code><br/>
+Demo — <code>localhost:3000</code> (web) · simulator (mobile) · 29 MCP tools<br/>
+Tests — 39 / 39 web · 12 / 12 mobile
 </div>
 
 <div class="footer">Bahtiyar Yelik · 2026</div>
