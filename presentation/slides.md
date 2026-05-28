@@ -556,7 +556,51 @@ Behavioural coverage is our marketing budget. Anyone can run <code>maestro test 
 
 ---
 
-<div class="eyebrow">19 — Roadmap</div>
+<div class="eyebrow">19 — Expected effect</div>
+
+# Practical significance.
+
+<div class="impact-grid">
+
+<div class="impact-card">
+<div class="impact-num">+70 %</div>
+<div class="impact-label">reduction in planning time</div>
+
+<div class="bar-row"><div class="bar-tag">Before · weeks</div><div class="bar-track"><div class="bar-fill bar-fill-grey" style="width:100%"></div></div></div>
+<div class="bar-row"><div class="bar-tag">After · minutes</div><div class="bar-track"><div class="bar-fill" style="width:30%"></div></div></div>
+
+<p class="impact-foot">Conversational planner replaces a 14-call DM chain that spans days.</p>
+</div>
+
+<div class="impact-card">
+<div class="impact-num">5–7×</div>
+<div class="impact-label">organizer workload cut</div>
+
+<div class="dots-row"><span class="dot dot-on"></span><span class="dot-label">1 · qonaqzhai</span></div>
+<div class="dots-row"><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="dot-label">7 · manual</span></div>
+
+<p class="impact-foot">Auto-generated plan + budget + vendor matches replace seven manual research passes.</p>
+</div>
+
+<div class="impact-card">
+<div class="impact-num">15–30 %</div>
+<div class="impact-label">cost savings per event</div>
+
+<div class="bar-row"><div class="bar-tag">Typical cheque ₸ 3 M</div><div class="bar-track"><div class="bar-fill bar-fill-grey" style="width:100%"></div></div></div>
+<div class="bar-row"><div class="bar-tag">Saved ₸ 450 K – 900 K</div><div class="bar-track"><div class="bar-fill" style="width:30%"></div></div></div>
+
+<p class="impact-foot">Catalog comparisons + AI-curated alternates cut the typical bill by 15–30 %.</p>
+</div>
+
+</div>
+
+<div class="subtitle" style="margin-top:14px">
+Estimates triangulated from the in-house vendor survey (Mar 2026) and the Halyk Finance retail consumption brief. Real numbers will be measured once paid bookings start flowing — see roadmap.
+</div>
+
+---
+
+<div class="eyebrow">20 — Roadmap</div>
 
 # What's next.
 
@@ -600,7 +644,7 @@ Behavioural coverage is our marketing budget. Anyone can run <code>maestro test 
 <!-- _class: lead -->
 <!-- _paginate: false -->
 
-<div class="eyebrow">20 — Thanks</div>
+<div class="eyebrow">21 — Thanks</div>
 
 # Built for KZ,<br/><span class="accent">tested like infrastructure.</span>
 
