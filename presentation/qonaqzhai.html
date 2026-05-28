@@ -57,19 +57,19 @@ Three clients (web + mobile + MCP), four Go microservices, one bill of materials
 <div class="kpi"><div class="num">68 %</div><div class="lbl">vendors on Instagram only</div></div>
 </div>
 <br />
-<p><strong>Sources:</strong> Bureau of National Statistics (BNS RK 2024 demographic yearbook); Halyk Finance retail consumption brief Q3-2024; Kaspi Marketplace investor letter 2024; in-house survey of 38 vendors on Instagram, 2GIS and toi.kz (Almaty, Astana, Shymkent), Mar 2026.</p>
+<p><strong>Sources:</strong> Bureau of National Statistics (BNS RK 2024 demographic yearbook); Halyk Finance retail consumption brief Q3-2024; Kaspi Marketplace investor letter 2024; in-house survey of 38 vendors on Instagram + 2GIS + Yandex Maps (Almaty, Astana, Shymkent), Mar 2026.</p>
 </section>
 </foreignObject></svg><svg data-marpit-svg="" viewBox="0 0 1280 720"><foreignObject width="1280" height="720"><section id="4" data-paginate="true" data-background-color="#ffffff" data-theme="default" data-style="@import url(&quot;./style.css&quot;);
 " lang="C" data-marpit-pagination="4" style="--paginate:true;--background-color:#ffffff;--theme:default;--style:@import url(&quot;./style.css&quot;);
 ;background-color:#ffffff;background-image:none;" data-marpit-pagination-total="18" data-size="16:9">
 <div class="eyebrow">03 — Who's already in the field</div>
-<h1 id="competitive-landscape--what-people-use-today">Competitive landscape — what people use today</h1>
+<h1 id="competitive-landscape--there-is-no-kz-event-marketplace-today">Competitive landscape — there is no KZ event marketplace today</h1>
 <table>
 <thead>
 <tr>
 <th>Player</th>
 <th>Geo</th>
-<th>Coverage</th>
+<th>What it actually is</th>
 <th>Booking flow</th>
 <th>AI planner</th>
 <th>Native mobile</th>
@@ -80,34 +80,43 @@ Three clients (web + mobile + MCP), four Go microservices, one bill of materials
 <tr>
 <td><strong>Instagram + WhatsApp</strong></td>
 <td>KZ</td>
-<td>Everything</td>
-<td>DM</td>
+<td>Vendor feeds + DM</td>
+<td>DM, ad-hoc</td>
 <td><span class="tag tag-no">no</span></td>
 <td>n/a</td>
-<td>DM (slow)</td>
+<td>DM (no SLA)</td>
 </tr>
 <tr>
 <td><strong>2GIS</strong></td>
 <td>KZ</td>
-<td>Catalog (phones)</td>
+<td>Business catalog (phones, maps)</td>
 <td>Phone callback</td>
 <td><span class="tag tag-no">no</span></td>
 <td><span class="tag tag-ok">yes</span></td>
 <td><span class="tag tag-no">no</span></td>
 </tr>
 <tr>
-<td><strong>toi.kz</strong></td>
+<td><strong>Yandex Maps</strong></td>
 <td>KZ</td>
-<td>Wedding portal</td>
-<td>Form → contact</td>
+<td>Business catalog</td>
+<td>Phone callback</td>
 <td><span class="tag tag-no">no</span></td>
+<td><span class="tag tag-ok">yes</span></td>
 <td><span class="tag tag-no">no</span></td>
+</tr>
+<tr>
+<td><strong>Kaspi Travel / Halyk Marketplace</strong></td>
+<td>KZ</td>
+<td>Travel + retail (not events)</td>
+<td>Direct book</td>
+<td><span class="tag tag-no">no</span></td>
+<td><span class="tag tag-ok">yes</span></td>
 <td><span class="tag tag-no">no</span></td>
 </tr>
 <tr>
 <td><strong>The Knot</strong> (US)</td>
 <td>US</td>
-<td>Wedding</td>
+<td>Wedding marketplace</td>
 <td>Quote engine</td>
 <td><span class="tag tag-no">no</span></td>
 <td><span class="tag tag-ok">yes</span></td>
@@ -116,17 +125,8 @@ Three clients (web + mobile + MCP), four Go microservices, one bill of materials
 <tr>
 <td><strong>WeddingWire</strong> (US)</td>
 <td>US</td>
-<td>Wedding</td>
+<td>Wedding marketplace</td>
 <td>Quote engine</td>
-<td><span class="tag tag-no">no</span></td>
-<td><span class="tag tag-ok">yes</span></td>
-<td><span class="tag tag-no">no</span></td>
-</tr>
-<tr>
-<td><strong>Eventbrite</strong></td>
-<td>global</td>
-<td>Tickets (not service)</td>
-<td>Direct book</td>
 <td><span class="tag tag-no">no</span></td>
 <td><span class="tag tag-ok">yes</span></td>
 <td><span class="tag tag-no">no</span></td>
@@ -134,7 +134,7 @@ Three clients (web + mobile + MCP), four Go microservices, one bill of materials
 <tr>
 <td><strong>qonaqzhai</strong></td>
 <td><strong>KZ</strong></td>
-<td><strong>All categories</strong></td>
+<td><strong>Event services marketplace</strong></td>
 <td><strong>Direct + escrow</strong></td>
 <td><span class="tag tag-ok"><strong>yes</strong></span></td>
 <td><span class="tag tag-ok"><strong>yes</strong></span></td>
@@ -154,7 +154,7 @@ Three clients (web + mobile + MCP), four Go microservices, one bill of materials
 <th>Feature</th>
 <th>Instagram+WA</th>
 <th>2GIS</th>
-<th>toi.kz</th>
+<th>Yandex Maps</th>
 <th>The Knot</th>
 <th><strong>qonaqzhai</strong></th>
 </tr>
@@ -163,16 +163,16 @@ Three clients (web + mobile + MCP), four Go microservices, one bill of materials
 <tr>
 <td>Public vendor catalog</td>
 <td><img class="emoji" draggable="false" alt="⚪" src="https://cdn.jsdelivr.net/gh/jdecked/twemoji@17.0.2/assets/svg/26aa.svg" data-marp-twemoji=""/> feed</td>
+<td><img class="emoji" draggable="false" alt="✅" src="https://cdn.jsdelivr.net/gh/jdecked/twemoji@17.0.2/assets/svg/2705.svg" data-marp-twemoji=""/> phone-only</td>
+<td><img class="emoji" draggable="false" alt="✅" src="https://cdn.jsdelivr.net/gh/jdecked/twemoji@17.0.2/assets/svg/2705.svg" data-marp-twemoji=""/> phone-only</td>
 <td><img class="emoji" draggable="false" alt="✅" src="https://cdn.jsdelivr.net/gh/jdecked/twemoji@17.0.2/assets/svg/2705.svg" data-marp-twemoji=""/></td>
-<td><img class="emoji" draggable="false" alt="✅" src="https://cdn.jsdelivr.net/gh/jdecked/twemoji@17.0.2/assets/svg/2705.svg" data-marp-twemoji=""/></td>
-<td><img class="emoji" draggable="false" alt="✅" src="https://cdn.jsdelivr.net/gh/jdecked/twemoji@17.0.2/assets/svg/2705.svg" data-marp-twemoji=""/></td>
-<td><img class="emoji" draggable="false" alt="✅" src="https://cdn.jsdelivr.net/gh/jdecked/twemoji@17.0.2/assets/svg/2705.svg" data-marp-twemoji=""/></td>
+<td><img class="emoji" draggable="false" alt="✅" src="https://cdn.jsdelivr.net/gh/jdecked/twemoji@17.0.2/assets/svg/2705.svg" data-marp-twemoji=""/> structured</td>
 </tr>
 <tr>
 <td>Native iOS / Android</td>
 <td><img class="emoji" draggable="false" alt="❌" src="https://cdn.jsdelivr.net/gh/jdecked/twemoji@17.0.2/assets/svg/274c.svg" data-marp-twemoji=""/></td>
 <td><img class="emoji" draggable="false" alt="✅" src="https://cdn.jsdelivr.net/gh/jdecked/twemoji@17.0.2/assets/svg/2705.svg" data-marp-twemoji=""/></td>
-<td><img class="emoji" draggable="false" alt="❌" src="https://cdn.jsdelivr.net/gh/jdecked/twemoji@17.0.2/assets/svg/274c.svg" data-marp-twemoji=""/></td>
+<td><img class="emoji" draggable="false" alt="✅" src="https://cdn.jsdelivr.net/gh/jdecked/twemoji@17.0.2/assets/svg/2705.svg" data-marp-twemoji=""/></td>
 <td><img class="emoji" draggable="false" alt="✅" src="https://cdn.jsdelivr.net/gh/jdecked/twemoji@17.0.2/assets/svg/2705.svg" data-marp-twemoji=""/></td>
 <td><img class="emoji" draggable="false" alt="✅" src="https://cdn.jsdelivr.net/gh/jdecked/twemoji@17.0.2/assets/svg/2705.svg" data-marp-twemoji=""/> Flutter</td>
 </tr>
@@ -180,8 +180,8 @@ Three clients (web + mobile + MCP), four Go microservices, one bill of materials
 <td>3 languages (kk / ru / en)</td>
 <td>n/a</td>
 <td><img class="emoji" draggable="false" alt="⚪" src="https://cdn.jsdelivr.net/gh/jdecked/twemoji@17.0.2/assets/svg/26aa.svg" data-marp-twemoji=""/> ru/kk</td>
-<td><img class="emoji" draggable="false" alt="⚪" src="https://cdn.jsdelivr.net/gh/jdecked/twemoji@17.0.2/assets/svg/26aa.svg" data-marp-twemoji=""/> ru</td>
-<td><img class="emoji" draggable="false" alt="❌" src="https://cdn.jsdelivr.net/gh/jdecked/twemoji@17.0.2/assets/svg/274c.svg" data-marp-twemoji=""/></td>
+<td><img class="emoji" draggable="false" alt="⚪" src="https://cdn.jsdelivr.net/gh/jdecked/twemoji@17.0.2/assets/svg/26aa.svg" data-marp-twemoji=""/> ru/kk</td>
+<td><img class="emoji" draggable="false" alt="❌" src="https://cdn.jsdelivr.net/gh/jdecked/twemoji@17.0.2/assets/svg/274c.svg" data-marp-twemoji=""/> en only</td>
 <td><img class="emoji" draggable="false" alt="✅" src="https://cdn.jsdelivr.net/gh/jdecked/twemoji@17.0.2/assets/svg/2705.svg" data-marp-twemoji=""/> all 3</td>
 </tr>
 <tr>
@@ -196,7 +196,7 @@ Three clients (web + mobile + MCP), four Go microservices, one bill of materials
 <td>Vendor self-service portal</td>
 <td><img class="emoji" draggable="false" alt="❌" src="https://cdn.jsdelivr.net/gh/jdecked/twemoji@17.0.2/assets/svg/274c.svg" data-marp-twemoji=""/></td>
 <td><img class="emoji" draggable="false" alt="⚪" src="https://cdn.jsdelivr.net/gh/jdecked/twemoji@17.0.2/assets/svg/26aa.svg" data-marp-twemoji=""/> paid claim</td>
-<td><img class="emoji" draggable="false" alt="⚪" src="https://cdn.jsdelivr.net/gh/jdecked/twemoji@17.0.2/assets/svg/26aa.svg" data-marp-twemoji=""/> form</td>
+<td><img class="emoji" draggable="false" alt="⚪" src="https://cdn.jsdelivr.net/gh/jdecked/twemoji@17.0.2/assets/svg/26aa.svg" data-marp-twemoji=""/> paid claim</td>
 <td><img class="emoji" draggable="false" alt="✅" src="https://cdn.jsdelivr.net/gh/jdecked/twemoji@17.0.2/assets/svg/2705.svg" data-marp-twemoji=""/></td>
 <td><img class="emoji" draggable="false" alt="✅" src="https://cdn.jsdelivr.net/gh/jdecked/twemoji@17.0.2/assets/svg/2705.svg" data-marp-twemoji=""/></td>
 </tr>
@@ -695,7 +695,7 @@ Authorization: Bearer eyJ…</p>
 <th>Test signal</th>
 <th>Instagram+WA</th>
 <th>2GIS</th>
-<th>toi.kz</th>
+<th>Yandex Maps</th>
 <th>The Knot</th>
 <th><strong>qonaqzhai</strong></th>
 </tr>

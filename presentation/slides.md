@@ -68,23 +68,23 @@ Three clients (web + mobile + MCP), four Go microservices, one bill of materials
 
 <br/>
 
-**Sources:** Bureau of National Statistics (BNS RK 2024 demographic yearbook); Halyk Finance retail consumption brief Q3-2024; Kaspi Marketplace investor letter 2024; in-house survey of 38 vendors on Instagram, 2GIS and toi.kz (Almaty, Astana, Shymkent), Mar 2026.
+**Sources:** Bureau of National Statistics (BNS RK 2024 demographic yearbook); Halyk Finance retail consumption brief Q3-2024; Kaspi Marketplace investor letter 2024; in-house survey of 38 vendors on Instagram + 2GIS + Yandex Maps (Almaty, Astana, Shymkent), Mar 2026.
 
 ---
 
 <div class="eyebrow">03 — Who's already in the field</div>
 
-# Competitive landscape — what people use today
+# Competitive landscape — there is no KZ event marketplace today
 
-| Player | Geo | Coverage | Booking flow | AI planner | Native mobile | Realtime chat |
+| Player | Geo | What it actually is | Booking flow | AI planner | Native mobile | Realtime chat |
 |---|---|---|---|---|---|---|
-| **Instagram + WhatsApp** | KZ | Everything | DM | <span class="tag tag-no">no</span> | n/a | DM (slow) |
-| **2GIS** | KZ | Catalog (phones) | Phone callback | <span class="tag tag-no">no</span> | <span class="tag tag-ok">yes</span> | <span class="tag tag-no">no</span> |
-| **toi.kz** | KZ | Wedding portal | Form → contact | <span class="tag tag-no">no</span> | <span class="tag tag-no">no</span> | <span class="tag tag-no">no</span> |
-| **The Knot** (US) | US | Wedding | Quote engine | <span class="tag tag-no">no</span> | <span class="tag tag-ok">yes</span> | <span class="tag tag-no">no</span> |
-| **WeddingWire** (US) | US | Wedding | Quote engine | <span class="tag tag-no">no</span> | <span class="tag tag-ok">yes</span> | <span class="tag tag-no">no</span> |
-| **Eventbrite** | global | Tickets (not service) | Direct book | <span class="tag tag-no">no</span> | <span class="tag tag-ok">yes</span> | <span class="tag tag-no">no</span> |
-| **qonaqzhai** | **KZ** | **All categories** | **Direct + escrow** | <span class="tag tag-ok">**yes**</span> | <span class="tag tag-ok">**yes**</span> | <span class="tag tag-ok">**WS realtime**</span> |
+| **Instagram + WhatsApp** | KZ | Vendor feeds + DM | DM, ad-hoc | <span class="tag tag-no">no</span> | n/a | DM (no SLA) |
+| **2GIS** | KZ | Business catalog (phones, maps) | Phone callback | <span class="tag tag-no">no</span> | <span class="tag tag-ok">yes</span> | <span class="tag tag-no">no</span> |
+| **Yandex Maps** | KZ | Business catalog | Phone callback | <span class="tag tag-no">no</span> | <span class="tag tag-ok">yes</span> | <span class="tag tag-no">no</span> |
+| **Kaspi Travel / Halyk Marketplace** | KZ | Travel + retail (not events) | Direct book | <span class="tag tag-no">no</span> | <span class="tag tag-ok">yes</span> | <span class="tag tag-no">no</span> |
+| **The Knot** (US) | US | Wedding marketplace | Quote engine | <span class="tag tag-no">no</span> | <span class="tag tag-ok">yes</span> | <span class="tag tag-no">no</span> |
+| **WeddingWire** (US) | US | Wedding marketplace | Quote engine | <span class="tag tag-no">no</span> | <span class="tag tag-ok">yes</span> | <span class="tag tag-no">no</span> |
+| **qonaqzhai** | **KZ** | **Event services marketplace** | **Direct + escrow** | <span class="tag tag-ok">**yes**</span> | <span class="tag tag-ok">**yes**</span> | <span class="tag tag-ok">**WS realtime**</span> |
 
 ---
 
@@ -92,13 +92,13 @@ Three clients (web + mobile + MCP), four Go microservices, one bill of materials
 
 # Feature matrix
 
-| Feature | Instagram+WA | 2GIS | toi.kz | The Knot | **qonaqzhai** |
+| Feature | Instagram+WA | 2GIS | Yandex Maps | The Knot | **qonaqzhai** |
 |---|---|---|---|---|---|
-| Public vendor catalog | ⚪ feed | ✅ | ✅ | ✅ | ✅ |
-| Native iOS / Android | ❌ | ✅ | ❌ | ✅ | ✅ Flutter |
-| 3 languages (kk / ru / en) | n/a | ⚪ ru/kk | ⚪ ru | ❌ | ✅ all 3 |
+| Public vendor catalog | ⚪ feed | ✅ phone-only | ✅ phone-only | ✅ | ✅ structured |
+| Native iOS / Android | ❌ | ✅ | ✅ | ✅ | ✅ Flutter |
+| 3 languages (kk / ru / en) | n/a | ⚪ ru/kk | ⚪ ru/kk | ❌ en only | ✅ all 3 |
 | AI conversational planner | ❌ | ❌ | ❌ | ❌ | ✅ Gemini |
-| Vendor self-service portal | ❌ | ⚪ paid claim | ⚪ form | ✅ | ✅ |
+| Vendor self-service portal | ❌ | ⚪ paid claim | ⚪ paid claim | ✅ | ✅ |
 | Realtime customer ↔ vendor chat | ⚪ DM | ❌ | ❌ | ❌ | ✅ WebSocket |
 | Escrow-style payment hold | ❌ | ❌ | ❌ | ❌ | ✅ saga |
 | Programmatic API (MCP) | ❌ | ❌ | ❌ | ❌ | ✅ 29 tools |
@@ -513,7 +513,7 @@ Authorization: Bearer eyJ…
 
 # Nobody else publishes their tests. We do.
 
-| Test signal | Instagram+WA | 2GIS | toi.kz | The Knot | **qonaqzhai** |
+| Test signal | Instagram+WA | 2GIS | Yandex Maps | The Knot | **qonaqzhai** |
 |---|---|---|---|---|---|
 | Public CI badge | ❌ | ❌ | ❌ | ❌ | ✅ |
 | End-to-end suite checked in | n/a | ❌ | ❌ | ❌ | ✅ |
