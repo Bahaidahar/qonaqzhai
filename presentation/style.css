@@ -1,0 +1,357 @@
+/* qonaqzhai deck — matches frontend/src/app/globals.css palette */
+
+@import url("https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500&display=swap");
+
+:root {
+  --bg: #ffffff;
+  --fg: #1a1a2c;
+  --muted: #f3f3f7;
+  --muted-fg: #6e6d80;
+  --border: #e4e3eb;
+  --input: #efeef4;
+  --primary: #4f2fe3;
+  --primary-soft: rgba(79, 47, 227, 0.08);
+  --primary-border: rgba(79, 47, 227, 0.25);
+  --success: #1b7a3a;
+  --warning: #b45309;
+  --danger: #b91c1c;
+}
+
+section {
+  font-family: "Manrope", -apple-system, sans-serif;
+  background: var(--bg);
+  color: var(--fg);
+  padding: 56px 72px;
+  letter-spacing: -0.01em;
+  font-size: 22px;
+  line-height: 1.5;
+}
+
+section.lead {
+  background: radial-gradient(circle at 20% 20%, var(--primary-soft) 0%, transparent 60%),
+              radial-gradient(circle at 80% 80%, rgba(79, 47, 227, 0.04) 0%, transparent 60%),
+              var(--bg);
+  text-align: left;
+  padding: 80px;
+}
+
+section.lead h1 {
+  font-size: 96px;
+  line-height: 0.95;
+  letter-spacing: -0.05em;
+  font-weight: 800;
+  margin-bottom: 20px;
+}
+
+section.lead h1 .accent {
+  color: var(--primary);
+}
+
+section.lead .subtitle {
+  font-size: 26px;
+  color: var(--muted-fg);
+  font-weight: 500;
+  margin-top: 16px;
+  max-width: 80%;
+}
+
+section.lead .footer {
+  position: absolute;
+  bottom: 60px;
+  left: 80px;
+  font-size: 14px;
+  color: var(--muted-fg);
+  font-family: "JetBrains Mono", monospace;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+h1 {
+  font-size: 52px;
+  letter-spacing: -0.03em;
+  font-weight: 700;
+  margin-bottom: 24px;
+  line-height: 1.05;
+}
+
+h2 {
+  font-size: 32px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  margin-top: 0;
+  margin-bottom: 12px;
+}
+
+h3 {
+  font-size: 20px;
+  font-weight: 600;
+}
+
+.eyebrow {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 11px;
+  color: var(--muted-fg);
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  font-weight: 500;
+  margin-bottom: 12px;
+}
+
+.subtitle {
+  font-size: 18px;
+  color: var(--muted-fg);
+}
+
+ul, ol {
+  margin: 0;
+  padding-left: 22px;
+}
+
+li {
+  margin: 6px 0;
+}
+
+p {
+  margin: 8px 0;
+}
+
+strong {
+  color: var(--fg);
+  font-weight: 700;
+}
+
+code {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 0.85em;
+  background: var(--muted);
+  padding: 2px 8px;
+  border-radius: 6px;
+  border: 1px solid var(--border);
+}
+
+table {
+  border-collapse: collapse;
+  width: 100%;
+  font-size: 16px;
+}
+
+table th {
+  text-align: left;
+  font-family: "JetBrains Mono", monospace;
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--muted-fg);
+  font-weight: 500;
+  padding: 12px 14px;
+  border-bottom: 1px solid var(--border);
+}
+
+table td {
+  padding: 11px 14px;
+  border-bottom: 1px solid var(--border);
+  font-size: 15px;
+  vertical-align: top;
+}
+
+table td:first-child {
+  font-weight: 600;
+}
+
+.cards {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+  margin-top: 24px;
+}
+
+.card {
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 22px 22px;
+  background: var(--bg);
+}
+
+.card .label {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  color: var(--muted-fg);
+  text-transform: uppercase;
+  margin-bottom: 6px;
+}
+
+.card .value {
+  font-size: 32px;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  color: var(--fg);
+  line-height: 1.1;
+}
+
+.card .value.indigo { color: var(--primary); }
+
+.card p {
+  font-size: 14px;
+  color: var(--muted-fg);
+  margin-top: 8px;
+}
+
+.tag {
+  display: inline-block;
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 600;
+  border: 1px solid var(--primary-border);
+  background: var(--primary-soft);
+  color: var(--primary);
+  margin-right: 4px;
+}
+
+.tag-ok {
+  border-color: rgba(27, 122, 58, 0.3);
+  background: rgba(27, 122, 58, 0.1);
+  color: var(--success);
+}
+
+.tag-no {
+  border-color: rgba(185, 28, 28, 0.3);
+  background: rgba(185, 28, 28, 0.1);
+  color: var(--danger);
+}
+
+.cols {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 36px;
+  margin-top: 16px;
+}
+
+.stack-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+  margin-top: 18px;
+}
+
+.stack-card {
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 18px;
+  background: var(--bg);
+}
+
+.stack-card h3 {
+  font-size: 14px;
+  margin: 0 0 4px;
+}
+
+.stack-card .layer {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 10px;
+  color: var(--muted-fg);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  margin-bottom: 6px;
+}
+
+.stack-card p {
+  font-size: 12.5px;
+  color: var(--muted-fg);
+  margin: 4px 0 0;
+}
+
+.screens {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 14px;
+  margin-top: 20px;
+}
+
+.screens img {
+  width: 100%;
+  border-radius: 14px;
+  border: 1px solid var(--border);
+  display: block;
+}
+
+.screens .label {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 10px;
+  color: var(--muted-fg);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  margin-top: 6px;
+}
+
+.screens-mobile {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 12px;
+  margin-top: 20px;
+}
+
+.screens-mobile img {
+  width: 100%;
+  border-radius: 22px;
+  border: 1px solid var(--border);
+  display: block;
+}
+
+.diagram {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 12px;
+  line-height: 1.5;
+  background: var(--muted);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 18px 24px;
+  white-space: pre;
+  color: var(--fg);
+}
+
+.kpi-row {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 14px;
+  margin-top: 20px;
+}
+
+.kpi {
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 20px;
+  background: var(--bg);
+}
+
+.kpi .num {
+  font-size: 40px;
+  font-weight: 800;
+  letter-spacing: -0.04em;
+  color: var(--primary);
+  line-height: 1;
+}
+
+.kpi .lbl {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--muted-fg);
+  margin-top: 6px;
+}
+
+.footer-bar {
+  position: absolute;
+  bottom: 22px;
+  left: 72px;
+  right: 72px;
+  display: flex;
+  justify-content: space-between;
+  font-family: "JetBrains Mono", monospace;
+  font-size: 10px;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--muted-fg);
+}
