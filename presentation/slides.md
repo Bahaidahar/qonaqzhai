@@ -14,10 +14,10 @@ style: |
 <div class="eyebrow">Diploma defense · 2026</div>
 
 # qonaqzhai
-# <span class="accent">Plan events by chatting.</span>
+# <span class="accent">Plan any event by chatting.</span>
 
 <div class="subtitle">
-AI-assisted event marketplace for Kazakhstan — wedding, toi, corporate.
+AI-assisted event services marketplace for Kazakhstan — toi · weddings · birthdays · corporate · graduations · baby showers · betashar.
 Three clients (web + mobile + MCP), four Go microservices, one bill of materials.
 </div>
 
@@ -27,27 +27,29 @@ Three clients (web + mobile + MCP), four Go microservices, one bill of materials
 
 <div class="eyebrow">01 — The problem</div>
 
-# Planning a Kazakh wedding takes <span style="color:var(--primary)">14+ phone calls</span> and an Instagram DM chain.
+# Booking **any event** in Kazakhstan — wedding, toi, birthday, corporate — takes <span style="color:var(--primary)">14+ calls</span> and an Instagram DM chain.
 
 <div class="cols">
 
 <div>
 
-**Customer side**
+**Customer side** — for the whole calendar of events
+- Toi · betashar · kelin tusіru · weddings · birthdays · corporate parties · graduations · baby showers
 - Vendors live on Instagram, WhatsApp, 2GIS — no price transparency
-- Comparisons mean screenshots in group chats
-- Cancellations slip because there's no booking record
-- AI assistance is locked to enterprise tools
+- Comparisons happen via screenshots in group chats
+- Cancellations slip because there is no booking record
+- AI planning assistance is locked to enterprise tools
 
 </div>
 
 <div>
 
-**Vendor side**
-- Bookings sit in DMs scattered across 4 messengers
+**Vendor side** — same business, multiple event types
+- Bookings scattered across 4 messengers
 - Payment is cash or Kaspi link, no escrow
-- Reviews are word-of-mouth, no portable reputation
-- Free Instagram traffic flattening since 2024
+- Reviews live in word-of-mouth, no portable reputation
+- Free Instagram reach flattening since 2024
+- No way to fill weekday gaps between weekend weddings
 
 </div>
 
@@ -57,13 +59,21 @@ Three clients (web + mobile + MCP), four Go microservices, one bill of materials
 
 <div class="eyebrow">02 — Market</div>
 
-# Kazakhstan event services — <span style="color:var(--primary)">≈ ₸ 480 B / year</span>
+# Kazakhstan event services — <span style="color:var(--primary)">≈ ₸ 480 B / year across the calendar</span>
 
 <div class="kpi-row">
-<div class="kpi"><div class="num">160 K</div><div class="lbl">weddings / year</div></div>
-<div class="kpi"><div class="num">~₸ 3 M</div><div class="lbl">avg cheque per event</div></div>
+<div class="kpi"><div class="num">160 K</div><div class="lbl">weddings + toi / yr</div></div>
+<div class="kpi"><div class="num">~2.4 M</div><div class="lbl">birthdays celebrated / yr</div></div>
 <div class="kpi"><div class="num">22 %</div><div class="lbl">YoY mobile commerce</div></div>
 <div class="kpi"><div class="num">68 %</div><div class="lbl">vendors on Instagram only</div></div>
+</div>
+
+<div class="subtitle" style="margin-top:18px">
+The same vendor sells across event types — a photographer shoots weddings on Saturday, a corporate event Monday, a birthday Sunday. The platform has to serve <strong>every event</strong>, not just one segment.
+</div>
+
+<div class="subtitle" style="margin-top:14px">
+<strong>Categories shipped on day one:</strong> Venues · Catering · Photo + Video · Music + DJ · Decor + Florists · Cakes · Toi / Betashar specialists · Animators (kids' events) · Tamada / hosts
 </div>
 
 <br/>
@@ -74,17 +84,17 @@ Three clients (web + mobile + MCP), four Go microservices, one bill of materials
 
 <div class="eyebrow">03 — Who's already in the field</div>
 
-# Competitive landscape — there is no KZ event marketplace today
+# Competitive landscape — no KZ marketplace covers the full event calendar
 
-| Player | Geo | What it actually is | Booking flow | AI planner | Native mobile | Realtime chat |
+| Player | Geo | Event coverage | Booking flow | AI planner | Native mobile | Realtime chat |
 |---|---|---|---|---|---|---|
-| **Instagram + WhatsApp** | KZ | Vendor feeds + DM | DM, ad-hoc | <span class="tag tag-no">no</span> | n/a | DM (no SLA) |
-| **2GIS** | KZ | Business catalog (phones, maps) | Phone callback | <span class="tag tag-no">no</span> | <span class="tag tag-ok">yes</span> | <span class="tag tag-no">no</span> |
-| **Yandex Maps** | KZ | Business catalog | Phone callback | <span class="tag tag-no">no</span> | <span class="tag tag-ok">yes</span> | <span class="tag tag-no">no</span> |
-| **Kaspi Travel / Halyk Marketplace** | KZ | Travel + retail (not events) | Direct book | <span class="tag tag-no">no</span> | <span class="tag tag-ok">yes</span> | <span class="tag tag-no">no</span> |
-| **The Knot** (US) | US | Wedding marketplace | Quote engine | <span class="tag tag-no">no</span> | <span class="tag tag-ok">yes</span> | <span class="tag tag-no">no</span> |
-| **WeddingWire** (US) | US | Wedding marketplace | Quote engine | <span class="tag tag-no">no</span> | <span class="tag tag-ok">yes</span> | <span class="tag tag-no">no</span> |
-| **qonaqzhai** | **KZ** | **Event services marketplace** | **Direct + escrow** | <span class="tag tag-ok">**yes**</span> | <span class="tag tag-ok">**yes**</span> | <span class="tag tag-ok">**WS realtime**</span> |
+| **Instagram + WhatsApp** | KZ | All events (ad-hoc) | DM | <span class="tag tag-no">no</span> | n/a | DM (no SLA) |
+| **2GIS** | KZ | Any service w/ phone | Phone callback | <span class="tag tag-no">no</span> | <span class="tag tag-ok">yes</span> | <span class="tag tag-no">no</span> |
+| **Yandex Maps** | KZ | Any service w/ phone | Phone callback | <span class="tag tag-no">no</span> | <span class="tag tag-ok">yes</span> | <span class="tag tag-no">no</span> |
+| **The Knot / WeddingWire** | US | Weddings only | Quote engine | <span class="tag tag-no">no</span> | <span class="tag tag-ok">yes</span> | <span class="tag tag-no">no</span> |
+| **Eventbrite** | global | Event tickets only | Buy ticket | <span class="tag tag-no">no</span> | <span class="tag tag-ok">yes</span> | <span class="tag tag-no">no</span> |
+| **Peerspace** (US/UK) | US | Venue rental only | Direct book | <span class="tag tag-no">no</span> | <span class="tag tag-ok">yes</span> | <span class="tag tag-no">no</span> |
+| **qonaqzhai** | **KZ** | **All events — wedding · toi · birthday · corporate** | **Direct + escrow** | <span class="tag tag-ok">**yes**</span> | <span class="tag tag-ok">**yes**</span> | <span class="tag tag-ok">**WS realtime**</span> |
 
 ---
 
@@ -92,15 +102,16 @@ Three clients (web + mobile + MCP), four Go microservices, one bill of materials
 
 # Feature matrix
 
-| Feature | Instagram+WA | 2GIS | Yandex Maps | The Knot | **qonaqzhai** |
+| Feature | Instagram+WA | 2GIS / Yandex | The Knot | Eventbrite | **qonaqzhai** |
 |---|---|---|---|---|---|
-| Public vendor catalog | ⚪ feed | ✅ phone-only | ✅ phone-only | ✅ | ✅ structured |
+| Covers all event types (wedding · toi · birthday · corporate) | ✅ (ad-hoc) | ✅ catalog | ❌ wedding only | ❌ tickets only | ✅ |
+| Public vendor catalog | ⚪ feed | ✅ phone-only | ✅ | ✅ events | ✅ structured |
 | Native iOS / Android | ❌ | ✅ | ✅ | ✅ | ✅ Flutter |
-| 3 languages (kk / ru / en) | n/a | ⚪ ru/kk | ⚪ ru/kk | ❌ en only | ✅ all 3 |
+| 3 languages (kk / ru / en) | n/a | ⚪ ru/kk | ❌ en | ❌ en | ✅ all 3 |
 | AI conversational planner | ❌ | ❌ | ❌ | ❌ | ✅ Gemini |
-| Vendor self-service portal | ❌ | ⚪ paid claim | ⚪ paid claim | ✅ | ✅ |
+| Vendor self-service portal | ❌ | ⚪ paid claim | ✅ | ✅ | ✅ |
 | Realtime customer ↔ vendor chat | ⚪ DM | ❌ | ❌ | ❌ | ✅ WebSocket |
-| Escrow-style payment hold | ❌ | ❌ | ❌ | ❌ | ✅ saga |
+| Escrow-style payment hold | ❌ | ❌ | ❌ | ⚪ tickets | ✅ saga |
 | Programmatic API (MCP) | ❌ | ❌ | ❌ | ❌ | ✅ 29 tools |
 | E2E test coverage published | ❌ | ❌ | ❌ | ❌ | ✅ 39 + 12 |
 
@@ -381,7 +392,7 @@ No cross-DB joins. User ids are plain UUIDs; cross-service lookups go through ba
 
 <div>
 
-**Conversation, not a form.** The user types `"wedding for 120 in Almaty, 5M ₸"` — the planner replies with three structured blocks:
+**Conversation, not a form.** The user types `"toi for 120 in Almaty, 5M ₸"` or `"birthday for 30 kids with animators"` — the planner replies with three structured blocks:
 
 - **Plan** — title, date guess, guest count, budget
 - **Budget** — categorised breakdown with bar chart
@@ -403,7 +414,7 @@ The block schema is contractual — mobile + web render identical cards from the
       "type": "plan",
       "data": {
         "title": "Draft event plan",
-        "eventType": "wedding",
+        "eventType": "toi",
         "city": "Almaty",
         "guests": 120,
         "budget": 5000000
@@ -513,7 +524,7 @@ Authorization: Bearer eyJ…
 
 # Nobody else publishes their tests. We do.
 
-| Test signal | Instagram+WA | 2GIS | Yandex Maps | The Knot | **qonaqzhai** |
+| Test signal | Instagram+WA | 2GIS / Yandex | The Knot | Eventbrite | **qonaqzhai** |
 |---|---|---|---|---|---|
 | Public CI badge | ❌ | ❌ | ❌ | ❌ | ✅ |
 | End-to-end suite checked in | n/a | ❌ | ❌ | ❌ | ✅ |
