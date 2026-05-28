@@ -84,17 +84,19 @@ The same vendor sells across event types — a photographer shoots weddings on S
 
 <div class="eyebrow">03 — Who's already in the field</div>
 
-# Competitive landscape — no KZ marketplace covers the full event calendar
+# Competitive landscape
 
-| Player | Geo | Event coverage | Booking flow | AI planner | Native mobile | Realtime chat |
+| Player | Geo | What it actually does | Booking flow | AI planner | Native mobile | Realtime chat |
 |---|---|---|---|---|---|---|
-| **Instagram + WhatsApp** | KZ | All events (ad-hoc) | DM | <span class="tag tag-no">no</span> | n/a | DM (no SLA) |
-| **2GIS** | KZ | Any service w/ phone | Phone callback | <span class="tag tag-no">no</span> | <span class="tag tag-ok">yes</span> | <span class="tag tag-no">no</span> |
-| **Yandex Maps** | KZ | Any service w/ phone | Phone callback | <span class="tag tag-no">no</span> | <span class="tag tag-ok">yes</span> | <span class="tag tag-no">no</span> |
-| **The Knot / WeddingWire** | US | Weddings only | Quote engine | <span class="tag tag-no">no</span> | <span class="tag tag-ok">yes</span> | <span class="tag tag-no">no</span> |
+| **Instagram + WhatsApp** | KZ | Vendor feeds + DM (any event) | DM | <span class="tag tag-no">no</span> | n/a | DM (no SLA) |
+| **2GIS** | KZ | Business catalog (any service w/ phone) | Phone callback | <span class="tag tag-no">no</span> | <span class="tag tag-ok">yes</span> | <span class="tag tag-no">no</span> |
+| **Yandex Maps** | KZ | Business catalog | Phone callback | <span class="tag tag-no">no</span> | <span class="tag tag-ok">yes</span> | <span class="tag tag-no">no</span> |
+| **Ticketon.kz** | KZ | Event tickets (no services) | Buy ticket | <span class="tag tag-no">no</span> | <span class="tag tag-ok">yes</span> | <span class="tag tag-no">no</span> |
+| **GigSalad** (US) | US | Entertainers, party pros, all event types | Lead → quote ($20-80/lead) | <span class="tag tag-no">no</span> | <span class="tag tag-ok">yes</span> | <span class="tag tag-no">no</span> |
+| **Thumbtack** (US) | US | Hire any pro (incl event services) | Pay-per-quote | <span class="tag tag-no">no</span> | <span class="tag tag-ok">yes</span> | <span class="tag tag-no">no</span> |
 | **Eventbrite** | global | Event tickets only | Buy ticket | <span class="tag tag-no">no</span> | <span class="tag tag-ok">yes</span> | <span class="tag tag-no">no</span> |
 | **Peerspace** (US/UK) | US | Venue rental only | Direct book | <span class="tag tag-no">no</span> | <span class="tag tag-ok">yes</span> | <span class="tag tag-no">no</span> |
-| **qonaqzhai** | **KZ** | **All events — wedding · toi · birthday · corporate** | **Direct + escrow** | <span class="tag tag-ok">**yes**</span> | <span class="tag tag-ok">**yes**</span> | <span class="tag tag-ok">**WS realtime**</span> |
+| **qonaqzhai** | **KZ** | **All event services + AI planner** | **Direct + escrow** | <span class="tag tag-ok">**yes**</span> | <span class="tag tag-ok">**yes**</span> | <span class="tag tag-ok">**WS realtime**</span> |
 
 ---
 
@@ -102,18 +104,19 @@ The same vendor sells across event types — a photographer shoots weddings on S
 
 # Feature matrix
 
-| Feature | Instagram+WA | 2GIS / Yandex | The Knot | Eventbrite | **qonaqzhai** |
-|---|---|---|---|---|---|
-| Covers all event types (wedding · toi · birthday · corporate) | ✅ (ad-hoc) | ✅ catalog | ❌ wedding only | ❌ tickets only | ✅ |
-| Public vendor catalog | ⚪ feed | ✅ phone-only | ✅ | ✅ events | ✅ structured |
-| Native iOS / Android | ❌ | ✅ | ✅ | ✅ | ✅ Flutter |
-| 3 languages (kk / ru / en) | n/a | ⚪ ru/kk | ❌ en | ❌ en | ✅ all 3 |
-| AI conversational planner | ❌ | ❌ | ❌ | ❌ | ✅ Gemini |
-| Vendor self-service portal | ❌ | ⚪ paid claim | ✅ | ✅ | ✅ |
-| Realtime customer ↔ vendor chat | ⚪ DM | ❌ | ❌ | ❌ | ✅ WebSocket |
-| Escrow-style payment hold | ❌ | ❌ | ❌ | ⚪ tickets | ✅ saga |
-| Programmatic API (MCP) | ❌ | ❌ | ❌ | ❌ | ✅ 29 tools |
-| E2E test coverage published | ❌ | ❌ | ❌ | ❌ | ✅ 39 + 12 |
+| Feature | Instagram+WA | 2GIS / Yandex | GigSalad | Thumbtack | Eventbrite | **qonaqzhai** |
+|---|---|---|---|---|---|---|
+| Geo: Kazakhstan | ✅ | ✅ | ❌ US | ❌ US | ⚪ partial | ✅ |
+| Covers all event types (toi · wedding · birthday · corporate) | ✅ ad-hoc | ✅ catalog | ✅ | ✅ | ❌ tickets | ✅ |
+| Public vendor catalog | ⚪ feed | ✅ phone-only | ✅ | ✅ | ✅ events | ✅ structured |
+| Native iOS / Android | ❌ | ✅ | ✅ | ✅ | ✅ | ✅ Flutter |
+| 3 languages (kk / ru / en) | n/a | ⚪ ru/kk | ❌ en | ❌ en | ❌ en | ✅ all 3 |
+| AI conversational planner | ❌ | ❌ | ❌ | ❌ | ❌ | ✅ Gemini |
+| Realtime customer ↔ vendor chat | ⚪ DM | ❌ | ❌ | ❌ | ❌ | ✅ WebSocket |
+| Escrow-style payment hold | ❌ | ❌ | ❌ | ❌ | ⚪ tickets | ✅ saga |
+| Pay-per-lead pricing trap | n/a | ⚪ paid claim | ❌ $20-80/lead | ❌ pay-per-quote | n/a | ✅ flat % |
+| Programmatic API (MCP) | ❌ | ❌ | ❌ | ❌ | ❌ | ✅ 29 tools |
+| E2E test coverage published | ❌ | ❌ | ❌ | ❌ | ❌ | ✅ 39 + 12 |
 
 <div class="subtitle" style="margin-top:14px">⚪ partial · ❌ none · ✅ shipped</div>
 
@@ -524,7 +527,7 @@ Authorization: Bearer eyJ…
 
 # Nobody else publishes their tests. We do.
 
-| Test signal | Instagram+WA | 2GIS / Yandex | The Knot | Eventbrite | **qonaqzhai** |
+| Test signal | Instagram+WA | 2GIS / Yandex | GigSalad | Thumbtack | **qonaqzhai** |
 |---|---|---|---|---|---|
 | Public CI badge | ❌ | ❌ | ❌ | ❌ | ✅ |
 | End-to-end suite checked in | n/a | ❌ | ❌ | ❌ | ✅ |
