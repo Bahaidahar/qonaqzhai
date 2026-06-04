@@ -497,22 +497,21 @@ func (h *Handler) ChatStub(w http.ResponseWriter, r *http.Request) {
 	if chatID == "" {
 		chatID = "stub-" + strconv.FormatInt(int64(len(req.Message)), 10)
 	}
+	// Response shape matches the web client's ChatReplyResponse: flat
+	// {chatId, reply, blocks}. (Earlier this was nested under "message",
+	// which the frontend could not parse, so replies rendered empty.)
 	httpx.WriteJSON(w, http.StatusOK, map[string]any{
 		"chatId": chatID,
-		"message": map[string]any{
-			"id":   "stub-reply",
-			"role": "ai",
-			"text": "Got it — here's a draft plan. Plug in a real LLM in /api/chat to replace this stub.",
-			"blocks": []map[string]any{
-				{
-					"type": "plan",
-					"data": map[string]any{
-						"title":     "Draft event plan",
-						"eventType": "event",
-						"city":      "Almaty",
-						"guests":    100,
-						"budget":    3000000,
-					},
+		"reply":  "Got it — here's a draft plan. Plug in a real LLM in /api/chat to replace this stub.",
+		"blocks": []map[string]any{
+			{
+				"type": "plan",
+				"data": map[string]any{
+					"title":     "Draft event plan",
+					"eventType": "event",
+					"city":      "Almaty",
+					"guests":    100,
+					"budget":    3000000,
 				},
 			},
 		},

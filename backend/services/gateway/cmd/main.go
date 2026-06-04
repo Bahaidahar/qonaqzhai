@@ -23,11 +23,13 @@ func main() {
 	addr := envOr("GATEWAY_ADDR", ":8080")
 	authURL := mustURL(envOr("AUTH_URL", "http://localhost:8081"))
 	coreURL := mustURL(envOr("CORE_URL", "http://localhost:8082"))
-	realtimeURL := mustURL(envOr("REALTIME_URL", "http://localhost:8083"))
+	paymentURL := mustURL(envOr("PAYMENT_URL", "http://localhost:8083"))
+	realtimeURL := mustURL(envOr("REALTIME_URL", "http://localhost:8084"))
 	corsOrigin := envOr("CORS_ORIGIN", "http://localhost:3000")
 
 	authProxy := newProxy(authURL)
 	coreProxy := newProxy(coreURL)
+	paymentProxy := newProxy(paymentURL)
 	realtimeProxy := newProxy(realtimeURL)
 
 	mux := http.NewServeMux()
@@ -38,12 +40,22 @@ func main() {
 			return
 		}
 		switch {
-		case path == "/api/ws":
+		case path == "/api/ws",
+			path == "/api/threads",
+			strings.HasPrefix(path, "/api/threads/"):
 			realtimeProxy.ServeHTTP(w, r)
+		case path == "/api/cards",
+			strings.HasPrefix(path, "/api/cards/"),
+			path == "/api/payments":
+			paymentProxy.ServeHTTP(w, r)
 		case path == "/api/signup",
 			path == "/api/login",
 			path == "/api/me",
+			path == "/api/admin/users",
+			strings.HasPrefix(path, "/api/admin/users/"),
 			strings.HasPrefix(path, "/api/auth/"):
+			// user management lives in auth-svc; the rest of /api/admin/* (vendors,
+			// stats, reviews) is owned by core and falls through to the default.
 			authProxy.ServeHTTP(w, r)
 		default:
 			coreProxy.ServeHTTP(w, r)
@@ -57,8 +69,8 @@ func main() {
 		IdleTimeout:       120 * time.Second,
 	}
 
-	log.Printf("gateway listening on %s · auth=%s · core=%s · realtime=%s · cors=%s",
-		addr, authURL, coreURL, realtimeURL, corsOrigin)
+	log.Printf("gateway listening on %s · auth=%s · core=%s · payment=%s · realtime=%s · cors=%s",
+		addr, authURL, coreURL, paymentURL, realtimeURL, corsOrigin)
 	if err := srv.ListenAndServe(); err != nil && !errors.Is(err, http.ErrServerClosed) {
 		log.Fatalf("listen: %v", err)
 	}

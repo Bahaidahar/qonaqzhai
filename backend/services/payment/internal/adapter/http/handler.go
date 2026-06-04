@@ -53,7 +53,7 @@ func (h *Handler) ListCards(w http.ResponseWriter, r *http.Request) {
 		httpx.HandleError(w, err)
 		return
 	}
-	httpx.WriteJSON(w, http.StatusOK, cs)
+	httpx.WriteJSON(w, http.StatusOK, map[string]any{"items": cs})
 }
 
 func (h *Handler) DeleteCard(w http.ResponseWriter, r *http.Request) {
@@ -81,7 +81,7 @@ func (h *Handler) ListPayments(w http.ResponseWriter, r *http.Request) {
 		httpx.HandleError(w, err)
 		return
 	}
-	httpx.WriteJSON(w, http.StatusOK, ps)
+	httpx.WriteJSON(w, http.StatusOK, map[string]any{"items": ps})
 }
 
 // Mux wires payment HTTP routes. No CORS — payment sits behind the gateway.
