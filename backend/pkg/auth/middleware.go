@@ -72,11 +72,16 @@ func (m *Middleware) RequireRole(roles ...string) func(http.Handler) http.Handle
 }
 
 func (m *Middleware) parse(r *http.Request) (Claims, bool) {
-	raw := r.Header.Get("Authorization")
-	if !strings.HasPrefix(raw, "Bearer ") {
+	var tok string
+	if raw := r.Header.Get("Authorization"); strings.HasPrefix(raw, "Bearer ") {
+		tok = strings.TrimPrefix(raw, "Bearer ")
+	} else if q := r.URL.Query().Get("token"); q != "" {
+		// WebSocket clients can't set request headers, so the token rides as a
+		// query parameter on /api/ws.
+		tok = q
+	} else {
 		return Claims{}, false
 	}
-	tok := strings.TrimPrefix(raw, "Bearer ")
 	ctx, cancel := context.WithTimeout(r.Context(), m.timeout)
 	defer cancel()
 	c, err := m.v.Verify(ctx, tok)
