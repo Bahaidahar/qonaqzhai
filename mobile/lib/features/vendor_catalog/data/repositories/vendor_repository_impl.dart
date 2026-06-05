@@ -78,7 +78,7 @@ class VendorRepositoryImpl implements VendorRepository {
     return items
         .whereType<Map<String, dynamic>>()
         .map((j) => VendorService(
-              id: j['id'] as String,
+              id: (j['id'] as String?) ?? '',
               vendorId: (j['vendorId'] as String?) ?? vendorId,
               name: (j['name'] as String?) ?? '',
               description: (j['description'] as String?) ?? '',

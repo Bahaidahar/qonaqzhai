@@ -18,10 +18,10 @@ class NotificationRepositoryImpl implements NotificationRepository {
     return ((res.data['items'] as List?) ?? const [])
         .map((e) => e as Map<String, dynamic>)
         .map((j) => AppNotification(
-              id: j['id'] as String,
-              type: j['type'] as String,
-              channel: j['channel'] as String,
-              title: j['title'] as String,
+              id: (j['id'] as String?) ?? '',
+              type: (j['type'] as String?) ?? 'info',
+              channel: (j['channel'] as String?) ?? 'app',
+              title: (j['title'] as String?) ?? '',
               body: j['body'] as String,
               status: j['status'] as String,
               createdAt: j['createdAt'] as String,

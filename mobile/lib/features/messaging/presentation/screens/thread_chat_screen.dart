@@ -76,11 +76,11 @@ class _ThreadChatScreenState extends ConsumerState<ThreadChatScreen> {
             final data = env['data'] as Map<String, dynamic>;
             if (data['threadId'] != widget.id) return;
             final m = ThreadMessage(
-              id: data['id'] as String,
-              threadId: data['threadId'] as String,
-              senderId: data['senderId'] as String,
-              text: data['text'] as String,
-              createdAt: data['createdAt'] as String,
+              id: (data['id'] as String?) ?? '',
+              threadId: (data['threadId'] as String?) ?? '',
+              senderId: (data['senderId'] as String?) ?? '',
+              text: (data['text'] as String?) ?? '',
+              createdAt: (data['createdAt'] as String?) ?? '',
             );
             if (_messages.any((x) => x.id == m.id)) return;
             setState(() => _messages = [..._messages, m]);

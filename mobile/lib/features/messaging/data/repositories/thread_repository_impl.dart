@@ -14,28 +14,34 @@ class ThreadRepositoryImpl implements ThreadRepository {
   final Dio _dio;
 
   BookingThread _thread(Map<String, dynamic> j) => BookingThread(
-        id: j['id'] as String,
-        bookingId: j['bookingId'] as String,
-        customerId: j['customerId'] as String,
-        vendorId: j['vendorId'] as String,
-        createdAt: j['createdAt'] as String,
-        updatedAt: j['updatedAt'] as String,
+        id: (j['id'] as String?) ?? '',
+        bookingId: (j['bookingId'] as String?) ?? '',
+        customerId: (j['customerId'] as String?) ?? '',
+        vendorId: (j['vendorId'] as String?) ?? '',
+        createdAt: (j['createdAt'] as String?) ?? '',
+        updatedAt: (j['updatedAt'] as String?) ?? '',
       );
 
   ThreadMessage _msg(Map<String, dynamic> j) => ThreadMessage(
-        id: j['id'] as String,
-        threadId: j['threadId'] as String,
-        senderId: j['senderId'] as String,
-        text: j['text'] as String,
-        createdAt: j['createdAt'] as String,
+        id: (j['id'] as String?) ?? '',
+        threadId: (j['threadId'] as String?) ?? '',
+        senderId: (j['senderId'] as String?) ?? '',
+        text: (j['text'] as String?) ?? '',
+        createdAt: (j['createdAt'] as String?) ?? '',
       );
 
   @override
   Future<List<BookingThread>> list() async {
     final res = await _dio.get('/api/threads');
-    return ((res.data['items'] as List?) ?? const [])
-        .map((e) => _thread(e as Map<String, dynamic>))
-        .toList();
+    // Each item is a summary: { thread: {...}, counterpart, ... } — the thread
+    // itself is nested, so unwrap it before parsing.
+    return ((res.data['items'] as List?) ?? const []).map((e) {
+      final m = Map<String, dynamic>.from(e as Map);
+      final t = m['thread'] is Map
+          ? Map<String, dynamic>.from(m['thread'] as Map)
+          : m;
+      return _thread(t);
+    }).toList();
   }
 
   @override

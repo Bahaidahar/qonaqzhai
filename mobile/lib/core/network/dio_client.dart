@@ -59,10 +59,19 @@ class _AuthInterceptor extends Interceptor {
             data: {'refreshToken': refresh},
             options: Options(extra: {'requiresAuth': false}),
           );
-          final data = res.data as Map<String, dynamic>;
-          await _tokens.saveAccess((data['accessToken'] ?? data['token']) as String);
-          if (data['refreshToken'] != null) {
-            await _tokens.saveRefresh(data['refreshToken'] as String);
+          final data = res.data is Map
+              ? Map<String, dynamic>.from(res.data as Map)
+              : <String, dynamic>{};
+          final access = (data['accessToken'] ?? data['token']) as String?;
+          if (access == null || access.isEmpty) {
+            await _tokens.clear();
+            handler.next(err);
+            return;
+          }
+          await _tokens.saveAccess(access);
+          final newRefresh = data['refreshToken'] as String?;
+          if (newRefresh != null && newRefresh.isNotEmpty) {
+            await _tokens.saveRefresh(newRefresh);
           }
           // retry the original request
           final retried = await _dio.fetch(err.requestOptions);

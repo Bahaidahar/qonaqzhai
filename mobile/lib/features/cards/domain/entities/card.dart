@@ -22,7 +22,7 @@ class PaymentCard {
   final String createdAt;
 
   factory PaymentCard.fromJson(Map<String, dynamic> json) => PaymentCard(
-        id: json['id'] as String,
+        id: (json['id'] as String?) ?? '',
         userId: json['userId'] as String? ?? '',
         brand: json['brand'] as String? ?? 'unknown',
         last4: json['last4'] as String? ?? '',

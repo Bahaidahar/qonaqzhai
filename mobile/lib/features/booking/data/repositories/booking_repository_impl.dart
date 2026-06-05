@@ -10,13 +10,13 @@ class BookingRepositoryImpl implements BookingRepository {
   final Dio _dio;
 
   Booking _fromJson(Map<String, dynamic> json) => Booking(
-        id: json['id'] as String,
-        customerId: json['customerId'] as String,
-        vendorId: json['vendorId'] as String,
-        eventDate: json['eventDate'] as String,
+        id: (json['id'] as String?) ?? '',
+        customerId: (json['customerId'] as String?) ?? '',
+        vendorId: (json['vendorId'] as String?) ?? '',
+        eventDate: (json['eventDate'] as String?) ?? '',
         guestCount: (json['guestCount'] as num?)?.toInt() ?? 0,
         note: (json['note'] as String?) ?? '',
-        status: json['status'] as String,
+        status: (json['status'] as String?) ?? 'pending',
         amount: (json['amount'] as num?)?.toInt() ?? 0,
         paymentId: (json['paymentId'] as String?) ?? '',
       );
