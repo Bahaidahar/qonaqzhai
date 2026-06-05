@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+import '../../../../core/i18n/i18n.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/ui/ui.dart';
 import '../viewmodels/review_viewmodel.dart';
@@ -46,7 +47,7 @@ class _ReviewSubmitScreenState extends ConsumerState<ReviewSubmitScreen> {
         ref.invalidate(vendorReviewsProvider(widget.vendorId!));
       }
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Thanks for the review!')),
+        SnackBar(content: Text(tr(ref, 'review_thanks'))),
       );
       context.pop();
     } catch (e) {
@@ -61,7 +62,7 @@ class _ReviewSubmitScreenState extends ConsumerState<ReviewSubmitScreen> {
     final p = AppPalette.of(context);
     return Scaffold(
       appBar: AppBar(
-        title: Text('Leave review',
+        title: Text(tr(ref, 'review_title'),
             style: GoogleFonts.manrope(fontWeight: FontWeight.w700, fontSize: 17)),
       ),
       body: ListView(
@@ -123,7 +124,7 @@ class _ReviewSubmitScreenState extends ConsumerState<ReviewSubmitScreen> {
                     child: CircularProgressIndicator(
                         strokeWidth: 2, color: Colors.white),
                   )
-                : const Text('Submit review'),
+                : Text(tr(ref, 'review_submit')),
           ),
         ],
       ),

@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+import '../../../../core/i18n/i18n.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/ui/ui.dart';
 import '../viewmodels/thread_viewmodel.dart';
@@ -17,7 +18,7 @@ class ThreadsScreen extends ConsumerWidget {
     final p = AppPalette.of(context);
     return Scaffold(
       appBar: AppBar(
-        title: Text('Messages',
+        title: Text(tr(ref, 'threads_title'),
             style: GoogleFonts.manrope(fontWeight: FontWeight.w700, fontSize: 17)),
       ),
       body: RefreshIndicator(

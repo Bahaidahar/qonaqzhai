@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+import '../../../../core/i18n/i18n.dart';
 import '../../../../core/network/api_endpoints.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/ui/ui.dart';
@@ -57,7 +58,7 @@ class _VendorCatalogScreenState extends ConsumerState<VendorCatalogScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text('Vendors',
+        title: Text(tr(ref, 'nav_vendors'),
             style: GoogleFonts.manrope(fontWeight: FontWeight.w700, fontSize: 17)),
         actions: [
           IconButton(
@@ -79,7 +80,7 @@ class _VendorCatalogScreenState extends ConsumerState<VendorCatalogScreen> {
               style: GoogleFonts.manrope(fontSize: 14, color: p.fg),
               decoration: InputDecoration(
                 prefixIcon: Icon(CupertinoIcons.search, color: p.mutedFg, size: 18),
-                hintText: 'Search venues, photo, music…',
+                hintText: tr(ref, 'vendors_search_hint'),
               ),
               onSubmitted: (_) => _apply(),
             ),
@@ -246,7 +247,7 @@ class _VendorCatalogScreenState extends ConsumerState<VendorCatalogScreen> {
                   setState(() {});
                   _apply();
                 },
-                child: const Text('Apply'),
+                child: Text(tr(ref, 'common_apply')),
               ),
             ],
           ),

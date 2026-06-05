@@ -7,6 +7,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
 
+import '../../../../core/i18n/i18n.dart';
 import '../../../../core/network/api_endpoints.dart';
 import '../../../../core/network/token_store.dart';
 import '../../../../core/theme/app_theme.dart';
@@ -140,7 +141,7 @@ class _ThreadChatScreenState extends ConsumerState<ThreadChatScreen> {
     }
     return Scaffold(
       appBar: AppBar(
-        title: Text('Conversation',
+        title: Text(tr(ref, 'thread_title'),
             style: GoogleFonts.manrope(fontWeight: FontWeight.w700, fontSize: 17)),
         actions: [
           Padding(
@@ -202,7 +203,7 @@ class _ThreadChatScreenState extends ConsumerState<ThreadChatScreen> {
                         style: GoogleFonts.manrope(fontSize: 14, color: p.fg),
                         decoration: InputDecoration(
                           filled: false,
-                          hintText: 'Message…',
+                          hintText: tr(ref, 'thread_input_hint'),
                           hintStyle:
                               GoogleFonts.manrope(fontSize: 14, color: p.mutedFg),
                           border: InputBorder.none,

@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+import '../../../../core/i18n/i18n.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/ui/ui.dart';
 import '../../../auth/domain/entities/user.dart';
@@ -122,7 +123,7 @@ class BookingsScreen extends ConsumerWidget {
   }
 }
 
-class _BookingCard extends StatelessWidget {
+class _BookingCard extends ConsumerWidget {
   const _BookingCard({
     required this.eventDate,
     required this.guests,
@@ -148,7 +149,7 @@ class _BookingCard extends StatelessWidget {
   final VoidCallback? onDecline;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final p = AppPalette.of(context);
     final tone = switch (status) {
       'accepted' || 'completed' => AppBadgeTone.success,
@@ -229,7 +230,7 @@ class _BookingCard extends StatelessWidget {
                     onPressed: onDecline,
                     icon: Icon(CupertinoIcons.xmark, size: 14, color: p.destructive),
                     label: Text(
-                      'Decline',
+                      tr(ref, 'booking_decline'),
                       style: GoogleFonts.manrope(
                           color: p.destructive,
                           fontSize: 12.5,
@@ -246,7 +247,7 @@ class _BookingCard extends StatelessWidget {
                   FilledButton.icon(
                     onPressed: onAccept,
                     icon: const Icon(CupertinoIcons.checkmark_alt, size: 16),
-                    label: const Text('Accept'),
+                    label: Text(tr(ref, 'booking_accept')),
                     style: FilledButton.styleFrom(
                       padding: const EdgeInsets.symmetric(horizontal: 14),
                       minimumSize: const Size(0, 36),
@@ -258,7 +259,7 @@ class _BookingCard extends StatelessWidget {
                   FilledButton.icon(
                     onPressed: onPay,
                     icon: const Icon(CupertinoIcons.creditcard, size: 16),
-                    label: const Text('Pay'),
+                    label: Text(tr(ref, 'booking_pay')),
                     style: FilledButton.styleFrom(
                       padding: const EdgeInsets.symmetric(horizontal: 14),
                       minimumSize: const Size(0, 36),
@@ -270,7 +271,7 @@ class _BookingCard extends StatelessWidget {
                   OutlinedButton.icon(
                     onPressed: onReview,
                     icon: const Icon(CupertinoIcons.star, size: 16),
-                    label: const Text('Review'),
+                    label: Text(tr(ref, 'booking_review')),
                     style: OutlinedButton.styleFrom(
                       padding: const EdgeInsets.symmetric(horizontal: 14),
                       minimumSize: const Size(0, 36),

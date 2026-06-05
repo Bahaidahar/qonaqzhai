@@ -169,7 +169,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
   }
 }
 
-class _Composer extends StatelessWidget {
+class _Composer extends ConsumerWidget {
   const _Composer({
     required this.controller,
     required this.thinking,
@@ -181,7 +181,7 @@ class _Composer extends StatelessWidget {
   final VoidCallback onSend;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final p = AppPalette.of(context);
     return Padding(
       padding: const EdgeInsets.fromLTRB(12, 4, 12, 12),
@@ -203,7 +203,7 @@ class _Composer extends StatelessWidget {
                 style: GoogleFonts.manrope(fontSize: 14, color: p.fg),
                 decoration: InputDecoration(
                   filled: false,
-                  hintText: 'Опиши событие, бюджет, локацию…',
+                  hintText: tr(ref, 'chat_input_hint'),
                   hintStyle: GoogleFonts.manrope(fontSize: 14, color: p.mutedFg),
                   border: InputBorder.none,
                   enabledBorder: InputBorder.none,
@@ -246,9 +246,9 @@ class _ChatHero extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final p = AppPalette.of(context);
     final presets = <String>[
-      'Свадьба на 120 гостей, бюджет 5 млн ₸, Алматы — собери план',
-      'Корпоратив на 80 человек, нужен фотограф и кейтеринг',
-      'День рождения ребёнка 6 лет, площадка с аниматорами',
+      tr(ref, 'chat_sugg_1'),
+      tr(ref, 'chat_sugg_2'),
+      tr(ref, 'chat_sugg_3'),
     ];
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 24),
@@ -267,7 +267,7 @@ class _ChatHero extends ConsumerWidget {
           ),
           const SizedBox(height: 16),
           Text(
-            'Планируй событие\nкак сообщение',
+            tr(ref, 'chat_empty_title'),
             style: GoogleFonts.manrope(
               fontSize: 36,
               fontWeight: FontWeight.w700,
@@ -278,7 +278,7 @@ class _ChatHero extends ConsumerWidget {
           ),
           const SizedBox(height: 10),
           Text(
-            'Опиши идею — qonaqzhai подберёт исполнителей, тайминг и бюджет.',
+            tr(ref, 'chat_empty_body'),
             style: GoogleFonts.manrope(fontSize: 14, color: p.mutedFg, height: 1.5),
           ),
           const SizedBox(height: 28),

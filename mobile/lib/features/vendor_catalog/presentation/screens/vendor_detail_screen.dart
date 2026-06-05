@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+import '../../../../core/i18n/i18n.dart';
 import '../../../../core/network/api_endpoints.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/ui/ui.dart';
@@ -38,7 +39,7 @@ class _VendorDetailScreenState extends ConsumerState<VendorDetailScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text('Vendor',
+        title: Text(tr(ref, 'vendor_detail_title'),
             style: GoogleFonts.manrope(fontWeight: FontWeight.w700, fontSize: 17)),
       ),
       bottomNavigationBar: vendorAsync.maybeWhen(

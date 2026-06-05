@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+import '../../../../core/i18n/i18n.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/ui/ui.dart';
 import '../viewmodels/notifications_viewmodel.dart';
@@ -17,7 +18,7 @@ class NotificationsScreen extends ConsumerWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text('Notifications',
+        title: Text(tr(ref, 'notifications_title'),
             style: GoogleFonts.manrope(fontWeight: FontWeight.w700, fontSize: 17)),
       ),
       body: RefreshIndicator(

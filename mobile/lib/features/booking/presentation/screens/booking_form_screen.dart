@@ -6,6 +6,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+import '../../../../core/i18n/i18n.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/ui/ui.dart';
 import '../viewmodels/booking_viewmodel.dart';
@@ -95,7 +96,7 @@ class _BookingFormScreenState extends ConsumerState<BookingFormScreen> {
       if (!mounted) return;
       unawaited(ref.read(bookingsProvider.notifier).refresh());
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Booking request sent')),
+        SnackBar(content: Text(tr(ref, 'booking_sent'))),
       );
       context.go('/bookings');
     } catch (e) {
@@ -111,7 +112,7 @@ class _BookingFormScreenState extends ConsumerState<BookingFormScreen> {
     final showPriceCard = _amount > 0;
     return Scaffold(
       appBar: AppBar(
-        title: Text('Book vendor',
+        title: Text(tr(ref, 'booking_form_title'),
             style: GoogleFonts.manrope(fontWeight: FontWeight.w700, fontSize: 17)),
       ),
       body: ListView(
@@ -216,7 +217,7 @@ class _BookingFormScreenState extends ConsumerState<BookingFormScreen> {
                         strokeWidth: 2, color: Colors.white),
                   )
                 : const Icon(CupertinoIcons.paperplane_fill, size: 16),
-            label: const Text('Send request'),
+            label: Text(tr(ref, 'booking_send')),
           ),
         ],
       ),
