@@ -30,6 +30,7 @@ export interface VendorsBlock {
     rating: number;
     priceFrom: number;
     city: string;
+    photoIds?: string[];
     tags?: string[];
   }[];
 }

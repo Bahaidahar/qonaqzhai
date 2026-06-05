@@ -203,9 +203,7 @@ func (s *Service) resolveIntent(ctx context.Context, message, lastCategory strin
 	if s.d.Planner != nil {
 		if it, err := s.d.Planner.Plan(ctx, message, lastCategory); err == nil && it != nil {
 			it.Category = normalizeCategory(it.Category)
-			if it.City == "" {
-				it.City = "Almaty"
-			}
+			it.City = "Almaty" // MVP is Almaty-only
 			return *it
 		} else if err != nil {
 			s.d.Logger.Warn("planner failed, using keyword fallback", "err", err)
@@ -217,7 +215,7 @@ func (s *Service) resolveIntent(ctx context.Context, message, lastCategory strin
 		Guests:     guests,
 		EventDate:  eventDate,
 		Budget:     parseBudget(message),
-		City:       parseCity(message),
+		City:       "Almaty", // MVP is Almaty-only
 		WantsOther: detectMoreIntent(message),
 	}
 }
@@ -309,6 +307,10 @@ func (s *Service) searchVendors(ctx context.Context, category string, exclude []
 func vendorsBlockData(vs []*domain.Vendor, query string, guests int, eventDate string) map[string]any {
 	items := make([]map[string]any, 0, len(vs))
 	for _, v := range vs {
+		photoIDs := v.PhotoIDs
+		if photoIDs == nil {
+			photoIDs = []string{}
+		}
 		items = append(items, map[string]any{
 			"id":        v.ID,
 			"name":      v.Name,
@@ -316,6 +318,7 @@ func vendorsBlockData(vs []*domain.Vendor, query string, guests int, eventDate s
 			"rating":    v.RatingAvg,
 			"priceFrom": v.PriceFrom,
 			"city":      v.City,
+			"photoIds":  photoIDs,
 		})
 	}
 	return map[string]any{"type": "vendors", "data": map[string]any{

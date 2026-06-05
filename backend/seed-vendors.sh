@@ -17,10 +17,10 @@ ADMIN=$(admin_token)
 # vendor rows: email|name|category|city|priceFrom|description
 VENDORS=(
 "venue_$SUFFIX@demo.kz|Asyl Toi Mekeni|Venue|Almaty|250000|Banquet hall for 300 guests in central Almaty."
-"catering_$SUFFIX@demo.kz|Dastarkhan Catering|Catering|Astana|4000|National & European cuisine, full-service catering."
-"music_$SUFFIX@demo.kz|DJ Astana Pro|Music & DJ|Astana|150000|Wedding & corporate DJ with light show."
+"catering_$SUFFIX@demo.kz|Dastarkhan Catering|Catering|Almaty|4000|National & European cuisine, full-service catering."
+"music_$SUFFIX@demo.kz|DJ Almaty Pro|Music & DJ|Almaty|150000|Wedding & corporate DJ with light show."
 "photo_$SUFFIX@demo.kz|Aspan Studio|Photo & Video|Almaty|80000|Photo and cinematic video for events."
-"decor_$SUFFIX@demo.kz|Gul Decor|Decor & Florists|Shymkent|120000|Floral arches, stage and table decor."
+"decor_$SUFFIX@demo.kz|Gul Decor|Decor & Florists|Almaty|120000|Floral arches, stage and table decor."
 "cakes_$SUFFIX@demo.kz|Tatti Cakes|Cakes|Almaty|15000|Custom wedding cakes and dessert tables."
 )
 

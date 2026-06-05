@@ -7,7 +7,7 @@ import { Badge } from "@/shared/ui/badge";
 import { Button } from "@/shared/ui/button";
 import { formatKZT } from "@/shared/lib/utils";
 import { useI18n } from "@/shared/i18n/context";
-import { api, ApiError } from "@/shared/api";
+import { api, ApiError, photoURL } from "@/shared/api";
 import type { VendorsBlock as VendorsBlockData } from "@/features/ai-chat/types";
 
 type VendorItem = VendorsBlockData["items"][number];
@@ -97,7 +97,16 @@ function VendorCard({
   return (
     <div className="group w-64 shrink-0 rounded-xl border bg-[var(--color-card)] transition hover:-translate-y-0.5 hover:border-[var(--color-primary)]/50 hover:shadow-md">
       <div className="aspect-[5/3] overflow-hidden rounded-t-xl">
-        <div className="img-zoom h-full w-full bg-gradient-to-br from-[var(--color-primary)]/25 via-[var(--color-muted)] to-[var(--color-accent)]/40" />
+        {v.photoIds && v.photoIds.length > 0 ? (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img
+            src={photoURL(v.photoIds[0])}
+            alt={v.name}
+            className="img-zoom h-full w-full object-cover"
+          />
+        ) : (
+          <div className="img-zoom h-full w-full bg-gradient-to-br from-[var(--color-primary)]/25 via-[var(--color-muted)] to-[var(--color-accent)]/40" />
+        )}
       </div>
       <div className="space-y-2 p-3">
         <div className="flex items-start justify-between gap-2">
