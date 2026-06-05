@@ -53,17 +53,38 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       return null;
     },
     routes: [
-      ShellRoute(
-        builder: (context, state, child) => _HomeShell(child: child),
-        routes: [
-          GoRoute(path: '/', builder: (_, __) => const ChatScreen()),
-          GoRoute(path: '/vendors', builder: (_, __) => const VendorCatalogScreen()),
-          GoRoute(path: '/bookings', builder: (_, __) => const BookingsScreen()),
-          GoRoute(path: '/notifications', builder: (_, __) => const NotificationsScreen()),
-          GoRoute(path: '/threads', builder: (_, __) => const ThreadsScreen()),
-          GoRoute(path: '/cards', builder: (_, __) => const CardsScreen()),
-          GoRoute(path: '/vendor-profile', builder: (_, __) => const VendorSelfScreen()),
-          GoRoute(path: '/settings', builder: (_, __) => const SettingsScreen()),
+      // Persistent bottom-nav shell. Each tab is its own branch kept alive in an
+      // IndexedStack, so switching tabs is instant and preserves scroll/state —
+      // it feels like tab switching, not page navigation. Branch order is fixed;
+      // the nav bar shows a role-specific subset (see _HomeShell).
+      StatefulShellRoute.indexedStack(
+        builder: (context, state, navigationShell) =>
+            _HomeShell(navigationShell: navigationShell),
+        branches: [
+          StatefulShellBranch(routes: [
+            GoRoute(path: '/', builder: (_, __) => const ChatScreen()),
+          ]),
+          StatefulShellBranch(routes: [
+            GoRoute(path: '/vendors', builder: (_, __) => const VendorCatalogScreen()),
+          ]),
+          StatefulShellBranch(routes: [
+            GoRoute(path: '/bookings', builder: (_, __) => const BookingsScreen()),
+          ]),
+          StatefulShellBranch(routes: [
+            GoRoute(path: '/notifications', builder: (_, __) => const NotificationsScreen()),
+          ]),
+          StatefulShellBranch(routes: [
+            GoRoute(path: '/threads', builder: (_, __) => const ThreadsScreen()),
+          ]),
+          StatefulShellBranch(routes: [
+            GoRoute(path: '/cards', builder: (_, __) => const CardsScreen()),
+          ]),
+          StatefulShellBranch(routes: [
+            GoRoute(path: '/vendor-profile', builder: (_, __) => const VendorSelfScreen()),
+          ]),
+          StatefulShellBranch(routes: [
+            GoRoute(path: '/settings', builder: (_, __) => const SettingsScreen()),
+          ]),
         ],
       ),
       GoRoute(
@@ -127,24 +148,41 @@ class _AuthListenable extends ChangeNotifier {
   final Ref _ref;
 }
 
+// Branch indices into StatefulShellRoute (must match the branch order above).
+const int _bChat = 0;
+const int _bVendors = 1;
+const int _bBookings = 2;
+const int _bNotifications = 3;
+const int _bThreads = 4;
+// ignore: unused_element
+const int _bCards = 5;
+const int _bVendorProfile = 6;
+const int _bSettings = 7;
+
 class _HomeShell extends ConsumerWidget {
-  const _HomeShell({required this.child});
-  final Widget child;
+  const _HomeShell({required this.navigationShell});
+  final StatefulNavigationShell navigationShell;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final user = ref.watch(authViewModelProvider).user;
     final role = user?.role ?? UserRole.customer;
     final tabs = _tabsFor(role, ref);
-    final loc = GoRouterState.of(context).matchedLocation;
-    int index = tabs.indexWhere((t) => t.match(loc));
-    if (index < 0) index = 0;
+
+    int selected = tabs.indexWhere((t) => t.branch == navigationShell.currentIndex);
+    if (selected < 0) selected = 0;
 
     return Scaffold(
-      body: child,
+      // IndexedStack keeps every visited tab mounted -> instant switch, no
+      // page transition, state preserved per tab.
+      body: navigationShell,
       bottomNavigationBar: NavigationBar(
-        selectedIndex: index,
-        onDestinationSelected: (i) => context.go(tabs[i].path),
+        selectedIndex: selected,
+        onDestinationSelected: (i) => navigationShell.goBranch(
+          tabs[i].branch,
+          // tapping the active tab resets it to the branch root
+          initialLocation: tabs[i].branch == navigationShell.currentIndex,
+        ),
         destinations: [
           for (final t in tabs)
             NavigationDestination(icon: Icon(t.icon), label: t.label),
@@ -157,29 +195,27 @@ class _HomeShell extends ConsumerWidget {
     switch (role) {
       case UserRole.customer:
         return [
-          _NavTab('/', CupertinoIcons.chat_bubble_text, tr(ref, 'nav_chat'), exact: true),
-          _NavTab('/vendors', CupertinoIcons.square_grid_2x2, tr(ref, 'nav_vendors')),
-          _NavTab('/bookings', CupertinoIcons.calendar, tr(ref, 'nav_bookings')),
-          _NavTab('/threads', CupertinoIcons.chat_bubble_2, tr(ref, 'nav_threads')),
-          _NavTab('/settings', CupertinoIcons.settings, tr(ref, 'nav_settings')),
+          _NavTab(_bChat, CupertinoIcons.chat_bubble_text, tr(ref, 'nav_chat')),
+          _NavTab(_bVendors, CupertinoIcons.square_grid_2x2, tr(ref, 'nav_vendors')),
+          _NavTab(_bBookings, CupertinoIcons.calendar, tr(ref, 'nav_bookings')),
+          _NavTab(_bThreads, CupertinoIcons.chat_bubble_2, tr(ref, 'nav_threads')),
+          _NavTab(_bSettings, CupertinoIcons.settings, tr(ref, 'nav_settings')),
         ];
       case UserRole.vendor:
         return [
-          _NavTab('/vendor-profile', CupertinoIcons.house, tr(ref, 'nav_vendor_profile'), exact: true),
-          _NavTab('/bookings', CupertinoIcons.calendar, tr(ref, 'nav_bookings')),
-          _NavTab('/threads', CupertinoIcons.chat_bubble_2, tr(ref, 'nav_threads')),
-          _NavTab('/notifications', CupertinoIcons.bell, tr(ref, 'nav_notifications')),
-          _NavTab('/settings', CupertinoIcons.settings, tr(ref, 'nav_settings')),
+          _NavTab(_bVendorProfile, CupertinoIcons.house, tr(ref, 'nav_vendor_profile')),
+          _NavTab(_bBookings, CupertinoIcons.calendar, tr(ref, 'nav_bookings')),
+          _NavTab(_bThreads, CupertinoIcons.chat_bubble_2, tr(ref, 'nav_threads')),
+          _NavTab(_bNotifications, CupertinoIcons.bell, tr(ref, 'nav_notifications')),
+          _NavTab(_bSettings, CupertinoIcons.settings, tr(ref, 'nav_settings')),
         ];
     }
   }
 }
 
 class _NavTab {
-  const _NavTab(this.path, this.icon, this.label, {this.exact = false});
-  final String path;
+  const _NavTab(this.branch, this.icon, this.label);
+  final int branch;
   final IconData icon;
   final String label;
-  final bool exact;
-  bool match(String loc) => exact ? loc == path : loc.startsWith(path);
 }
