@@ -4,6 +4,7 @@ import { useState, type ReactNode } from "react";
 import Link from "next/link";
 import { useAuth } from "@/features/auth/context";
 import { useI18n } from "@/shared/i18n/context";
+import { LOCALES } from "@/shared/i18n/dict";
 import { Button } from "@/shared/ui/button";
 import { Input } from "@/shared/ui/input";
 import { ApiError, type Role } from "@/shared/api";
@@ -69,7 +70,7 @@ export function AuthGate({ children, allowedRoles }: AuthGateProps) {
 }
 
 function AuthScreen() {
-  const { t } = useI18n();
+  const { t, locale, setLocale } = useI18n();
   const { signup, login } = useAuth();
   const [mode, setMode] = useState<"signin" | "signup">("signin");
   const [role, setRole] = useState<Role>("customer");
@@ -102,6 +103,26 @@ function AuthScreen() {
       <div className="pointer-events-none absolute inset-0 -z-10">
         <div className="absolute inset-0 grid-bg opacity-50" />
         <div className="glow-indigo absolute left-1/2 top-1/2 h-[500px] w-[700px] -translate-x-1/2 -translate-y-1/2 pulse-soft" />
+      </div>
+
+      {/* Language switcher — available before sign-in */}
+      <div className="absolute right-4 top-4 z-10 flex gap-1 rounded-xl border bg-[var(--color-card)]/80 p-1 backdrop-blur">
+        {LOCALES.map((l) => (
+          <button
+            key={l.code}
+            type="button"
+            onClick={() => setLocale(l.code)}
+            aria-pressed={locale === l.code}
+            className={cn(
+              "rounded-lg px-2.5 py-1 text-xs font-medium transition-colors",
+              locale === l.code
+                ? "bg-[var(--color-primary)] text-[var(--color-primary-foreground)]"
+                : "text-[var(--color-muted-foreground)] hover:bg-[var(--color-muted)]"
+            )}
+          >
+            {l.short}
+          </button>
+        ))}
       </div>
 
       <div className="w-full max-w-md">
