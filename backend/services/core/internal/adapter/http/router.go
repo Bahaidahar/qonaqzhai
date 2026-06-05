@@ -39,7 +39,7 @@ func Mux(h *Handler, mw *pkgauth.Middleware, log *slog.Logger) http.Handler {
 
 	// AI chat — stubbed fallback response so the UI is never 404. Replace with
 	// real Gemini integration when the backend chat usecase lands.
-	mux.Handle("POST /api/chat", mw.Required(http.HandlerFunc(h.ChatStub)))
+	mux.Handle("POST /api/chat", mw.Required(http.HandlerFunc(h.ChatSend)))
 	mux.Handle("GET /api/chats", mw.Required(http.HandlerFunc(h.ChatsList)))
 	mux.Handle("GET /api/chats/{id}", mw.Required(http.HandlerFunc(h.ChatGet)))
 	mux.Handle("DELETE /api/chats/{id}", mw.Required(http.HandlerFunc(h.ChatDelete)))
@@ -58,6 +58,7 @@ func Mux(h *Handler, mw *pkgauth.Middleware, log *slog.Logger) http.Handler {
 
 	// Admin endpoints.
 	mux.Handle("PATCH /api/admin/vendors/{id}/status", mw.RequireRole("admin")(http.HandlerFunc(h.AdminSetVendorStatus)))
+	mux.Handle("DELETE /api/admin/reviews/{id}", mw.RequireRole("admin")(http.HandlerFunc(h.AdminDeleteReview)))
 	mux.Handle("GET /api/admin/stats", mw.RequireRole("admin")(http.HandlerFunc(h.AdminStats)))
 	mux.Handle("GET /api/admin/stats/bookings", mw.RequireRole("admin")(http.HandlerFunc(h.AdminStatsBookings)))
 	mux.Handle("GET /api/admin/stats/categories", mw.RequireRole("admin")(http.HandlerFunc(h.AdminStatsCategories)))

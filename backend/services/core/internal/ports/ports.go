@@ -106,7 +106,22 @@ type ReviewRepo interface {
 	Create(ctx context.Context, r *domain.Review) (*domain.Review, error)
 	ListForVendor(ctx context.Context, vendorID string, p Page) ([]*domain.Review, error)
 	FindByBooking(ctx context.Context, bookingID string) (*domain.Review, error)
+	Find(ctx context.Context, id string) (*domain.Review, error)
+	Delete(ctx context.Context, id string) error
 	AggregateForVendor(ctx context.Context, vendorID string) (float64, int, error)
+}
+
+// ChatRepo persists AI assistant chats and their messages. Reads are scoped
+// to the owning user; cross-user access surfaces as ErrNotFound.
+type ChatRepo interface {
+	CreateChat(ctx context.Context, c *domain.Chat) (*domain.Chat, error)
+	GetChat(ctx context.Context, id, userID string) (*domain.Chat, error)
+	ListChats(ctx context.Context, userID string) ([]*domain.Chat, error)
+	DeleteChat(ctx context.Context, id, userID string) error
+	RenameChat(ctx context.Context, id, userID, title string) error
+	TouchChat(ctx context.Context, id string) error
+	AddMessage(ctx context.Context, m *domain.ChatMessage) (*domain.ChatMessage, error)
+	ListMessages(ctx context.Context, chatID string) ([]*domain.ChatMessage, error)
 }
 
 // NotificationRepo persists in-app notifications.

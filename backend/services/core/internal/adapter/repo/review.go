@@ -92,6 +92,23 @@ func (r *ReviewRepo) AggregateForVendor(ctx context.Context, vendorID string) (f
 	return avg.Float64, count, nil
 }
 
+// Find returns a review by id, or ErrNotFound.
+func (r *ReviewRepo) Find(ctx context.Context, id string) (*domain.Review, error) {
+	return r.find(ctx, id)
+}
+
+// Delete removes a review by id. Missing rows surface as ErrNotFound.
+func (r *ReviewRepo) Delete(ctx context.Context, id string) error {
+	res, err := r.db.ExecContext(ctx, `DELETE FROM reviews WHERE id = $1`, id)
+	if err != nil {
+		return fmt.Errorf("delete review: %w", err)
+	}
+	if n, _ := res.RowsAffected(); n == 0 {
+		return errs.ErrNotFound
+	}
+	return nil
+}
+
 func (r *ReviewRepo) find(ctx context.Context, id string) (*domain.Review, error) {
 	row := r.db.QueryRowContext(ctx, `SELECT `+reviewCols+` FROM reviews WHERE id = $1`, id)
 	rv, err := scanReview(row)

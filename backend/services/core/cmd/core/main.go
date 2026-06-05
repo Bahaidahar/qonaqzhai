@@ -24,12 +24,14 @@ import (
 	"qonaqzhai-backend/pkg/logger"
 
 	coregrpc "qonaqzhai-backend/services/core/internal/adapter/grpc"
+	"qonaqzhai-backend/services/core/internal/adapter/gemini"
 	"qonaqzhai-backend/services/core/internal/adapter/grpcclient"
 	corehttp "qonaqzhai-backend/services/core/internal/adapter/http"
 	"qonaqzhai-backend/pkg/idgen"
 	"qonaqzhai-backend/services/core/internal/adapter/repo"
 	"qonaqzhai-backend/services/core/internal/usecase/admin"
 	"qonaqzhai-backend/services/core/internal/usecase/booking"
+	"qonaqzhai-backend/services/core/internal/usecase/chat"
 	"qonaqzhai-backend/services/core/internal/usecase/notification"
 	"qonaqzhai-backend/services/core/internal/usecase/photo"
 	"qonaqzhai-backend/services/core/internal/usecase/review"
@@ -68,9 +70,20 @@ func run(log *slog.Logger) error {
 	notifications := repo.NewNotificationRepo(db, id)
 	fcmTokens := repo.NewFCMTokenRepo(db, id)
 	services := repo.NewServiceRepo(db, id)
+	chats := repo.NewChatRepo(db, id)
 
 	vendorSvc := vendor.New(vendor.Deps{Vendors: vendors, Reviews: reviews})
 	reviewSvc := review.New(review.Deps{Reviews: reviews, Bookings: bookings, Vendors: vendors, Logger: log})
+	// Optional LLM planner — falls back to keyword parsing when key is unset.
+	// Assign through the interface only when non-nil to avoid a typed-nil.
+	var planner chat.Planner
+	if gc := gemini.New(os.Getenv("GEMINI_API_KEY"), os.Getenv("GEMINI_MODEL")); gc != nil {
+		planner = gc
+		log.Info("chat planner: gemini", "model", config.EnvOr("GEMINI_MODEL", "gemini-2.5-flash"))
+	} else {
+		log.Info("chat planner: keyword fallback (set GEMINI_API_KEY to enable LLM)")
+	}
+	chatSvc := chat.New(chat.Deps{Chats: chats, Vendors: vendorSvc, Planner: planner, Logger: log})
 	photoSvc := photo.New(photo.Deps{Photos: photos, Vendors: vendors})
 	notifSvc := notification.New(notification.Deps{Notifications: notifications, FCMTokens: fcmTokens})
 	adminSvc := admin.New(admin.Deps{Vendors: vendors, Bookings: bookings})
@@ -108,7 +121,7 @@ func run(log *slog.Logger) error {
 
 	handler := &corehttp.Handler{
 		Vendors: vendorSvc, Bookings: bookingSvc, Reviews: reviewSvc,
-		Photos: photoSvc, Notifications: notifSvc, Admin: adminSvc,
+		Chats: chatSvc, Photos: photoSvc, Notifications: notifSvc, Admin: adminSvc,
 		Services: services,
 	}
 

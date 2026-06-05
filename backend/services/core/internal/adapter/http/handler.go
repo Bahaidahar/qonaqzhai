@@ -2,6 +2,7 @@
 package http
 
 import (
+	"encoding/json"
 	"errors"
 	"io"
 	"net/http"
@@ -16,6 +17,7 @@ import (
 	"qonaqzhai-backend/services/core/internal/ports"
 	"qonaqzhai-backend/services/core/internal/usecase/admin"
 	"qonaqzhai-backend/services/core/internal/usecase/booking"
+	"qonaqzhai-backend/services/core/internal/usecase/chat"
 	"qonaqzhai-backend/services/core/internal/usecase/notification"
 	"qonaqzhai-backend/services/core/internal/usecase/photo"
 	"qonaqzhai-backend/services/core/internal/usecase/review"
@@ -27,6 +29,7 @@ type Handler struct {
 	Vendors       *vendor.Service
 	Bookings      *booking.Service
 	Reviews       *review.Service
+	Chats         *chat.Service
 	Photos        *photo.Service
 	Notifications *notification.Service
 	Admin         *admin.Service
@@ -249,6 +252,15 @@ func (h *Handler) ListReviews(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	httpx.WriteJSON(w, http.StatusOK, map[string]any{"items": rv})
+}
+
+// AdminDeleteReview removes a review and recomputes the vendor rating.
+func (h *Handler) AdminDeleteReview(w http.ResponseWriter, r *http.Request) {
+	if err := h.Reviews.Delete(r.Context(), r.PathValue("id")); err != nil {
+		httpx.HandleError(w, err)
+		return
+	}
+	w.WriteHeader(http.StatusNoContent)
 }
 
 // --- photos ---
@@ -481,62 +493,78 @@ func (h *Handler) ListVendorServices(w http.ResponseWriter, r *http.Request) {
 // `{ chatId, message: { id, role, text, blocks } }` and renders block cards;
 // returning realistic-shape data here keeps the mobile + web flows alive
 // while the real Gemini integration is still pending on the backend.
-func (h *Handler) ChatStub(w http.ResponseWriter, r *http.Request) {
+// ChatSend persists the user message, generates + stores an AI reply, and
+// returns the flat {chatId, reply, blocks} shape the web client expects.
+func (h *Handler) ChatSend(w http.ResponseWriter, r *http.Request) {
+	uid, _ := pkgauth.UserIDFrom(r.Context())
 	var req struct {
-		Message string  `json:"message"`
-		ChatID  *string `json:"chatId"`
+		Message string `json:"message"`
+		ChatID  string `json:"chatId"`
 	}
 	if err := httpx.ReadJSON(r, &req); err != nil {
 		httpx.WriteError(w, http.StatusBadRequest, "invalid json")
 		return
 	}
-	chatID := ""
-	if req.ChatID != nil {
-		chatID = *req.ChatID
+	res, err := h.Chats.Send(r.Context(), uid, req.ChatID, req.Message)
+	if err != nil {
+		httpx.HandleError(w, err)
+		return
 	}
-	if chatID == "" {
-		chatID = "stub-" + strconv.FormatInt(int64(len(req.Message)), 10)
+	blocks := res.Blocks
+	if len(blocks) == 0 {
+		blocks = json.RawMessage("[]")
 	}
-	// Response shape matches the web client's ChatReplyResponse: flat
-	// {chatId, reply, blocks}. (Earlier this was nested under "message",
-	// which the frontend could not parse, so replies rendered empty.)
-	httpx.WriteJSON(w, http.StatusOK, map[string]any{
-		"chatId": chatID,
-		"reply":  "Got it — here's a draft plan. Plug in a real LLM in /api/chat to replace this stub.",
-		"blocks": []map[string]any{
-			{
-				"type": "plan",
-				"data": map[string]any{
-					"title":     "Draft event plan",
-					"eventType": "event",
-					"city":      "Almaty",
-					"guests":    100,
-					"budget":    3000000,
-				},
-			},
-		},
-	})
+	httpx.WriteJSON(w, http.StatusOK, struct {
+		ChatID string          `json:"chatId"`
+		Reply  string          `json:"reply"`
+		Blocks json.RawMessage `json:"blocks"`
+	}{ChatID: res.ChatID, Reply: res.Reply, Blocks: blocks})
 }
 
-func (h *Handler) ChatsList(w http.ResponseWriter, _ *http.Request) {
-	httpx.WriteJSON(w, http.StatusOK, map[string]any{"items": []any{}})
+func (h *Handler) ChatsList(w http.ResponseWriter, r *http.Request) {
+	uid, _ := pkgauth.UserIDFrom(r.Context())
+	chats, err := h.Chats.List(r.Context(), uid)
+	if err != nil {
+		httpx.HandleError(w, err)
+		return
+	}
+	httpx.WriteJSON(w, http.StatusOK, map[string]any{"items": chats})
 }
 
 func (h *Handler) ChatGet(w http.ResponseWriter, r *http.Request) {
-	httpx.WriteJSON(w, http.StatusOK, map[string]any{
-		"id":       r.PathValue("id"),
-		"title":    "Stub chat",
-		"messages": []any{},
-	})
+	uid, _ := pkgauth.UserIDFrom(r.Context())
+	c, msgs, err := h.Chats.Detail(r.Context(), uid, r.PathValue("id"))
+	if err != nil {
+		httpx.HandleError(w, err)
+		return
+	}
+	httpx.WriteJSON(w, http.StatusOK, struct {
+		*domain.Chat
+		Messages []*domain.ChatMessage `json:"messages"`
+	}{Chat: c, Messages: msgs})
 }
 
-func (h *Handler) ChatDelete(w http.ResponseWriter, _ *http.Request) {
+func (h *Handler) ChatDelete(w http.ResponseWriter, r *http.Request) {
+	uid, _ := pkgauth.UserIDFrom(r.Context())
+	if err := h.Chats.Delete(r.Context(), uid, r.PathValue("id")); err != nil {
+		httpx.HandleError(w, err)
+		return
+	}
 	w.WriteHeader(http.StatusNoContent)
 }
 
 func (h *Handler) ChatRename(w http.ResponseWriter, r *http.Request) {
-	httpx.WriteJSON(w, http.StatusOK, map[string]any{
-		"id":    r.PathValue("id"),
-		"title": "Renamed",
-	})
+	uid, _ := pkgauth.UserIDFrom(r.Context())
+	var req struct {
+		Title string `json:"title"`
+	}
+	if err := httpx.ReadJSON(r, &req); err != nil {
+		httpx.WriteError(w, http.StatusBadRequest, "invalid json")
+		return
+	}
+	if err := h.Chats.Rename(r.Context(), uid, r.PathValue("id"), req.Title); err != nil {
+		httpx.HandleError(w, err)
+		return
+	}
+	w.WriteHeader(http.StatusNoContent)
 }

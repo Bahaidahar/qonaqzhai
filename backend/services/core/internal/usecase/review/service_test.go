@@ -43,6 +43,28 @@ func (m *memReviews) ListForVendor(_ context.Context, id string, _ ports.Page) (
 	return out, nil
 }
 func (m *memReviews) FindByBooking(context.Context, string) (*domain.Review, error) { return nil, errs.ErrNotFound }
+func (m *memReviews) Find(_ context.Context, id string) (*domain.Review, error) {
+	m.mu.Lock()
+	defer m.mu.Unlock()
+	for _, r := range m.rows {
+		if r.ID == id {
+			cp := *r
+			return &cp, nil
+		}
+	}
+	return nil, errs.ErrNotFound
+}
+func (m *memReviews) Delete(_ context.Context, id string) error {
+	m.mu.Lock()
+	defer m.mu.Unlock()
+	for i, r := range m.rows {
+		if r.ID == id {
+			m.rows = append(m.rows[:i], m.rows[i+1:]...)
+			return nil
+		}
+	}
+	return errs.ErrNotFound
+}
 func (m *memReviews) AggregateForVendor(_ context.Context, id string) (float64, int, error) {
 	m.mu.Lock()
 	defer m.mu.Unlock()

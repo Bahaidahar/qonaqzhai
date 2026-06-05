@@ -113,6 +113,10 @@ func (f *fakeReviews) ListForVendor(context.Context, string, ports.Page) ([]*dom
 	return nil, nil
 }
 func (f *fakeReviews) FindByBooking(context.Context, string) (*domain.Review, error) { return nil, nil }
+func (f *fakeReviews) Find(context.Context, string) (*domain.Review, error) {
+	return &domain.Review{}, nil
+}
+func (f *fakeReviews) Delete(context.Context, string) error { return f.err }
 func (f *fakeReviews) AggregateForVendor(context.Context, string) (float64, int, error) {
 	return f.avg, f.count, f.err
 }

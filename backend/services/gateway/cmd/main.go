@@ -50,6 +50,10 @@ func main() {
 			paymentProxy.ServeHTTP(w, r)
 		case path == "/api/signup",
 			path == "/api/login",
+			path == "/api/refresh",
+			path == "/api/logout",
+			path == "/api/forgot-password",
+			path == "/api/reset-password",
 			path == "/api/me",
 			path == "/api/admin/users",
 			strings.HasPrefix(path, "/api/admin/users/"),

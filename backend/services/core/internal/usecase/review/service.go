@@ -70,3 +70,24 @@ func (s *Service) Submit(ctx context.Context, callerID, bookingID string, rating
 func (s *Service) ListForVendor(ctx context.Context, vendorID string, p ports.Page) ([]*domain.Review, error) {
 	return s.d.Reviews.ListForVendor(ctx, vendorID, p)
 }
+
+// Delete removes a review (admin moderation) and recomputes the vendor's
+// rating aggregate. Aggregate failures are logged, not fatal.
+func (s *Service) Delete(ctx context.Context, id string) error {
+	rv, err := s.d.Reviews.Find(ctx, id)
+	if err != nil {
+		return err
+	}
+	if err := s.d.Reviews.Delete(ctx, id); err != nil {
+		return err
+	}
+	avg, count, err := s.d.Reviews.AggregateForVendor(ctx, rv.VendorID)
+	if err != nil {
+		s.d.Logger.Warn("rating aggregate failed", "vendor", rv.VendorID, "err", err)
+		return nil
+	}
+	if err := s.d.Vendors.UpdateRating(ctx, rv.VendorID, avg, count); err != nil {
+		s.d.Logger.Warn("rating update failed", "vendor", rv.VendorID, "err", err)
+	}
+	return nil
+}
