@@ -42,14 +42,15 @@ class ApiEndpoints {
   static const String bookings = '/api/bookings';
   static String booking(String id) => '/api/bookings/$id';
   static String startPayment(String id) => '/api/bookings/$id/pay';
-  static String mockPayment(String id) => '/api/bookings/$id/pay/mock';
+  // Backend exposes a single mock-charge endpoint; there is no /pay/mock.
+  static String mockPayment(String id) => '/api/bookings/$id/pay';
 
   // reviews
   static const String reviews = '/api/reviews';
 
   // notifications
   static const String notifications = '/api/notifications';
-  static const String fcmTokens = '/api/notifications/tokens';
+  static const String fcmTokens = '/api/notifications/fcm';
 
   // threads
   static const String threads = '/api/threads';
