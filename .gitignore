@@ -72,3 +72,6 @@ backend/payment
 backend/realtime
 mcp/qonaqzhai-mcp/node_modules/
 mcp/qonaqzhai-mcp/dist/
+
+# deployment secrets
+deploy/.env

@@ -1,0 +1,134 @@
+# Isolated, namespaced deployment. Bring up with:
+#   docker compose -p qonaqzhai --env-file deploy/.env up -d --build
+# Tear down completely (leaves the host's other projects untouched):
+#   docker compose -p qonaqzhai down -v --rmi local
+#
+# Only the gateway (8090) and web (3001) are published; everything else talks
+# over the private qonaqzhai-net network by container name.
+name: qonaqzhai
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: qz-postgres
+    environment:
+      POSTGRES_USER: qonaqzhai
+      POSTGRES_PASSWORD: qonaqzhai
+      POSTGRES_DB: postgres
+    volumes:
+      - qz-pgdata:/var/lib/postgresql/data
+      - ./postgres-init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U qonaqzhai"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    networks: [qz-net]
+
+  auth:
+    image: qonaqzhai-backend
+    build: { context: ../backend }
+    container_name: qz-auth
+    command: ["auth"]
+    environment:
+      AUTH_DATABASE_URL: postgres://qonaqzhai:qonaqzhai@qz-postgres:5432/qonaqzhai_auth?sslmode=disable
+      AUTH_HTTP_ADDR: ":8081"
+      AUTH_GRPC_ADDR: ":9081"
+      JWT_SECRET: ${JWT_SECRET}
+      ADMIN_EMAIL: ${ADMIN_EMAIL}
+      ADMIN_PASSWORD: ${ADMIN_PASSWORD}
+      SMTP_HOST: ${SMTP_HOST:-}
+      SMTP_PORT: ${SMTP_PORT:-}
+      SMTP_USER: ${SMTP_USER:-}
+      SMTP_PASSWORD: ${SMTP_PASS:-}
+    depends_on:
+      postgres: { condition: service_healthy }
+    networks: [qz-net]
+
+  core:
+    image: qonaqzhai-backend
+    container_name: qz-core
+    command: ["core"]
+    environment:
+      CORE_DATABASE_URL: postgres://qonaqzhai:qonaqzhai@qz-postgres:5432/qonaqzhai_core?sslmode=disable
+      CORE_HTTP_ADDR: ":8082"
+      CORE_GRPC_ADDR: ":9082"
+      AUTH_GRPC_ADDR: "qz-auth:9081"
+      PAYMENT_GRPC_ADDR: "qz-payment:9083"
+      REALTIME_GRPC_ADDR: "qz-realtime:9084"
+      GEMINI_API_KEY: ${GEMINI_API_KEY:-}
+      GEMINI_MODEL: ${GEMINI_MODEL:-gemini-2.5-flash}
+    depends_on:
+      postgres: { condition: service_healthy }
+      auth: { condition: service_started }
+    networks: [qz-net]
+
+  payment:
+    image: qonaqzhai-backend
+    container_name: qz-payment
+    command: ["payment"]
+    environment:
+      PAYMENT_DATABASE_URL: postgres://qonaqzhai:qonaqzhai@qz-postgres:5432/qonaqzhai_payment?sslmode=disable
+      PAYMENT_HTTP_ADDR: ":8083"
+      PAYMENT_GRPC_ADDR: ":9083"
+      AUTH_GRPC_ADDR: "qz-auth:9081"
+      CORE_GRPC_ADDR: "qz-core:9082"
+    depends_on:
+      postgres: { condition: service_healthy }
+      auth: { condition: service_started }
+    networks: [qz-net]
+
+  realtime:
+    image: qonaqzhai-backend
+    container_name: qz-realtime
+    command: ["realtime"]
+    environment:
+      REALTIME_DATABASE_URL: postgres://qonaqzhai:qonaqzhai@qz-postgres:5432/qonaqzhai_realtime?sslmode=disable
+      REALTIME_HTTP_ADDR: ":8084"
+      REALTIME_GRPC_ADDR: ":9084"
+      AUTH_GRPC_ADDR: "qz-auth:9081"
+    depends_on:
+      postgres: { condition: service_healthy }
+      auth: { condition: service_started }
+    networks: [qz-net]
+
+  gateway:
+    image: qonaqzhai-backend
+    container_name: qz-gateway
+    command: ["gateway"]
+    environment:
+      GATEWAY_ADDR: ":8080"
+      AUTH_URL: "http://qz-auth:8081"
+      CORE_URL: "http://qz-core:8082"
+      PAYMENT_URL: "http://qz-payment:8083"
+      REALTIME_URL: "http://qz-realtime:8084"
+      CORS_ORIGIN: ${WEB_ORIGIN}
+    ports:
+      - "8090:8080"
+    depends_on:
+      auth: { condition: service_started }
+      core: { condition: service_started }
+      payment: { condition: service_started }
+      realtime: { condition: service_started }
+    networks: [qz-net]
+
+  web:
+    image: qonaqzhai-web
+    build:
+      context: ../frontend
+      args:
+        NEXT_PUBLIC_API_URL: ${PUBLIC_API_URL}
+    container_name: qz-web
+    ports:
+      - "3001:3000"
+    depends_on:
+      gateway: { condition: service_started }
+    networks: [qz-net]
+
+networks:
+  qz-net:
+    name: qonaqzhai-net
+
+volumes:
+  qz-pgdata:
+    name: qonaqzhai-pgdata
