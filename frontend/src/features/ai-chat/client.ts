@@ -45,6 +45,8 @@ function adaptBlock(b: ChatBlockRaw): Block | null {
       return {
         type: "vendors",
         query: String(data.query ?? ""),
+        guests: Number(data.guests ?? 0),
+        eventDate: String(data.eventDate ?? ""),
         items: Array.isArray(data.items)
           ? (data.items as Block extends { type: "vendors"; items: infer I } ? I : never)
           : [],

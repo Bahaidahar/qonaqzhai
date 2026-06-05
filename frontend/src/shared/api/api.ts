@@ -150,9 +150,9 @@ function vendorSearchQuery(params: VendorSearchParams): string {
   if (params.q) q.set("q", params.q);
   if (params.category) q.set("category", params.category);
   if (params.city) q.set("city", params.city);
-  if (params.priceMin != null) q.set("price_min", String(params.priceMin));
-  if (params.priceMax != null) q.set("price_max", String(params.priceMax));
-  if (params.ratingMin != null) q.set("rating_min", String(params.ratingMin));
+  if (params.priceMin != null) q.set("min_price", String(params.priceMin));
+  if (params.priceMax != null) q.set("max_price", String(params.priceMax));
+  if (params.ratingMin != null) q.set("min_rating", String(params.ratingMin));
   if (params.sort) q.set("sort", params.sort);
   if (params.page != null) q.set("page", String(params.page));
   if (params.limit != null) q.set("limit", String(params.limit));
@@ -317,7 +317,7 @@ export const api = {
     });
   },
   payBookingMock(id: string, cardId?: string): Promise<Booking> {
-    return request<Booking>(`/api/bookings/${id}/pay/mock`, {
+    return request<Booking>(`/api/bookings/${id}/pay`, {
       method: "POST",
       body: JSON.stringify(cardId ? { cardId } : {}),
       auth: true,
@@ -381,24 +381,24 @@ export const api = {
     return request<{ items: Service[] | null }>(`/api/vendors/${vendorId}/services`);
   },
   myServices(): Promise<{ items: Service[] | null }> {
-    return request<{ items: Service[] | null }>("/api/vendor/services", { auth: true });
+    return request<{ items: Service[] | null }>("/api/me/vendor/services", { auth: true });
   },
   createService(body: ServiceInput): Promise<Service> {
-    return request<Service>("/api/vendor/services", {
+    return request<Service>("/api/me/vendor/services", {
       method: "POST",
       body: JSON.stringify(body),
       auth: true,
     });
   },
   updateService(id: string, body: ServiceInput): Promise<Service> {
-    return request<Service>(`/api/vendor/services/${id}`, {
+    return request<Service>(`/api/me/vendor/services/${id}`, {
       method: "PATCH",
       body: JSON.stringify(body),
       auth: true,
     });
   },
   deleteService(id: string): Promise<void> {
-    return request<void>(`/api/vendor/services/${id}`, {
+    return request<void>(`/api/me/vendor/services/${id}`, {
       method: "DELETE",
       auth: true,
     });

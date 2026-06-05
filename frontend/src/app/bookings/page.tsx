@@ -72,7 +72,9 @@ function BookingsList() {
     setPayError(null);
     setPayingId(id);
     try {
-      await api.payBookingMock(id);
+      // charge the default card (fall back to the first saved card)
+      const card = cards.find((c) => c.isDefault) ?? cards[0];
+      await api.payBookingMock(id, card?.id);
       await load();
     } catch (e) {
       setPayError(e instanceof Error ? e.message : "payment failed");
@@ -167,7 +169,7 @@ function BookingsList() {
                       </Link>
                     )
                   )}
-                  {b.status === "completed" && (
+                  {(b.status === "completed" || b.status === "paid") && (
                     <Button
                       size="sm"
                       onClick={() =>

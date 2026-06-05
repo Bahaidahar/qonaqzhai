@@ -19,6 +19,10 @@ export interface BudgetBlock {
 export interface VendorsBlock {
   type: "vendors";
   query: string;
+  /** Guest count parsed from the prompt (0 when unknown). */
+  guests?: number;
+  /** ISO event date parsed from the prompt ("" when unknown). */
+  eventDate?: string;
   items: {
     id: string;
     name: string;

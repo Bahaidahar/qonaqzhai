@@ -30,6 +30,8 @@ function adaptRawBlock(raw: { type: string; data: Record<string, unknown> }): Bl
       return {
         type: "vendors",
         query: String(data.query ?? ""),
+        guests: Number(data.guests ?? 0),
+        eventDate: String(data.eventDate ?? ""),
         items: Array.isArray(data.items)
           ? (data.items as Block extends { type: "vendors"; items: infer I } ? I : never)
           : [],
