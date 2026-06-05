@@ -11,14 +11,14 @@ class VendorRepositoryImpl implements VendorRepository {
   final Dio _dio;
 
   Vendor _fromJson(Map<String, dynamic> json) => Vendor(
-        id: json['id'] as String,
-        userId: json['userId'] as String,
-        name: json['name'] as String,
-        category: json['category'] as String,
-        city: json['city'] as String,
+        id: (json['id'] as String?) ?? '',
+        userId: (json['userId'] as String?) ?? '',
+        name: (json['name'] as String?) ?? '',
+        category: (json['category'] as String?) ?? '',
+        city: (json['city'] as String?) ?? '',
         description: (json['description'] as String?) ?? '',
         priceFrom: (json['priceFrom'] as num?)?.toInt() ?? 0,
-        status: json['status'] as String,
+        status: (json['status'] as String?) ?? 'pending',
         ratingAvg: ((json['ratingAvg'] as num?) ?? 0).toDouble(),
         ratingCount: (json['ratingCount'] as num?)?.toInt() ?? 0,
         photoIds: ((json['photoIds'] as List?) ?? const [])

@@ -16,10 +16,10 @@ class UserDto {
   final String status;
 
   factory UserDto.fromJson(Map<String, dynamic> json) => UserDto(
-        id: json['id'] as String,
-        email: json['email'] as String,
+        id: (json['id'] as String?) ?? '',
+        email: (json['email'] as String?) ?? '',
         name: (json['name'] as String?) ?? '',
-        role: json['role'] as String,
+        role: (json['role'] as String?) ?? 'customer',
         status: (json['status'] as String?) ?? 'active',
       );
 
@@ -44,8 +44,9 @@ class AuthResponseDto {
   final UserDto user;
 
   factory AuthResponseDto.fromJson(Map<String, dynamic> json) => AuthResponseDto(
-        accessToken: (json['accessToken'] ?? json['token']) as String,
+        accessToken: ((json['accessToken'] ?? json['token']) as String?) ?? '',
         refreshToken: json['refreshToken'] as String?,
-        user: UserDto.fromJson(json['user'] as Map<String, dynamic>),
+        user: UserDto.fromJson(
+            Map<String, dynamic>.from((json['user'] as Map?) ?? const {})),
       );
 }
