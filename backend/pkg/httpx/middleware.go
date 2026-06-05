@@ -1,7 +1,10 @@
 package httpx
 
 import (
+	"bufio"
+	"errors"
 	"log/slog"
+	"net"
 	"net/http"
 	"strings"
 	"sync"
@@ -68,6 +71,16 @@ type statusWriter struct {
 func (w *statusWriter) WriteHeader(c int) {
 	w.status = c
 	w.ResponseWriter.WriteHeader(c)
+}
+
+// Hijack lets WebSocket upgrades (gorilla) work through the logging wrapper —
+// the gorilla upgrader requires the ResponseWriter to be an http.Hijacker.
+func (w *statusWriter) Hijack() (net.Conn, *bufio.ReadWriter, error) {
+	h, ok := w.ResponseWriter.(http.Hijacker)
+	if !ok {
+		return nil, nil, errors.New("underlying ResponseWriter does not support hijacking")
+	}
+	return h.Hijack()
 }
 
 // RateLimiter throttles requests per key (IP or user id).
